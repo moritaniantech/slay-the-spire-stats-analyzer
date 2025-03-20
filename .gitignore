@@ -70,3 +70,7 @@ run
 .cursor/
 *.tsbuildinfo
 vite.config.d.ts
+
+# Build output
+release/
+dist-electron/
