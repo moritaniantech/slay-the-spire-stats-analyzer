@@ -75,7 +75,7 @@ MIT
 
 ## 作者
 
-moritaniantech <mr.de.cube@gmail.com>
+moritaniantech
 
 ## バグ報告・機能要望
 
