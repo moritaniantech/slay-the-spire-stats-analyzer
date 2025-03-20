@@ -25,6 +25,18 @@ interface SQLiteAPI {
   get: (sql: string, params?: any[]) => Promise<any>;
 }
 
+interface UpdateInfo {
+  version: string;
+  releaseNotes?: string;
+}
+
+interface ProgressInfo {
+  bytesPerSecond: number;
+  percent: number;
+  transferred: number;
+  total: number;
+}
+
 // APIの型定義
 interface ElectronAPI {
   loadRunFiles: (runFolderPath: string) => Promise<Run[]>;
@@ -36,6 +48,12 @@ interface ElectronAPI {
   onLoadProgress: (callback: (progress: LoadProgress) => void) => () => void;
   deleteRun: (run: any) => Promise<void>;
   sqlite: SQLiteAPI;
+  checkForUpdates: () => Promise<void>;
+  startUpdate: () => Promise<void>;
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
+  onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
+  onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void;
+  onUpdateError: (callback: (error: Error) => void) => () => void;
 }
 
 // SQLite APIの実装
@@ -62,6 +80,36 @@ const electronAPI: ElectronAPI = {
   },
   deleteRun: (run) => ipcRenderer.invoke('delete-run', run),
   sqlite: sqliteAPI,
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  startUpdate: () => ipcRenderer.invoke('start-update'),
+  onUpdateAvailable: (callback) => {
+    const handler = (_: any, info: UpdateInfo) => callback(info);
+    ipcRenderer.on('update-available', handler);
+    return () => {
+      ipcRenderer.removeListener('update-available', handler);
+    };
+  },
+  onUpdateProgress: (callback) => {
+    const handler = (_: any, info: ProgressInfo) => callback(info);
+    ipcRenderer.on('download-progress', handler);
+    return () => {
+      ipcRenderer.removeListener('download-progress', handler);
+    };
+  },
+  onUpdateDownloaded: (callback) => {
+    const handler = (_: any, info: UpdateInfo) => callback(info);
+    ipcRenderer.on('update-downloaded', handler);
+    return () => {
+      ipcRenderer.removeListener('update-downloaded', handler);
+    };
+  },
+  onUpdateError: (callback) => {
+    const handler = (_: any, error: Error) => callback(error);
+    ipcRenderer.on('update-error', handler);
+    return () => {
+      ipcRenderer.removeListener('update-error', handler);
+    };
+  },
 };
 
 // APIをウィンドウオブジェクトに公開

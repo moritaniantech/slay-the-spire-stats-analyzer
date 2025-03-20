@@ -21,6 +21,7 @@ import { precalculateCardStats, precalculateRelicStats, clearStatsCache, setCach
 import allCards from "./assets/cards/allCards.json";
 import allRelics from "./assets/relics/relics.json";
 import NeowBonusList from './components/NeowBonusList';
+import UpdateNotification from './components/UpdateNotification';
 
 // グローバル設定変数を定義
 declare global {
@@ -290,7 +291,10 @@ function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-      <main className="pt-32 min-h-screen w-full">{children}</main>
+      <div className="pt-24 pb-8">
+        {children}
+      </div>
+      <UpdateNotification />
     </div>
   );
 }

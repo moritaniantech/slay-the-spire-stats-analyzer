@@ -7,6 +7,7 @@ import type { Dirent } from 'fs';
 import { migrateDatabase } from './database/migrations';
 import Store from 'electron-store';
 import { safeReadFile, safeWriteFile, safeDeleteFile, ensureDirectory } from './utils/fileUtils';
+import { UpdateHandler } from './updater';
 
 // アプリケーション名を設定（最初に設定する必要がある）
 const APP_NAME = 'StS Stats Analyzer';
@@ -290,6 +291,11 @@ async function createWindow() {
 
     return true;
   });
+
+  // アップデートハンドラーの初期化
+  if (app.isPackaged) {
+    new UpdateHandler(mainWindow);
+  }
 
   return mainWindow;
 }
