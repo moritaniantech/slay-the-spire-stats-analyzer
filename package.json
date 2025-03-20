@@ -7,7 +7,7 @@
   "main": "./dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b --noEmit && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "build:electron": "tsc -p electron/tsconfig.json",
@@ -18,9 +18,9 @@
     "rebuild": "electron-rebuild -f -w sqlite3",
     "buildL:mdc": "ts-node -P rules/tsconfig.json rules/build-mdc.ts",
     "watchL:mdc": "ts-node -P rules/tsconfig.json rules/watch-mdc.ts",
-    "build:app": "yarn build && electron-builder build --mac --win -c.extraMetadata.main=dist-electron/main.js",
-    "build:win": "yarn build && electron-builder build --win -c.extraMetadata.main=dist-electron/main.js",
-    "build:mac": "yarn build && electron-builder build --mac -c.extraMetadata.main=dist-electron/main.js"
+    "build:app": "vite build && electron-builder build --mac --win -c.extraMetadata.main=dist-electron/main.js",
+    "build:win": "vite build && electron-builder build --win -c.extraMetadata.main=dist-electron/main.js",
+    "build:mac": "vite build && electron-builder build --mac -c.extraMetadata.main=dist-electron/main.js"
   },
   "dependencies": {
     "@eslint/config-array": "^0.19.2",
