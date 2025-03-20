@@ -2,7 +2,7 @@
   "name": "sts-stats-analyzer",
   "productName": "StS Stats Analyzer",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "commonjs",
   "main": "./dist-electron/main.js",
   "scripts": {
@@ -121,30 +121,39 @@
       ],
       "category": "public.app-category.developer-tools",
       "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
       "extendInfo": {
         "CFBundleDisplayName": "StS Stats Analyzer",
         "CFBundleName": "StS Stats Analyzer",
         "CFBundleIdentifier": "com.moritaniantech.sts-stats-analyzer",
         "LSApplicationCategoryType": "public.app-category.developer-tools"
-      },
-      "extraResources": [
-        {
-          "from": "public/mac/Info.plist",
-          "to": "Info.plist"
-        }
-      ]
+      }
     },
     "win": {
       "icon": "public/icons/icon.png",
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
       ]
     },
-    "linux": {
-      "icon": "public/icons/icon.png",
-      "target": [
-        "AppImage"
-      ]
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "StS Stats Analyzer",
+      "installerIcon": "public/icons/icon.ico",
+      "uninstallerIcon": "public/icons/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "moritaniantech",
+      "repo": "slay-the-spire-stats-analyzer",
+      "private": false,
+      "releaseType": "release"
     }
   }
 }

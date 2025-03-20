@@ -42,9 +42,7 @@ export default defineConfig({
                 },
             },
         ]),
-        renderer({
-            build: function () { return null; },
-        }),
+        renderer(),
     ],
     build: {
         rollupOptions: {
