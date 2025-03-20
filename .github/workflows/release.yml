@@ -27,13 +27,16 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build Electron app
-        run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            yarn build:win
-          else
-            yarn build:mac
-          fi
+      - name: Build Electron app for Windows
+        if: matrix.os == 'windows-latest'
+        run: yarn build:win
+        env:
+          VITE_APP_VERSION: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Electron app for macOS
+        if: matrix.os == 'macos-latest'
+        run: yarn build:mac
         env:
           VITE_APP_VERSION: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
