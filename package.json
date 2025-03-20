@@ -58,6 +58,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.0.0",
     "@electron/rebuild": "^3.7.1",
     "@eslint/js": "^9.22.0",
     "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
@@ -116,6 +117,12 @@
       "dist/**/*",
       "dist-electron/**/*"
     ],
+    "protocols": {
+      "name": "StS Stats Analyzer",
+      "schemes": [
+        "sts-stats-analyzer"
+      ]
+    },
     "win": {
       "target": "nsis",
       "icon": "public/icons/icon.ico"
@@ -124,7 +131,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["arm64", "x64"]
+          "arch": [
+            "arm64",
+            "x64"
+          ]
         }
       ],
       "icon": "public/icons/icon.png",
@@ -135,6 +145,16 @@
       "darkModeSupport": true,
       "identity": null,
       "extendInfo": {
+        "CFBundleIdentifier": "com.momomo.sts-stats-analyzer",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "StS Stats Analyzer",
+            "CFBundleURLSchemes": [
+              "sts-stats-analyzer"
+            ]
+          }
+        ],
+        "LSApplicationCategoryType": "public.app-category.games",
         "NSAppleEventsUsageDescription": "StS Stats Analyzerはゲームのプレイデータを分析するためにファイルアクセスが必要です。",
         "NSMicrophoneUsageDescription": "このアプリはマイクを使用しません。",
         "NSCameraUsageDescription": "このアプリはカメラを使用しません。",
@@ -160,6 +180,7 @@
         "height": 380
       }
     },
+    "afterSign": "scripts/notarize.js",
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
