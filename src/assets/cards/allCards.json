@@ -1,0 +1,3654 @@
+{
+  "cards": [
+    {
+      "name": "Battle Hymn",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "At the start of each turn, add a Smite into your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. At the start of each turn, add a Smite into your hand."
+    },
+    {
+      "name": "Carve Reality",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 6 damage. Add a Smite into your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. Add a Smite into your hand."
+    },
+    {
+      "name": "Collect",
+      "cost": "X",
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Next turn, add X Miracle+ into your hand. Exhaust.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Next turn, add X+1 Miracle+ into your hand. Exhaust."
+    },
+    {
+      "name": "Conclude",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 12 damage to ALL enemies. End your turn.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 16 damage to ALL enemies. End your turn."
+    },
+    {
+      "name": "Deceive Reality",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 4 Block. Add a Safety into your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 7 Block. Add a Safety into your hand."
+    },
+    {
+      "name": "Empty Mind",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Draw 2 cards. Exit your Stance.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Draw 3 cards. Exit your Stance."
+    },
+    {
+      "name": "Fasting",
+      "cost": 2,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 3 Strength and 3 Dexterity. At the start of your turn, gain 1 less Energy.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 4 Strength and 4 Dexterity. At the start of your turn, gain 1 less Energy."
+    },
+    {
+      "name": "Fear No Evil",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 8 damage. If the enemy intends to Attack, enter Calm.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 11 damage. If the enemy intends to Attack, enter Calm."
+    },
+    {
+      "name": "Foreign Influence",
+      "cost": 0,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Choose 1 of 3 random Attack cards from any class to add into your hand. It costs 0 this turn. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Choose 1 of 3 random Attack cards from any class to add into your hand. It costs 0 this turn."
+    },
+    {
+      "name": "Indignation",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Apply 3 Vulnerable to ALL enemies. Enter Wrath.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Apply 5 Vulnerable to ALL enemies. Enter Wrath."
+    },
+    {
+      "name": "Inner Peace",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "If you are in Wrath, draw 3 cards and enter Calm.",
+      "upgradedCost": 1,
+      "upgradedEffect": "If you are in Wrath, draw 4 cards and enter Calm."
+    },
+    {
+      "name": "Like Water",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "At the end of your turn, if you are in Calm, gain 5 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the end of your turn, if you are in Calm, gain 7 Block."
+    },
+    {
+      "name": "Meditate",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Put a card from your discard pile on top of your draw pile. Enter Calm. End your turn.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Put 2 cards from your discard pile on top of your draw pile. Enter Calm. End your turn."
+    },
+    {
+      "name": "Auto-Shields",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "If you have no Block, gain 11 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "If you have no Block, gain 15 Block."
+    },
+    {
+      "name": "Blizzard",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal damage equal to 2 times the number of Frost Channeled this combat to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal damage equal to 3 times the number of Frost Channeled this combat to ALL enemies."
+    },
+    {
+      "name": "Boot Sequence",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Innate. Gain 10 Block. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Innate. Gain 13 Block. Exhaust."
+    },
+    {
+      "name": "Bullseye",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal 8 damage. Apply 2 Lock-On.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 11 damage. Apply 3 Lock-On."
+    },
+    {
+      "name": "Capacitor",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 2 Orb slots.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 3 Orb slots."
+    },
+    {
+      "name": "Chill",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Channel 1 Frost for each enemy in combat. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Innate. Channel 1 Frost for each enemy in combat. Exhaust."
+    },
+    {
+      "name": "Defragment",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 1 Focus.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 2 Focus."
+    },
+    {
+      "name": "Doom and Gloom",
+      "cost": 2,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal 10 damage to ALL enemies. Channel 1 Dark.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 14 damage to ALL enemies. Channel 1 Dark."
+    },
+    {
+      "name": "Double Energy",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Double your Energy. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Double your Energy. Exhaust."
+    },
+    {
+      "name": "Equilibrium",
+      "cost": 2,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 13 Block. Retain your hand this turn.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 16 Block. Retain your hand this turn."
+    },
+    {
+      "name": "FTL",
+      "cost": 0,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal 5 damage. If you have played less than 3 cards this turn, draw 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 6 damage. If you have played less than 4 cards this turn, draw 1 card."
+    },
+    {
+      "name": "Force Field",
+      "cost": 4,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Costs 1 less Energy for each Power card played this combat. Gain 12 Block.",
+      "upgradedCost": 4,
+      "upgradedEffect": "Costs 1 less Energy for each Power card played this combat. Gain 16 Block."
+    },
+    {
+      "name": "Fusion",
+      "cost": 2,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Channel 1 Plasma.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Channel 1 Plasma."
+    },
+    {
+      "name": "Genetic Algorithm",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 1 Block. Permanently increase this card's Block by 2. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 1 Block. Permanently increase this card's Block by 3. Exhaust."
+    },
+    {
+      "name": "Glacier",
+      "cost": 2,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 7 Block. Channel 2 Frost.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 10 Block. Channel 2 Frost."
+    },
+    {
+      "name": "Heatsinks",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Whenever you play a Power card, draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you play a Power card, draw 2 cards."
+    },
+    {
+      "name": "Hello World",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "At the start of your turn, add a random Common card into your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. At the start of your turn, add a random Common card into your hand."
+    },
+    {
+      "name": "A Thousand Cuts",
+      "cost": 2,
+      "type": "power",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Whenever you play a card, deal 1 damage to ALL enemies.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Whenever you play a card, deal 2 damage to ALL enemies."
+    },
+    {
+      "name": "Adrenaline",
+      "cost": 0,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Gain 1 Energy. Draw 2 cards. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 2 Energy. Draw 2 cards. Exhaust."
+    },
+    {
+      "name": "After Image",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Whenever you play a card, gain 1 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. Whenever you play a card, gain 1 Block."
+    },
+    {
+      "name": "Bullet Time",
+      "cost": 3,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "You cannot draw additional cards this turn. Reduce the cost of all cards in your hand to 0 this turn.",
+      "upgradedCost": 2,
+      "upgradedEffect": "You cannot draw additional cards this turn. Reduce the cost of all cards in your hand to 0 this turn."
+    },
+    {
+      "name": "Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "basic",
+      "effect": "Deal 6 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage."
+    },
+    {
+      "name": "Defend",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "basic",
+      "effect": "Gain 5 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block."
+    },
+    {
+      "name": "Bash",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "basic",
+      "effect": "Deal 8 damage. Apply 2 Vulnerable.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 10 damage. Apply 3 Vulnerable."
+    },
+    {
+      "name": "Demon Form",
+      "cost": 3,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "At the start of each turn, gain 2 Strength.",
+      "upgradedCost": 3,
+      "upgradedEffect": "At the start of each turn, gain 3 Strength."
+    },
+    {
+      "name": "Neutralize",
+      "cost": 0,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "basic",
+      "effect": "Deal 3 damage. Apply 1 Weak.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 4 damage. Apply 2 Weak."
+    },
+    {
+      "name": "Survivor",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "basic",
+      "effect": "Gain 8 Block. Discard 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 11 Block. Discard 1 card."
+    },
+    {
+      "name": "Wraith Form",
+      "cost": 3,
+      "type": "power",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Gain 2 Intangible. At the end of your turn, lose 1 Dexterity.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Gain 3 Intangible. At the end of your turn, lose 1 Dexterity."
+    },
+    {
+      "name": "Zap",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "basic",
+      "effect": "Channel 1 Lightning.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Channel 1 Lightning."
+    },
+    {
+      "name": "Dualcast",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "basic",
+      "effect": "Evoke your next Orb twice.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Evoke your next Orb twice."
+    },
+    {
+      "name": "Echo Form",
+      "cost": 3,
+      "type": "power",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Ethereal. The first card you play each turn is played twice.",
+      "upgradedCost": 3,
+      "upgradedEffect": "The first card you play each turn is played twice."
+    },
+    {
+      "name": "Eruption",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "basic",
+      "effect": "Deal 9 damage. Enter Wrath.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage. Enter Wrath."
+    },
+    {
+      "name": "Vigilance",
+      "cost": 2,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "basic",
+      "effect": "Gain 8 Block. Enter Calm.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 12 Block. Enter Calm."
+    },
+    {
+      "name": "Deva Form",
+      "cost": 3,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "At the start of your turn, gain Energy and increase this gain by 1.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Innate. At the start of your turn, gain Energy and increase this gain by 1."
+    },
+    {
+      "name": "Apparition",
+      "cost": 1,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Gain 1 Intangible. Exhaust. Ethereal.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 1 Intangible. Exhaust."
+    },
+    {
+      "name": "Beta",
+      "cost": 2,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Shuffle an Omega into your draw pile. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Shuffle an Omega into your draw pile. Exhaust."
+    },
+    {
+      "name": "Omega",
+      "cost": 3,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "At the start of your turn, deal 50 damage to ALL enemies.",
+      "upgradedCost": 3,
+      "upgradedEffect": "At the start of your turn, deal 60 damage to ALL enemies."
+    },
+    {
+      "name": "Insight",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Retain. Draw 2 cards.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Retain. Draw 3 cards."
+    },
+    {
+      "name": "J.A.X.",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Lose 3 HP. Gain 2 Strength.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Lose 3 HP. Gain 3 Strength."
+    },
+    {
+      "name": "Safety",
+      "cost": 1,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Retain. Gain 12 Block. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Retain. Gain 16 Block. Exhaust."
+    },
+    {
+      "name": "Shiv",
+      "cost": 0,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Deal 4 damage. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 6 damage. Exhaust."
+    },
+    {
+      "name": "Bite",
+      "cost": 1,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Deal 7 damage. Heal 2 HP.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage. Heal 3 HP."
+    },
+    {
+      "name": "Regret",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. At the end of your turn, lose HP equal to the number of cards in your hand."
+    },
+    {
+      "name": "Pain",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. While in hand, lose 1 HP whenever you play another card."
+    },
+    {
+      "name": "Anger",
+      "cost": 0,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 6 damage. Add a copy of this card to your discard pile.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 8 damage. Add a copy of this card to your discard pile."
+    },
+    {
+      "name": "Armaments",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Gain 5 Block. Upgrade a card in your hand for the rest of combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 5 Block. Upgrade ALL cards in your hand for the rest of combat."
+    },
+    {
+      "name": "Battle Trance",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Draw 3 cards. You cannot draw additional cards this turn.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 4 cards. You cannot draw additional cards this turn."
+    },
+    {
+      "name": "Shockwave",
+      "cost": 2,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Apply 3 Weak and Vulnerable to ALL enemies. Exhaust",
+      "upgradedCost": 2,
+      "upgradedEffect": "Apply 5 Weak and Vulnerable to ALL enemies. Exhaust"
+    },
+    {
+      "name": "Searing Blow",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 12 damage can be Upgraded any number of times.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 16 damage can be Upgraded any number of times."
+    },
+    {
+      "name": "Body Slam",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal damage equal to your Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal damage equal to your Block."
+    },
+    {
+      "name": "Clash",
+      "cost": 0,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Can only be played if every card in your hand is an Attack. Deal 14 damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Can only be played if every card in your hand is an Attack. Deal 18 damage."
+    },
+    {
+      "name": "Cleave",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 8 damage to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 11 damage to ALL enemies."
+    },
+    {
+      "name": "Clothesline",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 12 damage. Apply 2 Weak.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 14 damage. Apply 3 Weak."
+    },
+    {
+      "name": "Flex",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Gain 2 Strength. At the end of this turn, lose 2 Strength.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 4 Strength. At the end of this turn, lose 4 Strength."
+    },
+    {
+      "name": "Havoc",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Play the top card of your draw pile and Exhaust it.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Play the top card of your draw pile and Exhaust it."
+    },
+    {
+      "name": "Headbutt",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 9 damage. Put a card from your discard pile on top of your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 12 damage. Put a card from your discard pile on top of your draw pile."
+    },
+    {
+      "name": "Heavy Blade",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 14 damage. Strength affects this card 3 times.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 14 damage. Strength affects this card 5 times."
+    },
+    {
+      "name": "Iron Wave",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Gain 5 Block. Deal 5 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 7 Block. Deal 7 damage."
+    },
+    {
+      "name": "Metallicize",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "At the end of your turn, gain 3 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the end of your turn, gain 4 Block."
+    },
+    {
+      "name": "Power Through",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Add 2 Wounds into your hand. Gain 15 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Add 2 Wounds into your hand. Gain 20 Block."
+    },
+    {
+      "name": "Perfected Strike",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 6 damage. Deals 2 additional damage for ALL your cards containing \"Strike\".",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 6 damage. Deals 3 additional damage for ALL your cards containing \"Strike\"."
+    },
+    {
+      "name": "Pommel Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 9 damage. Draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. Draw 2 cards."
+    },
+    {
+      "name": "Pummel",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 2 damge 4 times. Exchaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 2 damge 5 times. Exchaust."
+    },
+    {
+      "name": "Rage",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Whenever you play an Attack this turn, gain 3 Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Whenever you play an Attack this turn, gain 4 Block."
+    },
+    {
+      "name": "Rampage",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 8 damage. Increse this card's damage by 5 this combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage. Increse this card's damage by 8 this combat."
+    },
+    {
+      "name": "Reckless Charge",
+      "cost": 0,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 7 damage. Shuffle a Dazed into your draw pile.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 10 damage. Shuffle a Dazed into your draw pile."
+    },
+    {
+      "name": "Rupture",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Whenever you lose HP from a card gain 1 Strength.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you lose HP from a card gain 2 Strength."
+    },
+    {
+      "name": "Second Wind",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Exchaust all non-Attack cards in your hand. Gain 5 Block for each card Exhausted",
+      "upgradedCost": 1,
+      "upgradedEffect": "Exchaust all non-Attack cards in your hand. Gain 7 Block for each card Exhausted"
+    },
+    {
+      "name": "Seeing Red",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Gain 2 Energy. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 2 Energy. Exhaust."
+    },
+    {
+      "name": "Spot Weakness",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "If the enemy intends to attack, gain 3 Strength.",
+      "upgradedCost": 0,
+      "upgradedEffect": "If the enemy intends to attack, gain 4 Strength."
+    },
+    {
+      "name": "Whirlwind",
+      "cost": "X",
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 5 damage to ALL enemies X times.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Deal 8 damage to ALL enemies X times."
+    },
+    {
+      "name": "Sword Boomerang",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 3 damage to a random enemy 3 times.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 3 damage to a random enemy 4 times."
+    },
+    {
+      "name": "Sentinel",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Gain 5 Block. If this card is Exhausted, gain 2 Energy.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block. If this card is Exhausted, gain 3 Energy."
+    },
+    {
+      "name": "Thunderclap",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 4 damage and apply 1 Vulnerable to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 7 damage and apply 1 Vulnerable to ALL enemies."
+    },
+    {
+      "name": "Sever Soul",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Exhaust all non-Attack cards in your hand. Deal 16 damage.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Exhaust all non-Attack cards in your hand. Deal 22 damage."
+    },
+    {
+      "name": "True Grit",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Gain 7 Block. Exhaust a random card in your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 9 Block. Exhaust a card in your hand."
+    },
+    {
+      "name": "Uppercut",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 13 damage Apply 1 Weak. Apply 1 Vulnerable.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 13 damage Apply 2 Weak. Apply 2 Vulnerable."
+    },
+    {
+      "name": "Twin Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Deal 5 damage twice.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 7 damage twice."
+    },
+    {
+      "name": "Warcry",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Draw 1 card. Put a card from your hand on top of your draw pile. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 2 cards. Put a card from your hand on top of your draw pile. Exhaust."
+    },
+    {
+      "name": "Wild Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 12 damage. Shuffle a Wound into your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 17 damage. Shuffle a Wound into your draw pile."
+    },
+    {
+      "name": "Shrug It Off",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "common",
+      "effect": "Gain 8 Block. Draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 11 Block. Draw 1 cards."
+    },
+    {
+      "name": "Blood for Blood",
+      "cost": 4,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Costs 1 less Energy for each time you lose HP in combat. Deal 18 damage.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Costs 1 less Energy for each time you lose HP in combat. Deal 22 damage."
+    },
+    {
+      "name": "Bloodletting",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Lose 3 HP. Gain 2 Energy.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Lose 3 HP. Gain 3 Energy."
+    },
+    {
+      "name": "Burning Pact",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Exhaust 1 card. Draw 2 cards.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Exhaust 1 card. Draw 3 cards."
+    },
+    {
+      "name": "Carnage",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Ethereal. Deal 20 damage.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Ethereal. Deal 28 damage."
+    },
+    {
+      "name": "Combust",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "At the end of your turn, lose 1 HP and deal 5 damage to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the end of your turn, lose 1 HP and deal 7 damage to ALL enemies."
+    },
+    {
+      "name": "Dark Embrace",
+      "cost": 2,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Whenever a card is Exhausted, draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever a card is Exhausted, draw 1 card."
+    },
+    {
+      "name": "Disarm",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Enemy loses 2 Strength. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Enemy loses 3 Strength. Exhaust."
+    },
+    {
+      "name": "Dropkick",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Deal 5 damage. If the enemy has Vulnerable, gain 1 Energy and draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage. If the enemy has Vulnerable, gain 1 Energy and draw 1 card."
+    },
+    {
+      "name": "Dual Wield",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Create a copy of an Attack or Power card in your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Create 2 copies of an Attack or Power card in your hand."
+    },
+    {
+      "name": "Entrench",
+      "cost": 2,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Double your current Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Double your current Block."
+    },
+    {
+      "name": "Evolve",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Whenever you draw a Status card, draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you draw a Status card, draw 2 cards."
+    },
+    {
+      "name": "Feel No Pain",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Whenever a card is Exhausted, gain 3 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever a card is Exhausted, gain 4 Block."
+    },
+    {
+      "name": "Fire Breathing",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Whenever you draw a Status or Curse card, deal 6 damage to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you draw a Status or Curse card, deal 10 damage to ALL enemies."
+    },
+    {
+      "name": "Flame Barrier",
+      "cost": 2,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Gain 12 Block. Whenever you are attacked this turn, deal 4 damage back.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 16 Block. Whenever you are attacked this turn, deal 6 damage back."
+    },
+    {
+      "name": "Ghostly Armor",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Ethereal. Gain 10 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Ethereal. Gain 13 Block."
+    },
+    {
+      "name": "Hemokinesis",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Lose 2 HP. Deal 15 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Lose 2 HP. Deal 20 damage."
+    },
+    {
+      "name": "Infernal Blade",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Add a random Attack card to your hand. It costs 0 this turn. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Add a random Attack card to your hand. It costs 0 this turn. Exhaust."
+    },
+    {
+      "name": "Inflame",
+      "cost": 1,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Gain 2 Strength.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 3 Strength."
+    },
+    {
+      "name": "Intimidate",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "uncommon",
+      "effect": "Apply 1 Weak to ALL enemies. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Apply 2 Weak to ALL enemies. Exhaust."
+    },
+    {
+      "name": "Barricade",
+      "cost": 3,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Block is not removed at the start of your turn.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Block is not removed at the start of your turn."
+    },
+    {
+      "name": "Berserk",
+      "cost": 0,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Gain 2 Vulnerable. At the start of your turn, gain 1 Energy.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 1 Vulnerable. At the start of your turn, gain 1 Energy."
+    },
+    {
+      "name": "Bludgeon",
+      "cost": 3,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Deal 32 damage.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Deal 42 damage."
+    },
+    {
+      "name": "Brutality",
+      "cost": 0,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "At the start of your turn, lose 1 HP and draw 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Innate. At the start of your turn, lose 1 HP and draw 1 card."
+    },
+    {
+      "name": "Corruption",
+      "cost": 3,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Skills cost 0. Whenever you play a Skill, Exhaust it.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Skills cost 0. Whenever you play a Skill, Exhaust it."
+    },
+    {
+      "name": "Double Tap",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "This turn, your next Attack is played twice.",
+      "upgradedCost": 1,
+      "upgradedEffect": "This turn, your next 2 Attacks are played twice."
+    },
+    {
+      "name": "Exhume",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Put a card from your exhaust pile into your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put a card from your exhaust pile into your hand. Exhaust."
+    },
+    {
+      "name": "Feed",
+      "cost": 1,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Deal 10 damage. If Fatal, raise your Max HP by 3. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 12 damage. If Fatal, raise your Max HP by 4. Exhaust."
+    },
+    {
+      "name": "Fiend Fire",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Exhaust your hand. Deal 7 damage for each card Exhausted. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Exhaust your hand. Deal 10 damage for each card Exhausted. Exhaust."
+    },
+    {
+      "name": "Immolate",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Deal 21 damage to ALL enemies. Add a Burn to your discard pile.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 28 damage to ALL enemies. Add a Burn to your discard pile."
+    },
+    {
+      "name": "Impervious",
+      "cost": 2,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Gain 30 Block. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 40 Block. Exhaust."
+    },
+    {
+      "name": "Juggernaut",
+      "cost": 2,
+      "type": "power",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Whenever you gain Block, deal 5 damage to a random enemy.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Whenever you gain Block, deal 7 damage to a random enemy."
+    },
+    {
+      "name": "Limit Break",
+      "cost": 1,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Double your Strength. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Double your Strength."
+    },
+    {
+      "name": "Offering",
+      "cost": 0,
+      "type": "skill",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Lose 6 HP. Gain 2 Energy. Draw 3 cards. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Lose 6 HP. Gain 2 Energy. Draw 5 cards. Exhaust."
+    },
+    {
+      "name": "Reaper",
+      "cost": 2,
+      "type": "attack",
+      "class": "ironclad",
+      "rarity": "rare",
+      "effect": "Deal 4 damage to ALL enemies. Heal HP equal to unblocked damage. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 5 damage to ALL enemies. Heal HP equal to unblocked damage. Exhaust."
+    },
+    {
+      "name": "Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "basic",
+      "effect": "Deal 6 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage."
+    },
+    {
+      "name": "Defend",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "basic",
+      "effect": "Gain 5 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block."
+    },
+    {
+      "name": "Acrobatics",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Draw 3 cards. Discard 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Draw 4 cards. Discard 1 card."
+    },
+    {
+      "name": "Backflip",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Gain 5 Block. Draw 2 cards.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block. Draw 2 cards."
+    },
+    {
+      "name": "Finisher",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 6 damage for each Attack played this turn.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage for each Attack played this turn."
+    },
+    {
+      "name": "Flechettes",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 4 damage for each Skill in your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 6 damage for each Skill in your hand."
+    },
+    {
+      "name": "Blade Dance",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Add 3 Shivs to your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Add 4 Shivs to your hand."
+    },
+    {
+      "name": "Bane",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 7 damage. If the enemy has Poison, deal 7 damage again.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. If the enemy has Poison, deal 10 damage again."
+    },
+    {
+      "name": "Dagger Spray",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 4 damage to ALL enemies twice.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 6 damage to ALL enemies twice."
+    },
+    {
+      "name": "Dagger Throw",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 9 damage. Draw 1 card. Discard 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 12 damage. Draw 1 card. Discard 1 card."
+    },
+    {
+      "name": "Deadly Poison",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Apply 5 Poison.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Apply 7 Poison."
+    },
+    {
+      "name": "Deflect",
+      "cost": 0,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Gain 4 Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 7 Block."
+    },
+    {
+      "name": "Dodge and Roll",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Gain 4 Block. Next turn, gain 4 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 6 Block. Next turn, gain 6 Block."
+    },
+    {
+      "name": "Flying Knee",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 8 damage. Next turn, gain 1 Energy.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 11 damage. Next turn, gain 1 Energy."
+    },
+    {
+      "name": "Outmaneuver",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Next turn, gain 2 Energy.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Next turn, gain 3 Energy."
+    },
+    {
+      "name": "Piercing Wail",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "ALL enemies lose 6 Strength this turn. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "ALL enemies lose 8 Strength this turn. Exhaust."
+    },
+    {
+      "name": "Poisoned Stab",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 6 damage. Apply 3 Poison.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage. Apply 4 Poison."
+    },
+    {
+      "name": "Prepared",
+      "cost": 0,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Draw 1 card. Discard 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 2 cards. Discard 2 cards."
+    },
+    {
+      "name": "Quick Slash",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 8 damage. Draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 12 damage. Draw 1 card."
+    },
+    {
+      "name": "Slice",
+      "cost": 0,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 6 damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 9 damage."
+    },
+    {
+      "name": "Sneaky Strike",
+      "cost": 2,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 12 damage. If you have discarded a card this turn, gain 2 Energy.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 16 damage. If you have discarded a card this turn, gain 2 Energy."
+    },
+    {
+      "name": "Sucker Punch",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "common",
+      "effect": "Deal 7 damage. Apply 1 Weak.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage. Apply 2 Weak."
+    },
+    {
+      "name": "Accuracy",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Shivs deal 4 additional damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Shivs deal 6 additional damage."
+    },
+    {
+      "name": "All-Out Attack",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 10 damage to ALL enemies. Discard 1 card at random.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 14 damage to ALL enemies. Discard 1 card at random."
+    },
+    {
+      "name": "Backstab",
+      "cost": 0,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Innate. Deal 11 damage. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Innate. Deal 15 damage. Exhaust."
+    },
+    {
+      "name": "Blur",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Gain 5 Block. Block is not removed at the start of your next turn.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block. Block is not removed at the start of your next turn."
+    },
+    {
+      "name": "Bouncing Flask",
+      "cost": 2,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Apply 3 Poison to a random enemy 3 times.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Apply 3 Poison to a random enemy 4 times."
+    },
+    {
+      "name": "Calculated Gamble",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Discard your hand, then draw that many cards. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Discard your hand, then draw that many cards."
+    },
+    {
+      "name": "Caltrops",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Whenever you are attacked, deal 3 damage back.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you are attacked, deal 5 damage back."
+    },
+    {
+      "name": "Catalyst",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Double the enemy's Poison. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Triple the enemy's Poison. Exhaust."
+    },
+    {
+      "name": "Choke",
+      "cost": 2,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 12 damage. Whenever you play a card this turn, the enemy loses 3 HP.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 12 damage. Whenever you play a card this turn, the enemy loses 5 HP."
+    },
+    {
+      "name": "Concentrate",
+      "cost": 0,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Discard 3 cards. Gain 2 Energy.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Discard 2 cards. Gain 2 Energy."
+    },
+    {
+      "name": "Crippling Cloud",
+      "cost": 2,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Apply 4 Poison and 2 Weak to ALL enemies. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Apply 7 Poison and 2 Weak to ALL enemies. Exhaust."
+    },
+    {
+      "name": "Distraction",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Add a random Skill to your hand. It costs 0 this turn. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Add a random Skill to your hand. It costs 0 this turn. Exhaust."
+    },
+    {
+      "name": "Endless Agony",
+      "cost": 0,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 4 damage. When you draw this card, add a copy of it to your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 6 damage. When you draw this card, add a copy of it to your hand. Exhaust."
+    },
+    {
+      "name": "Escape Plan",
+      "cost": 0,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Draw 1 card. If you draw a Skill, gain 3 Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 1 card. If you draw a Skill, gain 5 Block."
+    },
+    {
+      "name": "Eviscerate",
+      "cost": 3,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Costs 1 less Energy for each card discarded this turn. Deal 7 damage 3 times.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Costs 1 less Energy for each card discarded this turn. Deal 9 damage 3 times."
+    },
+    {
+      "name": "Expertise",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Draw cards until you have 6 in your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Draw cards until you have 7 in your hand."
+    },
+    {
+      "name": "Footwork",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Gain 2 Dexterity.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 3 Dexterity."
+    },
+    {
+      "name": "Heel Hook",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 5 damage. If the enemy has Weak, gain 1 Energy and draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage. If the enemy has Weak, gain 1 Energy and draw 1 card."
+    },
+    {
+      "name": "Infinite Blades",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "At the start of your turn, add a Shiv to your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. At the start of your turn, add a Shiv to your hand."
+    },
+    {
+      "name": "Leg Sweep",
+      "cost": 2,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Apply 2 Weak. Gain 11 Block.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Apply 3 Weak. Gain 14 Block."
+    },
+    {
+      "name": "Masterful Stab",
+      "cost": 0,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Costs 1 additional Energy for each time you lose HP this combat. Deal 12 damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Costs 1 additional Energy for each time you lose HP this combat. Deal 16 damage."
+    },
+    {
+      "name": "Noxious Fumes",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "At the start of your turn, apply 2 Poison to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of your turn, apply 3 Poison to ALL enemies."
+    },
+    {
+      "name": "Predator",
+      "cost": 2,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 15 damage. Next turn, draw 2 additional cards.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 20 damage. Next turn, draw 2 additional cards."
+    },
+    {
+      "name": "Reflex",
+      "cost": -1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Unplayable. If this card is discarded from your hand, draw 2 cards.",
+      "upgradedCost": -1,
+      "upgradedEffect": "Unplayable. If this card is discarded from your hand, draw 3 cards."
+    },
+    {
+      "name": "Riddle With Holes",
+      "cost": 2,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 3 damage 5 times.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 4 damage 5 times."
+    },
+    {
+      "name": "Setup",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Put a card from your hand on top of your draw pile. It costs 0 until played.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put a card from your hand on top of your draw pile. It costs 0 until played."
+    },
+    {
+      "name": "Skewer",
+      "cost": "X",
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Deal 7 damage X times.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Deal 10 damage X times."
+    },
+    {
+      "name": "Tactician",
+      "cost": -1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Unplayable. If this card is discarded from your hand, gain 1 Energy.",
+      "upgradedCost": -1,
+      "upgradedEffect": "Unplayable. If this card is discarded from your hand, gain 2 Energy."
+    },
+    {
+      "name": "Terror",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Apply 99 Vulnerable. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Apply 99 Vulnerable. Exhaust."
+    },
+    {
+      "name": "Well-Laid Plans",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "At the end of your turn, retain up to 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the end of your turn, retain up to 2 cards."
+    },
+    {
+      "name": "Burst",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "This turn, your next Skill is played twice.",
+      "upgradedCost": 1,
+      "upgradedEffect": "This turn, your next 2 Skills are played twice."
+    },
+    {
+      "name": "Corpse Explosion",
+      "cost": 2,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Apply 6 Poison. When the enemy dies, deal damage equal to its Max HP to ALL enemies.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Apply 9 Poison. When the enemy dies, deal damage equal to its Max HP to ALL enemies."
+    },
+    {
+      "name": "Die Die Die",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Deal 13 damage to ALL enemies. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 17 damage to ALL enemies. Exhaust."
+    },
+    {
+      "name": "Doppelganger",
+      "cost": "X",
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Next turn, draw X cards and gain X Energy. Exhaust.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Next turn, draw X+1 cards and gain X+1 Energy. Exhaust."
+    },
+    {
+      "name": "Envenom",
+      "cost": 2,
+      "type": "power",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Whenever an Attack deals unblocked damage, apply 1 Poison.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever an Attack deals unblocked damage, apply 1 Poison."
+    },
+    {
+      "name": "Glass Knife",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Deal 8 damage twice. Decrease the damage of this card by 2 this combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 12 damage twice. Decrease the damage of this card by 2 this combat."
+    },
+    {
+      "name": "Grand Finale",
+      "cost": 0,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Can only be played if your draw pile is empty. Deal 50 damage to ALL enemies.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Can only be played if your draw pile is empty. Deal 60 damage to ALL enemies."
+    },
+    {
+      "name": "Malaise",
+      "cost": "X",
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Enemy loses X Strength. Apply X Weak. Exhaust.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Enemy loses X+1 Strength. Apply X+1 Weak. Exhaust."
+    },
+    {
+      "name": "Nightmare",
+      "cost": 3,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Choose a card. Next turn, add 3 copies of that card into your hand. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Choose a card. Next turn, add 3 copies of that card into your hand. Exhaust."
+    },
+    {
+      "name": "Phantasmal Killer",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Next turn, your Attacks deal double damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Next turn, your Attacks deal double damage."
+    },
+    {
+      "name": "Storm of Steel",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Discard your hand. Add 1 Shiv to your hand for each card discarded.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Discard your hand. Add 1 Shiv+ to your hand for each card discarded."
+    },
+    {
+      "name": "Tools of the Trade",
+      "cost": 1,
+      "type": "power",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "At the start of your turn, draw 1 card and discard 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "At the start of your turn, draw 1 card and discard 1 card."
+    },
+    {
+      "name": "Alchemize",
+      "cost": 1,
+      "type": "skill",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Obtain a random potion. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Obtain a random potion. Exhaust."
+    },
+    {
+      "name": "Unload",
+      "cost": 1,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "rare",
+      "effect": "Deal 14 damage. Discard all non-Attack cards in your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 18 damage. Discard all non-Attack cards in your hand."
+    },
+    {
+      "name": "Dash",
+      "cost": 2,
+      "type": "attack",
+      "class": "silent",
+      "rarity": "uncommon",
+      "effect": "Gain 10 Block. Deal 10 damage.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 13 Block. Deal 13 damage."
+    },
+    {
+      "name": "Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "basic",
+      "effect": "Deal 6 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage."
+    },
+    {
+      "name": "Defend",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "basic",
+      "effect": "Gain 5 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block."
+    },
+    {
+      "name": "Ball Lightning",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 7 damage. Channel 1 Lightning.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. Channel 1 Lightning."
+    },
+    {
+      "name": "Beam Cell",
+      "cost": 0,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 3 damage. Apply 1 Vulnerable.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 4 damage. Apply 2 Vulnerable."
+    },
+    {
+      "name": "Charge Battery",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Gain 7 Block. Next turn: Gain 1 Energy.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 10 Block. Next turn: Gain 1 Energy."
+    },
+    {
+      "name": "Aggregate",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain Energy for every 4 cards in your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain Energy for every 3 cards in your draw pile."
+    },
+    {
+      "name": "Claw",
+      "cost": 0,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 3 damage. Increse the damage of ALL Claw cards by 2 this combat.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 5 damage. Increse the damage of ALL Claw cards by 2 this combat."
+    },
+    {
+      "name": "Barrage",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 4 damage for each Channeled Orb.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 6 damage for each Channeled Orb."
+    },
+    {
+      "name": "Consume",
+      "cost": 2,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 2 Focus. Lose 1 Orb slot.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 3 Focus. Lose 1 Orb slot."
+    },
+    {
+      "name": "Darkness",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Channel 1 Dark.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Channel 1 Dark. Trigger the passive ability of all Dark orbs."
+    },
+    {
+      "name": "Cold Snap",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 6 damage. Channel 1 Frost.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage. Channel 1 Frost."
+    },
+    {
+      "name": "Compile Driver",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 7 damage. Draw 1 card for each unique Orb you have.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. Draw 1 card for each unique Orb you have."
+    },
+    {
+      "name": "Coolheaded",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Channel 1 Frost. Draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Channel 1 Frost. Draw 2 cards."
+    },
+    {
+      "name": "Go for the Eyes",
+      "cost": 0,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 3 damage. If the enemy intends to attack, apply 1 Weak.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 4 damage. If the enemy intends to attack, apply 2 Weak."
+    },
+    {
+      "name": "Hologram",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Gain 3 Block. Put a card from your discard pile into your hand. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 5 Block. Put a card from your discard pile into your hand."
+    },
+    {
+      "name": "Leap",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Gain 9 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 12 Block."
+    },
+    {
+      "name": "Rebound",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 9 damage. Put the next card you play this turn on top of your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 12 damage. Put the next card you play this turn on top of your draw pile."
+    },
+    {
+      "name": "Recursion",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Evoke your next Orb. Channel the Orb that was just Evoked.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Evoke your next Orb. Channel the Orb that was just Evoked."
+    },
+    {
+      "name": "Stack",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Gain Block equal to the number of cards in your discard pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain Block equal to the number of cards in your discard pile +3."
+    },
+    {
+      "name": "Steam Barrier",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Gain 6 Block. Decrease this card's Block by 1 this combat.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 8 Block. Decrease this card's Block by 1 this combat."
+    },
+    {
+      "name": "Streamline",
+      "cost": 2,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 15 damage. Reduce this card's cost by 1 this combat.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 20 damage. Reduce this card's cost by 1 this combat."
+    },
+    {
+      "name": "Sweeping Beam",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Deal 6 damage to ALL enemies. Draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage to ALL enemies. Draw 1 card."
+    },
+    {
+      "name": "TURBO",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "common",
+      "effect": "Gain 2 Energy. Add a Void into your discard pile.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 3 Energy. Add a Void into your discard pile."
+    },
+    {
+      "name": "Loop",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "At the start of your turn, trigger your next Orb's passive ability.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of your turn, trigger your next Orb's passive ability twice."
+    },
+    {
+      "name": "Melter",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Remove all Block from the enemy. Deal 10 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Remove all Block from the enemy. Deal 14 damage."
+    },
+    {
+      "name": "Overclock",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Draw 2 cards. Add a Burn into your discard pile.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 3 cards. Add a Burn into your discard pile."
+    },
+    {
+      "name": "Recycle",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Exhaust a card. Gain Energy equal to its cost.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Exhaust a card. Gain Energy equal to its cost."
+    },
+    {
+      "name": "Reinforced Body",
+      "cost": "X",
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Gain 7 Block X times.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Gain 9 Block X times."
+    },
+    {
+      "name": "Reprogram",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Lose 1 Focus. Gain 1 Strength. Gain 1 Dexterity.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Lose 2 Focus. Gain 2 Strength. Gain 2 Dexterity."
+    },
+    {
+      "name": "Rip and Tear",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal 7 damage to a random enemy twice.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage to a random enemy twice."
+    },
+    {
+      "name": "Scrape",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal 7 damage. Draw 4 cards. Discard all cards drawn this way that do not cost 0.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. Draw 5 cards. Discard all cards drawn this way that do not cost 0."
+    },
+    {
+      "name": "Self Repair",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "At the end of combat, heal 7 HP.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the end of combat, heal 10 HP."
+    },
+    {
+      "name": "Skim",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Draw 3 cards.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Draw 4 cards."
+    },
+    {
+      "name": "Static Discharge",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Whenever you receive unblocked attack damage, Channel 1 Lightning.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you receive unblocked attack damage, Channel 2 Lightning."
+    },
+    {
+      "name": "Storm",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Whenever you play a Power card, Channel 1 Lightning.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. Whenever you play a Power card, Channel 1 Lightning."
+    },
+    {
+      "name": "Sunder",
+      "cost": 3,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Deal 24 damage. If this kills an enemy, gain 3 Energy.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Deal 32 damage. If this kills an enemy, gain 3 Energy."
+    },
+    {
+      "name": "Tempest",
+      "cost": "X",
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Channel X Lightning. Exhaust.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Channel X+1 Lightning. Exhaust."
+    },
+    {
+      "name": "White Noise",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "uncommon",
+      "effect": "Add a random Power card to your hand. It costs 0 this turn. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Add a random Power card to your hand. It costs 0 this turn. Exhaust."
+    },
+    {
+      "name": "All for One",
+      "cost": 2,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Deal 10 damage. Put all cost 0 cards from your discard pile into your hand.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 14 damage. Put all cost 0 cards from your discard pile into your hand."
+    },
+    {
+      "name": "Amplify",
+      "cost": 1,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "This turn, your next Power card is played twice.",
+      "upgradedCost": 1,
+      "upgradedEffect": "This turn, your next 2 Power cards are played twice."
+    },
+    {
+      "name": "Biased Cognition",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Gain 4 Focus. At the start of your turn, lose 1 Focus.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 5 Focus. At the start of your turn, lose 1 Focus."
+    },
+    {
+      "name": "Buffer",
+      "cost": 2,
+      "type": "power",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Prevent the next time you would lose HP.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Prevent the next 2 times you would lose HP."
+    },
+    {
+      "name": "Core Surge",
+      "cost": 1,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Deal 11 damage. Gain 1 Artifact. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 15 damage. Gain 1 Artifact. Exhaust."
+    },
+    {
+      "name": "Creative AI",
+      "cost": 3,
+      "type": "power",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "At the start of your turn, add a random Power card to your hand.",
+      "upgradedCost": 2,
+      "upgradedEffect": "At the start of your turn, add a random Power card to your hand."
+    },
+    {
+      "name": "Electrodynamics",
+      "cost": 2,
+      "type": "power",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Lightning now hits ALL enemies. Channel 2 Lightning.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Lightning now hits ALL enemies. Channel 3 Lightning."
+    },
+    {
+      "name": "Fission",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Remove all your Orbs. Gain 1 Energy and draw 1 card for each Orb removed. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Evoke all your Orbs. Gain 1 Energy and draw 1 card for each Orb removed. Exhaust."
+    },
+    {
+      "name": "Hyperbeam",
+      "cost": 2,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Deal 26 damage to ALL enemies. Lose 3 Focus.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 34 damage to ALL enemies. Lose 3 Focus."
+    },
+    {
+      "name": "Machine Learning",
+      "cost": 1,
+      "type": "power",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "At the start of your turn, draw 1 additional card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. At the start of your turn, draw 1 additional card."
+    },
+    {
+      "name": "Meteor Strike",
+      "cost": 5,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Deal 24 damage. Channel 3 Plasma.",
+      "upgradedCost": 5,
+      "upgradedEffect": "Deal 30 damage. Channel 3 Plasma."
+    },
+    {
+      "name": "Multi-Cast",
+      "cost": "X",
+      "type": "skill",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Evoke your next Orb X times.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Evoke your next Orb X+1 times."
+    },
+    {
+      "name": "Rainbow",
+      "cost": 2,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Channel 1 Lightning. Channel 1 Frost. Channel 1 Dark. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Channel 1 Lightning. Channel 1 Frost. Channel 1 Dark."
+    },
+    {
+      "name": "Reboot",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Shuffle all your cards into your draw pile. Draw 4 cards. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Shuffle all your cards into your draw pile. Draw 6 cards. Exhaust."
+    },
+    {
+      "name": "Seek",
+      "cost": 0,
+      "type": "skill",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Put 1 card from your draw pile into your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put 2 cards from your draw pile into your hand. Exhaust."
+    },
+    {
+      "name": "Thunder Strike",
+      "cost": 3,
+      "type": "attack",
+      "class": "defect",
+      "rarity": "rare",
+      "effect": "Deal 7 damage to a random enemy for each Lightning channeled this combat.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Deal 9 damage to a random enemy for each Lightning channeled this combat."
+    },
+    {
+      "name": "Strike",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "basic",
+      "effect": "Deal 6 damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage."
+    },
+    {
+      "name": "Defend",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "basic",
+      "effect": "Gain 5 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block."
+    },
+    {
+      "name": "Bowling Bash",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 7 damage for each enemy in combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage for each enemy in combat."
+    },
+    {
+      "name": "Consecrate",
+      "cost": 0,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 5 damage to ALL enemies.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 8 damage to ALL enemies."
+    },
+    {
+      "name": "Crescendo",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Enter Wrath. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Enter Wrath. Exhaust."
+    },
+    {
+      "name": "Crush Joints",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 8 damage. If the last card played this combat was a Skill, apply 1 Vulnerable.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 8 damage. If the last card played this combat was a Skill, apply 2 Vulnerable."
+    },
+    {
+      "name": "Cut Through Fate",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 7 damage. Scry 2. Draw 1 card.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 9 damage. Scry 2. Draw 1 card."
+    },
+    {
+      "name": "Empty Body",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Gain 7 Block. Exit your Stance.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 10 Block. Exit your Stance."
+    },
+    {
+      "name": "Empty Fist",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 9 damage. Exit your Stance.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 14 damage. Exit your Stance."
+    },
+    {
+      "name": "Evaluate",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Gain 6 Block. Shuffle an Insight into your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 8 Block. Shuffle an Insight into your draw pile."
+    },
+    {
+      "name": "Foresight",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "At the start of your turn, Scry 3.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of your turn, Scry 4."
+    },
+    {
+      "name": "Flurry of Blows",
+      "cost": 0,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 4 damage. When you change Stances, return this from the discard pile to your hand.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 6 damage. When you change Stances, return this from the discard pile to your hand."
+    },
+    {
+      "name": "Flying Sleeves",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 4 damage twice. Retain.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 6 damage twice. Retain."
+    },
+    {
+      "name": "Follow-Up",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 7 damage. If the last card played this combat was an Attack, gain 1 Energy.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 11 damage. If the last card played this combat was an Attack, gain 1 Energy."
+    },
+    {
+      "name": "Halt",
+      "cost": 0,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Gain 3 Block. If you are in Wrath, gain 9 additional Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 4 Block. If you are in Wrath, gain 12 additional Block."
+    },
+    {
+      "name": "Just Lucky",
+      "cost": 0,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Scry 1. Gain 2 Block. Deal 3 damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Scry 1. Gain 3 Block. Deal 4 damage."
+    },
+    {
+      "name": "Pressure Points",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Apply 8 Mark. ALL enemies lose HP equal to their Mark.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Apply 11 Mark. ALL enemies lose HP equal to their Mark."
+    },
+    {
+      "name": "Prostrate",
+      "cost": 0,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Gain 2 Mantra. Gain 4 Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 3 Mantra. Gain 4 Block."
+    },
+    {
+      "name": "Protect",
+      "cost": 2,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Gain 12 Block. Retain.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 16 Block. Retain."
+    },
+    {
+      "name": "Sash Whip",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Deal 8 damage. If the last card played this combat was an Attack, apply 1 Weak.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 10 damage. If the last card played this combat was an Attack, apply 2 Weak."
+    },
+    {
+      "name": "Third Eye",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Gain 7 Block. Scry 3.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 9 Block. Scry 5."
+    },
+    {
+      "name": "Tranquility",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "common",
+      "effect": "Enter Calm. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Retain. Enter Calm. Exhaust."
+    },
+    {
+      "name": "Mental Fortress",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Whenever you change Stances, gain 4 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you change Stances, gain 6 Block."
+    },
+    {
+      "name": "Nirvana",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Whenever you Scry, gain 3 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you Scry, gain 4 Block."
+    },
+    {
+      "name": "Perseverance",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 5 Block. Retain. When Retained, increase its Block by 2 this combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 7 Block. Retain. When Retained, increase its Block by 3 this combat."
+    },
+    {
+      "name": "Pray",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 3 Mantra. Shuffle an Insight into your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 4 Mantra. Shuffle an Insight into your draw pile."
+    },
+    {
+      "name": "Reach Heaven",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 10 damage. Add a Through Violence into your hand.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 15 damage. Add a Through Violence into your hand."
+    },
+    {
+      "name": "Rushdown",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Whenever you enter Wrath, draw 2 cards.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Whenever you enter Wrath, draw 2 cards."
+    },
+    {
+      "name": "Sanctity",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 6 Block. If the last card played this combat was a Skill, draw 2 cards.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Gain 9 Block. If the last card played this combat was a Skill, draw 2 cards."
+    },
+    {
+      "name": "Sands of Time",
+      "cost": 4,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Retain. Deal 20 damage. When Retained, lower its cost by 1 this combat.",
+      "upgradedCost": 4,
+      "upgradedEffect": "Retain. Deal 26 damage. When Retained, lower its cost by 1 this combat."
+    },
+    {
+      "name": "Study",
+      "cost": 2,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "At the end of your turn, shuffle an Insight into your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the end of your turn, shuffle an Insight into your draw pile."
+    },
+    {
+      "name": "Simmering Fury",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "At the start of your next turn, enter Wrath and draw 2 cards.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of your next turn, enter Wrath and draw 3 cards."
+    },
+    {
+      "name": "Swivel",
+      "cost": 2,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 8 Block. The next Attack you play costs 0.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 11 Block. The next Attack you play costs 0."
+    },
+    {
+      "name": "Talk to the Hand",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 5 damage. Whenever you attack this enemy, gain 2 Block.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 7 damage. Whenever you attack this enemy, gain 3 Block."
+    },
+    {
+      "name": "Tantrum",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 3 damage 3 times. Enter Wrath. Shuffle this card into your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 4 damage 3 times. Enter Wrath. Shuffle this card into your draw pile."
+    },
+    {
+      "name": "Wallop",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 9 damage. Gain Block equal to unblocked damage dealt.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 12 damage. Gain Block equal to unblocked damage dealt."
+    },
+    {
+      "name": "Wave of the Hand",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Whenever you gain Block this turn, apply 1 Weak to ALL enemies.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Whenever you gain Block this turn, apply 2 Weak to ALL enemies."
+    },
+    {
+      "name": "Weave",
+      "cost": 0,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 4 damage. Whenever you Scry, return this card from your discard pile to your hand.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 6 damage. Whenever you Scry, return this card from your discard pile to your hand."
+    },
+    {
+      "name": "Wheel Kick",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Deal 15 damage. Draw 2 cards.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 20 damage. Draw 2 cards."
+    },
+    {
+      "name": "Windmill Strike",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Retain. Deal 7 damage. When Retained, increase its damage by 4 this combat.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Retain. Deal 10 damage. When Retained, increase its damage by 5 this combat."
+    },
+    {
+      "name": "Worship",
+      "cost": 2,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Gain 5 Mantra.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Retain. Gain 5 Mantra."
+    },
+    {
+      "name": "Wreath of Flame",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Your next Attack deals 5 additional damage.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Your next Attack deals 8 additional damage."
+    },
+    {
+      "name": "Alpha",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Shuffle a Beta into your draw pile. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. Shuffle a Beta into your draw pile. Exhaust."
+    },
+    {
+      "name": "Blasphemy",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Enter Divinity. Die next turn. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Retain. Enter Divinity. Die next turn. Exhaust."
+    },
+    {
+      "name": "Brilliance",
+      "cost": 1,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Deal 12 damage. Deals additional damage equal to Mantra gained this combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 16 damage. Deals additional damage equal to Mantra gained this combat."
+    },
+    {
+      "name": "Conjure Blade",
+      "cost": "X",
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Shuffle an Expunger (X+1) into your draw pile. Exhaust.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Shuffle an Expunger (X+2) into your draw pile. Exhaust."
+    },
+    {
+      "name": "Devotion",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "At the start of your turn, gain 2 Mantra.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of your turn, gain 3 Mantra."
+    },
+    {
+      "name": "Establishment",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Whenever a card is Retained, reduce its cost by 1 this combat.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. Whenever a card is Retained, reduce its cost by 1 this combat."
+    },
+    {
+      "name": "Judgement",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "If the enemy has 30 or less HP, set their HP to 0.",
+      "upgradedCost": 1,
+      "upgradedEffect": "If the enemy has 40 or less HP, set their HP to 0."
+    },
+    {
+      "name": "Lesson Learned",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Deal 10 damage. If Fatal, Upgrade a random card in your deck. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 13 damage. If Fatal, Upgrade a random card in your deck. Exhaust."
+    },
+    {
+      "name": "Master Reality",
+      "cost": 1,
+      "type": "power",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Whenever a card is created during combat, Upgrade it.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. Whenever a card is created during combat, Upgrade it."
+    },
+    {
+      "name": "Omniscience",
+      "cost": 4,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Choose a card in your draw pile. Play the chosen card twice and exhaust it. Exhaust.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Choose a card in your draw pile. Play the chosen card twice and exhaust it. Exhaust."
+    },
+    {
+      "name": "Ragnarok",
+      "cost": 3,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Deal 5 damage to a random enemy 5 times.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Deal 6 damage to a random enemy 5 times."
+    },
+    {
+      "name": "Scrawl",
+      "cost": 1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Draw cards until your hand is full. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw cards until your hand is full. Exhaust."
+    },
+    {
+      "name": "Spirit Shield",
+      "cost": 2,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Gain 3 Block for each card in your hand.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Gain 3 Block for each card in your hand."
+    },
+    {
+      "name": "Vault",
+      "cost": 3,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Take an extra turn after this one. End your turn. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Take an extra turn after this one. End your turn. Exhaust."
+    },
+    {
+      "name": "Wish",
+      "cost": 3,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Choose one: Gain 6 Strength, 6 Plated Armor, or 25 Gold. Exhaust.",
+      "upgradedCost": 3,
+      "upgradedEffect": "Choose one: Gain 8 Strength, 8 Plated Armor, or 30 Gold. Exhaust."
+    },
+    {
+      "name": "Deus Ex Machina",
+      "cost": -1,
+      "type": "skill",
+      "class": "watcher",
+      "rarity": "rare",
+      "effect": "Unplayable. When you draw this card, add 2 Mirachles to your hand and Exhoust",
+      "upgradedCost": -1,
+      "upgradedEffect": "Unplayable. When you draw this card, add 3 Mirachles to your hand and Exhoust"
+    },
+    {
+      "name": "Bandage Up",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Heal 4 HP. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Heal 6 HP. Exhaust."
+    },
+    {
+      "name": "Become Almighty",
+      "cost": -1,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Gain 3 Strength.",
+      "upgradedCost": -1,
+      "upgradedEffect": "Gain 4 Strength."
+    },
+    {
+      "name": "Blind",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Apply 2 Weak",
+      "upgradedCost": 0,
+      "upgradedEffect": "Apply 2 Weak to ALL enemies."
+    },
+    {
+      "name": "Dark Shackles",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Enemy loses 9 Strength this turn. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Enemy loses 15 Strength this turn. Exhaust."
+    },
+    {
+      "name": "Deep Breath",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Shuffle your discard pile into your draw pile. Draw 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Shuffle your discard pile into your draw pile. Draw 2 cards."
+    },
+    {
+      "name": "Discovery",
+      "cost": 1,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Choose 1 of 3 random cards to add into your hand. It costs 0 this turn. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Choose 1 of 3 random cards to add into your hand. It costs 0 this turn."
+    },
+    {
+      "name": "Dramatic Entrance",
+      "cost": 0,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Innate. Deal 8 damage to ALL enemies. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Innate. Deal 12 damage to ALL enemies. Exhaust."
+    },
+    {
+      "name": "Enlightenment",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Reduce the cost of all cards in your hand to 1 this turn.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Reduce the cost of all cards in your hand to 1 this combat."
+    },
+    {
+      "name": "Expunger",
+      "cost": 1,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Deal 9 damage X times",
+      "upgradedCost": 1,
+      "upgradedEffect": "Deal 15 damage X times"
+    },
+    {
+      "name": "Fame and Fortune",
+      "cost": -1,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Gain 25 Gold.",
+      "upgradedCost": -1,
+      "upgradedEffect": "Gain 30 Gold."
+    },
+    {
+      "name": "Finesse",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Gain 2 Block. Draw 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 4 Block. Draw 1 card."
+    },
+    {
+      "name": "Forethought",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Put a card from your draw pile on the bottom of your draw pile. It consts 0 until played.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put any number of cards from your draw pile on the bottom of your draw pile. It consts 0 until played."
+    },
+    {
+      "name": "Flash of Steel",
+      "cost": 0,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Deal 3 damage. Draw 1 card.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 6 damage. Draw 1 card."
+    },
+    {
+      "name": "Good Instincts",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Gain 6 Block.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 9 Block."
+    },
+    {
+      "name": "Impatience",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "If you have no Attack cards in your hand, draw 2 cards.",
+      "upgradedCost": 0,
+      "upgradedEffect": "If you have no Attack cards in your hand, draw 3 cards."
+    },
+    {
+      "name": "Jack of All Trades",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Add 1 random Colorless card into your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Add 2 random Colorless cards into your hand. Exhaust."
+    },
+    {
+      "name": "Live Forever",
+      "cost": -1,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Gain 6 Plated Armor.",
+      "upgradedCost": -1,
+      "upgradedEffect": "Gain 8 Plated Armor."
+    },
+    {
+      "name": "Madness",
+      "cost": 1,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Reduce the cost of a random card in your hand to 0 this combat. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Reduce the cost of a random card in your hand to 0 this combat. Exhaust."
+    },
+    {
+      "name": "Mind Blast",
+      "cost": 2,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Innate. Deal damage equal to the number of cards in your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Innate. Deal damage equal to the number of cards in your draw pile."
+    },
+    {
+      "name": "Panacea",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Gain 1 Artifact. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 2 Artifacts. Exhaust."
+    },
+    {
+      "name": "Panic Button",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Gain 30 Block. You cannot gain Block from cards for 2 turns. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Gain 40 Block. You cannot gain Block from cards for 2 turns. Exhaust."
+    },
+    {
+      "name": "Purity",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Exhaust up to 3 cards in your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Exhaust up to 5 cards in your hand. Exhaust."
+    },
+    {
+      "name": "Swift Strike",
+      "cost": 0,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Deal 7 damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 10 damage."
+    },
+    {
+      "name": "Trip",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "uncommon",
+      "effect": "Apply 2 Vulnerable.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Apply 2 Vulnerable to ALL enemies."
+    },
+    {
+      "name": "Apotheosis",
+      "cost": 2,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Upgrade ALL of your cards for the rest of combat. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Upgrade ALL of your cards for the rest of combat. Exhaust."
+    },
+    {
+      "name": "Chrysalis",
+      "cost": 2,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Add 3 random Skills into your draw pile. They cost 0 this combat. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Add 5 random Skills into your draw pile. They cost 0 this combat. Exhaust."
+    },
+    {
+      "name": "Hand of Greed",
+      "cost": 2,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Deal 20 damage. If Fatal, gain 20 Gold.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Deal 25 damage. If Fatal, gain 25 Gold."
+    },
+    {
+      "name": "Magnetism",
+      "cost": 2,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "At the start of each turn, add a random Colorless card to your hand.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of each turn, add a random Colorless card to your hand."
+    },
+    {
+      "name": "Master of Strategy",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Draw 3 cards. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 4 cards. Exhaust."
+    },
+    {
+      "name": "Mayhem",
+      "cost": 2,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "At the start of your turn, play the top card of your draw pile.",
+      "upgradedCost": 1,
+      "upgradedEffect": "At the start of your turn, play the top card of your draw pile."
+    },
+    {
+      "name": "Metamorphosis",
+      "cost": 2,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Add 3 random Attacks into your draw pile. They cost 0 this combat. Exhaust.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Add 5 random Attacks into your draw pile. They cost 0 this combat. Exhaust."
+    },
+    {
+      "name": "Panache",
+      "cost": 0,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Every time you play 5 cards in a single turn, deal 10 damage to ALL enemies.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Every time you play 5 cards in a single turn, deal 14 damage to ALL enemies."
+    },
+    {
+      "name": "Miracle",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Retain. Gain an energy. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Retain. Gain 2 energies. Exhaust."
+    },
+    {
+      "name": "Smite",
+      "cost": 1,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Retain. Deal 12 damage. Exhaust.",
+      "upgradedCost": 1,
+      "upgradedEffect": "Retain. Deal 16 damage. Exhaust."
+    },
+    {
+      "name": "Through Violence",
+      "cost": 0,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Retain. Deal 20 damage. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Retain. Deal 30 damage. Exhaust."
+    },
+    {
+      "name": "Sadistic Nature",
+      "cost": 0,
+      "type": "power",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Whenever you apply a debuff to an enemy, they take 5 damage.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Whenever you apply a debuff to an enemy, they take 7 damage."
+    },
+    {
+      "name": "Secret Technique",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Put a Skill from your draw pile into your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put a Skill from your draw pile into your hand."
+    },
+    {
+      "name": "Secret Weapon",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Put an Attack from your draw pile into your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put an Attack from your draw pile into your hand."
+    },
+    {
+      "name": "The Bomb",
+      "cost": 2,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "At the end of 3 turns, deal 40 damage to ALL enemies.",
+      "upgradedCost": 2,
+      "upgradedEffect": "At the end of 3 turns, deal 50 damage to ALL enemies."
+    },
+    {
+      "name": "Thinking Ahead",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Draw 2 cards. Put a card from your hand on top of your draw pile. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Draw 2 cards. Put a card from your hand on top of your draw pile."
+    },
+    {
+      "name": "Transmutation",
+      "cost": "X",
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Add X random Colorless cards into your hand. They cost 0 this turn. Exhaust.",
+      "upgradedCost": "X",
+      "upgradedEffect": "Add X random Upgraded Colorless cards into your hand. They cost 0 this turn. Exhaust."
+    },
+    {
+      "name": "Violence",
+      "cost": 0,
+      "type": "skill",
+      "class": "colorless",
+      "rarity": "rare",
+      "effect": "Put 3 random Attacks from your draw pile into your hand. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Put 4 random Attacks from your draw pile into your hand. Exhaust."
+    },
+    {
+      "name": "Ritual Dagger",
+      "cost": 1,
+      "type": "attack",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Deal 15 damage. If Fatal, permanently increase this card's damage by 3. Exhaust.",
+      "upgradedCost": 0,
+      "upgradedEffect": "Deal 15 damage. If Fatal, permanently increase this card's damage by 5. Exhaust."
+    },
+    {
+      "name": "Ascender's Bane",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. Ethereal. Cannot be removed from your deck."
+    },
+    {
+      "name": "Clumsy",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. Ethereal."
+    },
+    {
+      "name": "Decay",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. At the end of your turn, take 2 damage."
+    },
+    {
+      "name": "Doubt",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. At the end of your turn, gain 1 Weak."
+    },
+    {
+      "name": "Curse of the Bell",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. Cannot be removed from your deck."
+    },
+    {
+      "name": "Injury",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable."
+    },
+    {
+      "name": "Necronomicurse",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "common",
+      "effect": "Unplayable. Cannot be removed from your deck."
+    },
+    {
+      "name": "Normality",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. While in hand, you cannot play more than 3 cards this turn."
+    },
+    {
+      "name": "Parasite",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. If transformed or removed from your deck, lose 3 Max HP."
+    },
+    {
+      "name": "Shame",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. At the end of your turn, gain 1 Frail."
+    },
+    {
+      "name": "Pride",
+      "cost": 1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Innate. At the end of your turn, put a copy of this card on top of your draw pile. Exhaust."
+    },
+    {
+      "name": "Writhe",
+      "cost": -1,
+      "type": "curse",
+      "class": "curse",
+      "rarity": "curse",
+      "effect": "Unplayable. Innate."
+    },
+    {
+      "name": "Burn",
+      "cost": -1,
+      "type": "status",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Unplayable. At the end of your turn, take 2 damage"
+    },
+    {
+      "name": "Dazed",
+      "cost": -1,
+      "type": "status",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Unplayable. Ethereal."
+    },
+    {
+      "name": "Slimed",
+      "cost": 1,
+      "type": "status",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Exhaust."
+    },
+    {
+      "name": "Void",
+      "cost": -1,
+      "type": "status",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Unplayable. Ethereal. Whenever this card is drawn, lose 1 Energy."
+    },
+    {
+      "name": "Wound",
+      "cost": -1,
+      "type": "status",
+      "class": "colorless",
+      "rarity": "common",
+      "effect": "Unplayable."
+    }
+  ],
+  "alias": {
+    "Ascenders Bane": "Ascender's Bane",
+    "Vengeance": "Simmering Fury",
+    "Wireheading": "Foresight",
+    "Lockon": "Bullseye",
+    "Adaptation": "Rushdown",
+    "ClearTheMind": "Tranquility",
+    "Redo": "Recursion",
+    "Undo": "Equilibrium",
+    "Gash": "Claw",
+    "Steam Power": "Streamline",
+    "Conserve Battery": "Charge Battery",
+    "Auto Shields": "Auto-Shields",
+    "Wreath Of Flame": "Wreath of Flame",
+    "Steam": "Steam Barrier",
+    "Path to Victory": "Pressure Points"
+  }
+}
+

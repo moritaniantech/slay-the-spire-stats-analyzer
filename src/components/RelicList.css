@@ -1,0 +1,190 @@
+/* フォントの読み込み */
+@font-face {
+  font-family: 'ZillaSlab-RegularItalic';
+  src: url('/src/assets/fonts/relicFlavor/ZillaSlab-RegularItalic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* スクロールバーを非表示にするためのクラス */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* タブバーのスタイル */
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+}
+
+/* レリック一覧のグリッドレイアウト */
+.grid {
+  display: grid;
+  width: 100%;
+}
+
+/* レリックカードのスタイル */
+.relic-card {
+  max-width: 100% !important;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  overflow: visible !important;
+  position: relative;
+  width: 420px;
+  height: 520px;
+}
+
+/* レリックフレームコンテナ */
+.relic-frame-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  overflow: visible !important;
+  max-width: none !important;
+  max-height: none !important;
+  position: relative;
+  z-index: 5;
+}
+
+/* レリック画像コンテナ */
+.relic-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  overflow: visible !important;
+  max-width: none !important;
+  max-height: none !important;
+  position: relative;
+  z-index: 10;
+  width: 140px;
+  height: 190px;
+  margin: 0 auto;
+  border-radius: 50%;
+}
+
+/* レリックフレームとレリック画像のスタイル */
+.relic-frame-container img,
+.relic-image-container img {
+  max-width: none !important;
+  max-height: none !important;
+  width: auto;
+  height: auto;
+}
+
+/* レリックフレーム画像 */
+.relic-frame-img {
+  transform-origin: center;
+  transition: all 0.3s ease;
+  width: 930px !important;
+  height: 600px !important;
+  object-fit: contain;
+}
+
+/* レリック画像 */
+.relic-img {
+  transform-origin: center;
+  transition: all 0.3s ease;
+  width: 140px !important;
+  height: 190px !important;
+  object-fit: contain;
+}
+
+/* ホバー時の拡大効果 - レリック画像コンテナのみに適用 */
+.relic-image-container:hover {
+  transform: scale(1.15) translateY(60%) !important;
+  z-index: 20;
+}
+
+/* 古いホバー効果を削除 */
+.relic-card:hover .relic-image-container {
+  transform: none;
+}
+
+/* フレームコンテナのホバー効果を削除 */
+.relic-card:hover .relic-frame-container {
+  transform: none;
+}
+
+/* レリックテキストの影 */
+.relic-text-shadow {
+  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.8);
+  color: #FFF6E4;
+}
+
+/* レリックキーワードの影を削除 */
+.relic-keyword {
+  color: #FFD700;
+}
+
+/* 数値のスタイル - 影を削除 */
+.relic-number {
+  color: #80D6EF;
+}
+
+/* レリックの説明コンテナ */
+.relic-description-wrapper {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  width: 100%;
+  height: 80px;
+  font-size: 12px;
+}
+
+/* テキスト表示エリアの制限 */
+.relic-description-container {
+  max-height: 80px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+  padding: 0 10px;
+  color: #FFF6E4;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* フレーバーテキストのラッパー */
+.relic-flavor-wrapper {
+  position: absolute;
+  top: 75%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  width: 100%;
+  height: 60px;
+}
+
+/* フレーバーテキストの制限 */
+.relic-flavor-text {
+  max-height: 80px;
+  overflow-y: auto;
+  opacity: 0.8;
+  width: 45%;
+  padding: 0 0px;
+  color: #FFF6E4;
+  font-family: 'ZillaSlab-RegularItalic', serif;
+  font-style: italic;
+  font-size: 12px;
+  text-align: center;
+  margin: 0 auto;
+} 

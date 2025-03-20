@@ -1,0 +1,68 @@
+/* フォントの読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Kreon:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* フォントの基本設定 */
+@layer base {
+  html {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+  }
+
+  /* カスタムカーソルをすべての要素に適用 */
+  html, body, *, *::before, *::after {
+    cursor: url('./assets/ui/cursors/gold2.png'), auto !important;
+  }
+  
+  /* 英語テキストにはKreonを適用 */
+  [lang="en"] {
+    font-family: 'Kreon', serif !important;
+  }
+}
+
+/* カードのコスト表示用のクラス */
+.card-cost {
+  font-family: 'Kreon', serif !important;
+  font-weight: 700;
+  font-feature-settings: "tnum" on, "lnum" on;
+}
+
+/* カードのタイプ表示用のクラス */
+.card-type {
+  font-family: 'Kreon', serif !important;
+  font-weight: 700;
+  text-transform: capitalize;
+  font-size: 10px;
+}
+
+/* 英語テキスト用の汎用クラス */
+.font-en {
+  font-family: 'Kreon', serif !important;
+}
+
+/* 日本語テキスト用の汎用クラス */
+.font-jp {
+  font-family: 'M PLUS Rounded 1c', sans-serif !important;
+}
+
+/* カードのホバーエフェクト */
+.card-hover {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: scale(1.05);
+}
+
+/* テキストシャドウ効果 */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-lg {
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(255, 255, 255, 0.3);
+}

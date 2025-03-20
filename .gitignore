@@ -1,2 +1,72 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
 node_modules
-node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+slay-the-spire-stats-analyzer.code-workspace
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment and Security
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.keystore
+*.jks
+
+# Cache and Temporary files
+.cache
+.temp
+.tmp
+*.tmp
+*.bak
+*.swp
+.eslintcache
+.stylelintcache
+.npm
+.yarn-cache
+
+# Build and Test
+coverage
+.nyc_output
+build/
+dist/
+out/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Other
+run-sample
+run
+
+# IDE and Build Info
+.cursor/
+*.tsbuildinfo
+vite.config.d.ts
