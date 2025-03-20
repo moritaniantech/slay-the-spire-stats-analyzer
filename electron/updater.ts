@@ -9,6 +9,14 @@ autoUpdater.logger = log;
 // アップデートの確認間隔（12時間）
 const CHECK_INTERVAL = 12 * 60 * 60 * 1000;
 
+// アップデーターの設定
+autoUpdater.autoDownload = false;
+autoUpdater.allowDowngrade = false;
+autoUpdater.allowPrerelease = false;
+autoUpdater.requestHeaders = {
+  'User-Agent': 'StS Stats Analyzer'
+};
+
 export class UpdateHandler {
   private mainWindow: BrowserWindow;
 
@@ -63,7 +71,9 @@ export class UpdateHandler {
     if (!app.isPackaged) return;
     
     try {
-      return await autoUpdater.checkForUpdates();
+      const result = await autoUpdater.checkForUpdates();
+      log.info('Update check result:', result);
+      return result;
     } catch (error) {
       log.error('Error checking for updates:', error);
       return null;

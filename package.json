@@ -128,8 +128,10 @@
         }
       ],
       "icon": "public/icons/icon.png",
-      "hardenedRuntime": true,
+      "hardenedRuntime": false,
       "gatekeeperAssess": false,
+      "entitlements": null,
+      "entitlementsInherit": null,
       "darkModeSupport": true
     },
     "dmg": {
@@ -156,12 +158,14 @@
       "installerIcon": "public/icons/icon.ico",
       "uninstallerIcon": "public/icons/icon.ico"
     },
-    "publish": {
-      "provider": "github",
-      "owner": "moritaniantech",
-      "repo": "slay-the-spire-stats-analyzer",
-      "private": false,
-      "releaseType": "release"
-    }
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "moritaniantech",
+        "repo": "slay-the-spire-stats-analyzer",
+        "private": false,
+        "releaseType": "release"
+      }
+    ]
   }
 }
