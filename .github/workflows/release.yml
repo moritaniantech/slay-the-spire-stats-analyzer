@@ -38,7 +38,14 @@ jobs:
           YARN_ENABLE_GLOBAL_CACHE: "false"
           YARN_CACHE_FOLDER: ./.yarn-cache
 
-      - name: Verify icon file exists
+      - name: Verify icon file exists (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          Get-ChildItem -Path "public\icons\icon.ico" -Force
+          Get-ChildItem -Path "public\icons\icon.png" -Force
+
+      - name: Verify icon file exists (macOS)
+        if: matrix.os == 'macos-latest'
         run: |
           ls -la public/icons/icon.ico
           ls -la public/icons/icon.png
