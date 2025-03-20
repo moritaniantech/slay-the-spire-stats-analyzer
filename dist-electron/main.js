@@ -17342,15 +17342,24 @@ function requireSrc() {
 }
 var srcExports = requireSrc();
 const log = /* @__PURE__ */ getDefaultExportFromCjs(srcExports);
-log.transports.file.level = "info";
+log.transports.file.level = "debug";
 mainExports.autoUpdater.logger = log;
 const CHECK_INTERVAL = 12 * 60 * 60 * 1e3;
 mainExports.autoUpdater.autoDownload = false;
 mainExports.autoUpdater.allowDowngrade = false;
 mainExports.autoUpdater.allowPrerelease = false;
+mainExports.autoUpdater.channel = "latest";
 mainExports.autoUpdater.requestHeaders = {
-  "User-Agent": "StS Stats Analyzer"
+  "User-Agent": "StS Stats Analyzer",
+  "Accept": "application/vnd.github+json"
 };
+mainExports.autoUpdater.setFeedURL({
+  provider: "github",
+  owner: "moritaniantech",
+  repo: "slay-the-spire-stats-analyzer",
+  private: false,
+  releaseType: "release"
+});
 class UpdateHandler {
   constructor(window2) {
     this.mainWindow = window2;
@@ -17358,16 +17367,23 @@ class UpdateHandler {
   }
   initialize() {
     mainExports.autoUpdater.on("update-available", (info) => {
+      log.info("Update available:", info);
       this.mainWindow.webContents.send("update-available", info);
     });
     mainExports.autoUpdater.on("download-progress", (progressObj) => {
+      log.debug("Download progress:", progressObj);
       this.mainWindow.webContents.send("download-progress", progressObj);
     });
     mainExports.autoUpdater.on("update-downloaded", (info) => {
+      log.info("Update downloaded:", info);
       this.mainWindow.webContents.send("update-downloaded", info);
     });
     mainExports.autoUpdater.on("error", (err) => {
       log.error("AutoUpdater error:", err);
+      if (err instanceof Error && err.message.includes("404")) {
+        log.info("No updates available or release not found");
+        return;
+      }
       this.mainWindow.webContents.send("update-error", err);
     });
     require$$1$3.ipcMain.handle("check-for-updates", () => {
@@ -17380,17 +17396,27 @@ class UpdateHandler {
       this.checkForUpdates();
     }, CHECK_INTERVAL);
     if (require$$1$3.app.isPackaged) {
-      this.checkForUpdates();
+      setTimeout(() => {
+        this.checkForUpdates();
+      }, 5e3);
     }
   }
   async checkForUpdates() {
-    if (!require$$1$3.app.isPackaged) return;
+    if (!require$$1$3.app.isPackaged) {
+      log.info("App is not packaged, skipping update check");
+      return;
+    }
     try {
+      log.info("Checking for updates...");
       const result = await mainExports.autoUpdater.checkForUpdates();
       log.info("Update check result:", result);
       return result;
     } catch (error2) {
       log.error("Error checking for updates:", error2);
+      if (error2 instanceof Error && error2.message.includes("404")) {
+        log.info("No updates available or release not found");
+        return null;
+      }
       return null;
     }
   }

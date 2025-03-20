@@ -132,7 +132,14 @@
       "gatekeeperAssess": false,
       "entitlements": null,
       "entitlementsInherit": null,
-      "darkModeSupport": true
+      "darkModeSupport": true,
+      "identity": null,
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "StS Stats Analyzerはゲームのプレイデータを分析するためにファイルアクセスが必要です。",
+        "NSMicrophoneUsageDescription": "このアプリはマイクを使用しません。",
+        "NSCameraUsageDescription": "このアプリはカメラを使用しません。",
+        "NSLocationUsageDescription": "このアプリは位置情報を使用しません。"
+      }
     },
     "dmg": {
       "sign": false,
@@ -147,7 +154,11 @@
           "type": "link",
           "path": "/Applications"
         }
-      ]
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
     },
     "nsis": {
       "oneClick": false,
@@ -158,14 +169,13 @@
       "installerIcon": "public/icons/icon.ico",
       "uninstallerIcon": "public/icons/icon.ico"
     },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "moritaniantech",
-        "repo": "slay-the-spire-stats-analyzer",
-        "private": false,
-        "releaseType": "release"
-      }
-    ]
+    "publish": {
+      "provider": "github",
+      "owner": "moritaniantech",
+      "repo": "slay-the-spire-stats-analyzer",
+      "private": false,
+      "releaseType": "release",
+      "updaterCacheDirName": "sts-stats-analyzer-updater"
+    }
   }
 }
