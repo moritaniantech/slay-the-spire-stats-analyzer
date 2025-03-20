@@ -38,6 +38,11 @@ jobs:
           YARN_ENABLE_GLOBAL_CACHE: "false"
           YARN_CACHE_FOLDER: ./.yarn-cache
 
+      - name: Verify icon file exists
+        run: |
+          ls -la public/icons/icon.ico
+          ls -la public/icons/icon.png
+
       - name: Build Electron app for Windows
         if: matrix.os == 'windows-latest'
         run: yarn build:win
