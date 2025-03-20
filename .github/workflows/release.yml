@@ -23,9 +23,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'yarn'
+
+      - name: Configure Yarn
+        if: matrix.os == 'windows-latest'
+        run: |
+          yarn config set network-timeout 300000
+          yarn config set registry https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: yarn install
+        run: |
+          yarn install --frozen-lockfile --network-timeout 300000
+        env:
+          YARN_ENABLE_GLOBAL_CACHE: "false"
+          YARN_CACHE_FOLDER: ./.yarn-cache
 
       - name: Build Electron app for Windows
         if: matrix.os == 'windows-latest'
