@@ -77,10 +77,9 @@ export default defineConfig(({ command, mode }) => {
       ]),
       renderer(), // renderer プラグインの設定も確認が必要なら後で
     ],
-    assetsInclude: ['src/assets/**/*'],
     base: '/',
     define: {
-      '__ASSET_BASE_PATH__': JSON.stringify(isProd ? 'asset://' : '/src/assets/'),
+      '__ASSET_BASE_PATH__': JSON.stringify(isProd ? 'asset://' : '/assets/'),
       '__IS_DEVELOPMENT__': isDev,
       '__IS_PRODUCTION__': isProd
     },
@@ -118,8 +117,7 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       alias: {
-        '@': 'src',
-        'assets': 'src/assets'
+        '@': 'src'
       },
     },
     json: {

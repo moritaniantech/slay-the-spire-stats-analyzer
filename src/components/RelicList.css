@@ -2,7 +2,7 @@
 @font-face {
   font-family: 'ZillaSlab';
   font-style: italic;
-  src: url('../assets/fonts/relicFlavor/ZillaSlab-RegularItalic.otf') format('opentype');
+  src: url('/assets/fonts/relicFlavor/ZillaSlab-RegularItalic.otf') format('opentype');
   font-weight: normal;
 }
 

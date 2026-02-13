@@ -16,7 +16,7 @@ export const getAssetBasePath = (): string => {
     return window.__ASSET_BASE_PATH__;
   }
   if (import.meta.env.DEV) {
-    return '/src/assets';
+    return '/assets';
   }
   return (import.meta.env.BASE_URL || './') + 'assets/';
 };
@@ -127,7 +127,7 @@ export const joinPaths = (base: string, relative: string): string => {
  * @returns アセットURLの場合はtrue
  */
 export const isAssetUrl = (url: string): boolean => {
-  return url.startsWith('asset://') || url.startsWith('/src/assets/');
+  return url.startsWith('asset://') || url.startsWith('/assets/');
 };
 
 // カード情報の型定義 (必要に応じて拡張)
