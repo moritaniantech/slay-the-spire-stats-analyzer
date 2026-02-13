@@ -90,21 +90,7 @@ export default defineConfig(({ command, mode }) => {
         external: ['electron-store', 'sqlite3', 'path', 'fs'],
         output: {
           format: 'cjs',
-          assetFileNames: (assetInfo) => {
-            console.log('[assetFileNames] assetInfo.name:', assetInfo.name);
-            // src/assets/ からのファイルは dist/assets/ 以下に配置
-            if (assetInfo.name && assetInfo.name.startsWith('src/assets/')) {
-              const relativePath = assetInfo.name.substring('src/assets/'.length);
-              return `assets/${relativePath}`;
-            }
-            // public ディレクトリ内のアセットは Vite が dist のルートに構造を維持してコピーするため、
-            // ここで特別な処理は不要。Vite のデフォルトの挙動に任せる。
-            // もし public/assets/foo.png があったら、dist/assets/foo.png になる。
-            // getAssetUrl('/assets/foo.png') で参照できるようになる。
-            
-            // 上記以外のアセット（例: CSSから参照される画像など）はデフォルトの命名規則
-            return 'assets/[name]-[hash][extname]';
-          },
+          assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'js/[name]-[hash].js',
           entryFileNames: 'js/[name]-[hash].js',
         }

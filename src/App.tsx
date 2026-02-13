@@ -600,14 +600,6 @@ function App() {
         </div>
       )}
 
-      {/* アセットロード中 */}
-      {assetStatus === 'loading' && (
-        <div className="fixed inset-0 z-[70] bg-base-100 flex flex-col items-center justify-center">
-          <div className="loading loading-spinner loading-lg mb-4"></div>
-          <p className="text-lg">アセットを読み込み中...</p>
-        </div>
-      )}
-
       <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
