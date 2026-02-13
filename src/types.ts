@@ -27,11 +27,6 @@ export interface ElectronAPI {
   onLoadProgress: (callback: (progress: LoadProgress) => void) => () => void;
 }
 
-// グローバルな型定義を削除し、型拡張を使用
-declare module 'electron' {
-  interface Window {
-    electronAPI: ElectronAPI;
-  }
-}
+// グローバルな型定義は src/global.d.ts を参照
 
 export {}; 

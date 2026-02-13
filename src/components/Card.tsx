@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { KEYWORDS, COLORS } from '../constants/keywords';
+import { getAssetUrl, getAssetFallbackUrl, normalizeAssetPath } from '../utils/assetUtils';
 
 interface CardProps {
   name: string;
@@ -28,30 +29,77 @@ const Card: React.FC<CardProps> = ({
   onClick,
   searchTerm = ''
 }) => {
-  // カードのベース画像パスを生成
-  const baseCardPath = cardClass === 'curse' 
-    ? `/src/assets/cards/design/curse/curse_curse.png`
-    : type === 'status'
-      ? `/src/assets/cards/design/colorless/colorless_skill.png`
-      : `/src/assets/cards/design/${cardClass}/${cardClass}_${type}.png`;
-  
-  // フレームとバナーのパスを生成
-  const adjustedRarity = rarity === 'starter' || rarity === 'special' || rarity === 'curse' ? 'common' : rarity;
-  const adjustedType = type === 'curse' || type === 'status' ? 'skill' : type;
-  const framePath = `/src/assets/cards/design/frame/frame_${adjustedRarity}_${adjustedType}.png`;
-  const bannerPath = `/src/assets/cards/design/banner/banner_${adjustedRarity}.png`;
-  
-  // コストの枠画像パスを生成
-  const costFramePath = type === 'status'
-    ? `/src/assets/cards/design/colorless/colorless.png`
-    : `/src/assets/cards/design/${cardClass}/${cardClass}.png`;
-  
-  // カード画像のパスを生成（英語名を小文字に変換し、スペースをアンダースコアに置換）
-  const cardImagePath = cardClass === 'curse'
-    ? `/src/assets/images/cards/${cardClass}/${name.toLowerCase().replace(/\s+/g, '_')}.png`
-    : type === 'status'
-      ? `/src/assets/images/cards/status/${name.toLowerCase().replace(/\s+/g, '_')}.png`
-      : `/src/assets/images/cards/${cardClass}/${type}/${name.toLowerCase().replace(/\s+/g, '_')}.png`;
+  // 画像パスの状態管理（本番環境でIPC経由でURLを取得するため）
+  const [baseCardPath, setBaseCardPath] = useState<string | null>(null);
+  const [framePath, setFramePath] = useState<string | null>(null);
+  const [bannerPath, setBannerPath] = useState<string | null>(null);
+  const [costFramePath, setCostFramePath] = useState<string | null>(null);
+  const [cardImagePath, setCardImagePath] = useState<string | null>(null);
+
+  // 画像パスの初期化
+  useEffect(() => {
+    const loadImagePaths = async () => {
+      // カードのベース画像パスを生成
+      const basePath = cardClass === 'curse' 
+        ? 'cards/design/curse/curse_curse.png'
+        : type === 'status'
+          ? 'cards/design/colorless/colorless_skill.png'
+          : `cards/design/${cardClass}/${cardClass}_${type}.png`;
+      
+      // フレームとバナーのパスを生成
+      const adjustedRarity = rarity === 'starter' || rarity === 'special' || rarity === 'curse' ? 'common' : rarity;
+      const adjustedType = type === 'curse' || type === 'status' ? 'skill' : type;
+      const framePathStr = `cards/design/frame/frame_${adjustedRarity}_${adjustedType}.png`;
+      const bannerPathStr = `cards/design/banner/banner_${adjustedRarity}.png`;
+      
+      // コストの枠画像パスを生成
+      const costFramePathStr = type === 'status'
+        ? 'cards/design/colorless/colorless.png'
+        : `cards/design/${cardClass}/${cardClass}.png`;
+      
+      // カード画像のパスを生成（英語名を小文字に変換し、スペースをアンダースコアに置換）
+      const cardImagePathStr = cardClass === 'curse'
+        ? `images/cards/${cardClass}/${name.toLowerCase().replace(/\s+/g, '_')}.png`
+        : type === 'status'
+          ? `images/cards/status/${name.toLowerCase().replace(/\s+/g, '_')}.png`
+          : `images/cards/${cardClass}/${type}/${name.toLowerCase().replace(/\s+/g, '_')}.png`;
+
+      // Electron環境（開発環境・本番環境共通）: IPC経由でURLを取得
+      if (window.electronAPI?.getFileURLForAsset) {
+        try {
+          const [baseUrl, frameUrl, bannerUrl, costFrameUrl, cardImageUrl] = await Promise.all([
+            getAssetFallbackUrl(normalizeAssetPath(basePath)) || getAssetUrl(basePath),
+            getAssetFallbackUrl(normalizeAssetPath(framePathStr)) || getAssetUrl(framePathStr),
+            getAssetFallbackUrl(normalizeAssetPath(bannerPathStr)) || getAssetUrl(bannerPathStr),
+            getAssetFallbackUrl(normalizeAssetPath(costFramePathStr)) || getAssetUrl(costFramePathStr),
+            getAssetFallbackUrl(normalizeAssetPath(cardImagePathStr)) || getAssetUrl(cardImagePathStr),
+          ]);
+          setBaseCardPath(baseUrl);
+          setFramePath(frameUrl);
+          setBannerPath(bannerUrl);
+          setCostFramePath(costFrameUrl);
+          setCardImagePath(cardImageUrl);
+        } catch (error) {
+          console.error('[Card] Error loading image paths via IPC:', error);
+          // フォールバック: 通常のgetAssetUrlを使用
+          setBaseCardPath(getAssetUrl(basePath));
+          setFramePath(getAssetUrl(framePathStr));
+          setBannerPath(getAssetUrl(bannerPathStr));
+          setCostFramePath(getAssetUrl(costFramePathStr));
+          setCardImagePath(getAssetUrl(cardImagePathStr));
+        }
+      } else {
+        // 非Electron環境
+        setBaseCardPath(getAssetUrl(basePath));
+        setFramePath(getAssetUrl(framePathStr));
+        setBannerPath(getAssetUrl(bannerPathStr));
+        setCostFramePath(getAssetUrl(costFramePathStr));
+        setCardImagePath(getAssetUrl(cardImagePathStr));
+      }
+    };
+
+    loadImagePaths();
+  }, [cardClass, type, rarity, name]);
 
   // カードタイプの英語表示
   const typeDisplay = {
@@ -62,303 +110,215 @@ const Card: React.FC<CardProps> = ({
     'curse': 'Curse'
   }[type];
 
-  // コストの変更を強調表示
-  const displayCost = () => {
-    // アップグレードされていない場合は通常のコストを表示
-    if (!upgraded) {
-      return typeof cost === 'string' ? cost.toUpperCase() : cost;
-    }
-
-    // アップグレード時のコスト処理
-    const normalizeValue = (value: number | string | undefined): string => {
-      if (value === undefined) return '';
-      if (typeof value === 'string') return value.toUpperCase();
-      return String(value);
-    };
-
-    // コストの正規化（undefinedの場合も考慮）
-    const originalCostValue = originalCost;
-    const currentCostValue = cost;
-
-    // 数値型の場合は数値として比較
-    if (typeof originalCostValue === 'number' && typeof currentCostValue === 'number') {
-      if (originalCostValue !== currentCostValue) {
-        return <span style={{ color: COLORS.UPGRADE }}>{currentCostValue}</span>;
-      }
-      return currentCostValue;
-    }
-
-    // 文字列型の場合は正規化して比較
-    const normalizedOriginal = normalizeValue(originalCostValue);
-    const normalizedCurrent = normalizeValue(currentCostValue);
-
-    if (normalizedOriginal !== normalizedCurrent) {
-      return <span style={{ color: COLORS.UPGRADE }}>{normalizedCurrent}</span>;
-    }
-
-    return normalizedCurrent;
+  // 正規表現の特殊文字をエスケープする関数
+  const escapeRegExp = (string: string): string => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   };
 
-  // キーワードに色を付ける関数
-  const colorizeKeywords = (text: string) => {
-    // 文を文単位で分割（ピリオドで区切る）
-    const sentences = text.split(/(?<=\.)/).filter(Boolean);
-    const result: React.ReactNode[] = [];
-    const searchTermLower = searchTerm.toLowerCase();
-    const hasSearchTerm = searchTerm && searchTermLower.length > 0;
-
-    sentences.forEach((sentence, index) => {
-      // 文字列を単語と区切り文字に分割
-      const parts = sentence.split(/([.,\s]|\d+|[A-Za-z]+)/g).filter(Boolean);
-      const sentenceResult: React.ReactNode[] = [];
-
-      parts.forEach((part, i) => {
-        if (/^\s+$/.test(part)) {
-          sentenceResult.push(
-            <React.Fragment key={`space-${i}`}>{part}</React.Fragment>
-          );
-          return;
-        }
-
-        // 検索ワードに一致するかチェック
-        if (hasSearchTerm && part.toLowerCase().includes(searchTermLower)) {
-          const startIndex = part.toLowerCase().indexOf(searchTermLower);
-          const endIndex = startIndex + searchTermLower.length;
-          
-          sentenceResult.push(
-            <span key={`highlight-${i}`}>
-              {part.substring(0, startIndex)}
-              <span style={{ backgroundColor: 'rgba(255, 255, 0, 0.4)', color: '#ffffff' }}>
-                {part.substring(startIndex, endIndex)}
-              </span>
-              {part.substring(endIndex)}
-            </span>
-          );
-        } else if (KEYWORDS.includes(part)) {
-          sentenceResult.push(
-            <span 
-              key={`keyword-${i}`}
-              style={{ 
-                color: COLORS.KEYWORD,
-                display: 'inline-block',
-                verticalAlign: 'baseline'
-              }}
-            >
-              {part}
-            </span>
-          );
-        } else {
-          sentenceResult.push(
-            <React.Fragment key={`text-${i}`}>{part}</React.Fragment>
-          );
+  // 説明文のキーワードをハイライト
+  const getHighlightedDescription = (text: string) => {
+    let highlighted = text;
+    
+    // アップグレード前後の説明文を比較して追加されたキーワードを検出
+    const keywordsAddedAfterUpgrade: string[] = [];
+    if (upgraded && originalDescription) {
+      // 特定のキーワードのリスト
+      const keywordsList = [
+        'Unplayable', 'Ethereal', 'Weak', 'Curse', 'Innate', 'Exhaust', 'Block', 
+        'Vulnerable', 'Channel', 'Lightning', 'Frost', 'Dark', 'Plasma', 'Evoke', 
+        'Void', 'channeled', 'Focus', 'Strength', 'Dexterity', 'Artifact', 'upgrade', 
+        'upgraded', 'Fatal', 'Burn', 'Poison', 'Shiv', 'Shiv+', 'Wrath', 'Calm', 
+        'Scry', 'Stance', 'Insight', 'Retain', 'Retained', 'Mark', 'Mantra', 'Smite', 
+        'Miracle', 'Miracle+', 'Safety', 'Intangible', 'Divinity', 'Expunger'
+      ];
+      
+      // アップグレード後に追加されたキーワードを検出
+      keywordsList.forEach(keyword => {
+        const escapedKeyword = escapeRegExp(keyword);
+        const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
+        if (!originalDescription.match(regex) && text.match(regex)) {
+          keywordsAddedAfterUpgrade.push(keyword);
         }
       });
-
-      result.push(
-        <div key={`sentence-${index}`} style={{ textAlign: 'center' }}>
-          {sentenceResult}
-          {index < sentences.length - 1 && <br />}
-        </div>
-      );
+    }
+    
+    // 特定のキーワードに色を適用
+    const keywordsList = [
+      'Unplayable', 'Ethereal', 'Weak', 'Curse', 'Innate', 'Exhaust', 'Block', 
+      'Vulnerable', 'Channel', 'Lightning', 'Frost', 'Dark', 'Plasma', 'Evoke', 
+      'Void', 'channeled', 'Focus', 'Strength', 'Dexterity', 'Artifact', 'upgrade', 
+      'upgraded', 'Fatal', 'Burn', 'Poison', 'Shiv', 'Shiv+', 'Wrath', 'Calm', 
+      'Scry', 'Stance', 'Insight', 'Retain', 'Retained', 'Mark', 'Mantra', 'Smite', 
+      'Miracle', 'Miracle+', 'Safety', 'Intangible', 'Divinity', 'Expunger'
+    ];
+    
+    keywordsList.forEach(keyword => {
+      const escapedKeyword = escapeRegExp(keyword);
+      const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
+      
+      // アップグレード後に追加されたキーワードには #76F900 を使用、それ以外は #F0C944
+      const color = keywordsAddedAfterUpgrade.includes(keyword) ? '#76F900' : '#F0C944';
+      
+      highlighted = highlighted.replace(regex, (match) => `<span style="color: ${color}; font-family: 'Kreon', serif;">${match}</span>`);
     });
-
-    return (
-      <div style={{ display: 'inline-block', whiteSpace: 'pre-wrap', width: '100%', textAlign: 'center' }}>
-        {result}
-      </div>
-    );
-  };
-
-  // 説明文の差分を強調表示する関数
-  const highlightDifferences = (original: string, upgraded: string) => {
-    if (!original || !upgraded) return colorizeKeywords(upgraded);
-    const searchTermLower = searchTerm.toLowerCase();
-    const hasSearchTerm = searchTerm && searchTermLower.length > 0;
-
-    // 文頭のキーワードを特別処理
-    const handleLeadingKeywords = (text: string): { prefix: string[], rest: string } => {
-      const leadingKeywords = ['Innate', 'Retain', 'Ethereal'];
-      const prefixes: string[] = [];
-      let rest = text;
-
-      // 文頭のキーワードを順番に検出
-      let changed = true;
-      while (changed) {
-        changed = false;
-        for (const keyword of leadingKeywords) {
-          if (rest.startsWith(`${keyword}.`)) {
-            prefixes.push(`${keyword}.`);
-            rest = rest.slice(keyword.length + 1).trim();
-            changed = true;
-            break;
-          }
-          if (rest.startsWith(`${keyword} `)) {
-            prefixes.push(`${keyword}.`);
-            rest = rest.slice(keyword.length + 1).trim();
-            changed = true;
-            break;
-          }
-        }
-      }
-
-      return { prefix: prefixes, rest };
-    };
-
-    const originalParts = handleLeadingKeywords(original);
-    const upgradedParts = handleLeadingKeywords(upgraded);
-
-    // 文を文単位で分割（ピリオドで区切る）
-    const originalSentences = originalParts.rest.split(/(?<=\.)/).filter(Boolean);
-    const upgradedSentences = upgradedParts.rest.split(/(?<=\.)/).filter(Boolean);
-    const result: React.ReactNode[] = [];
-
-    // 文頭キーワードの処理
-    upgradedParts.prefix.forEach((prefix, index) => {
-      const wasInOriginal = originalParts.prefix.includes(prefix);
-      result.push(
-        <div key={`prefix-${index}`} style={{ textAlign: 'center' }}>
-          <span
-            style={{
-              color: wasInOriginal ? COLORS.KEYWORD : COLORS.UPGRADE,
-              display: 'inline-block',
-              verticalAlign: 'baseline'
-            }}
-          >
-            {prefix}
-          </span>
-          {index < upgradedParts.prefix.length - 1 && <br />}
-        </div>
-      );
+    
+    // キーワードをハイライト (以前のコードと同様)
+    Object.entries(KEYWORDS).forEach(([keyword, color]) => {
+      const escapedKeyword = escapeRegExp(keyword);
+      const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
+      highlighted = highlighted.replace(regex, (match) => `<span style="color: ${color}; font-family: 'Kreon', serif;">${match}</span>`);
     });
-
-    // 削除されたキーワードがある場合は、残りの文章を変更なしとして扱う
-    const hasRemovedKeywords = originalParts.prefix.length > upgradedParts.prefix.length;
-    if (hasRemovedKeywords && originalParts.rest === upgradedParts.rest) {
-      // 残りの文章をそのまま表示（変更なしとして扱う）
-      upgradedSentences.forEach((sentence, index) => {
-        const sentenceResult = colorizeKeywords(sentence);
-        result.push(
-          <div key={`sentence-${index}`} style={{ textAlign: 'center' }}>
-            {sentenceResult}
-            {index < upgradedSentences.length - 1 && <br />}
-          </div>
-        );
-      });
-    } else {
-      // 通常の差分検出処理
-      upgradedSentences.forEach((sentence, index) => {
-        const originalSentence = originalSentences[index] || '';
-        
-        // 単純化したトークン化関数
-        const tokenize = (text: string): string[] => {
-          // 単語、数字、空白、句読点に分割
-          return text.split(/(\s+|\d+|[A-Za-z]+|[.,!?])/).filter(Boolean);
+    
+    // 数字のハイライト (変更されたものだけハイライト)
+    if (upgraded && originalDescription) {
+      // アップグレード前後で単語が変化したかを検出する機能を追加
+      const findAddedOrChangedWords = () => {
+        // テキストから特殊文字を除去して単語に分割する関数
+        const getWords = (text: string) => {
+          // 句読点などを空白に置き換えて単語を抽出しやすくする
+          const cleanText = text.replace(/[.,!?;:]/g, ' ');
+          return cleanText.split(/\s+/).filter(word => word.length > 0);
         };
-
-        const originalTokens = tokenize(originalSentence);
-        const upgradedTokens = tokenize(sentence);
-
-        // 単純な差分検出（完全一致のみ）
-        const changes: boolean[] = new Array(upgradedTokens.length).fill(false);
         
-        // 各トークンが元のテキストに存在するかチェック
-        upgradedTokens.forEach((token, idx) => {
-          // キーワードの場合
-          if (KEYWORDS.includes(token)) {
-            // 元のテキストにキーワードが含まれていない場合は変更とマーク
-            changes[idx] = !originalTokens.includes(token);
+        const originalWords = getWords(originalDescription);
+        const newWords = getWords(text);
+        
+        // 単語ごとの出現回数をカウント
+        const originalWordCount: Record<string, number> = {};
+        const newWordCount: Record<string, number> = {};
+        
+        originalWords.forEach(word => {
+          originalWordCount[word] = (originalWordCount[word] || 0) + 1;
+        });
+        
+        newWords.forEach(word => {
+          newWordCount[word] = (newWordCount[word] || 0) + 1;
+        });
+        
+        // 追加された単語や出現回数が増えた単語を検出
+        const changedWords: string[] = [];
+        
+        for (const word in newWordCount) {
+          // アップグレード後にのみ存在する単語、または出現回数が増えた単語
+          if (!originalWordCount[word] || newWordCount[word] > originalWordCount[word]) {
+            changedWords.push(word);
+          }
+        }
+        
+        return changedWords;
+      };
+      
+      // アップグレード前後で変化した単語を検出
+      const changedWords = findAddedOrChangedWords();
+      
+      // 変化した単語をハイライト（単語境界を考慮）
+      changedWords.forEach(word => {
+        // 単語が数字だけの場合は既に処理されているのでスキップ
+        if (/^\d+$/.test(word)) return;
+        
+        // 特殊な単語（ALLなど）は単語境界を厳密にチェックしない
+        const specialWords = ['ALL'];
+        
+        if (specialWords.includes(word)) {
+          // 大文字のALLなど、特殊な単語は正確にマッチさせる
+          const escapedWord = escapeRegExp(word);
+          const regex = new RegExp(`(${escapedWord})`, 'g');
+          highlighted = highlighted.replace(regex, `<span style="color: ${COLORS.UPGRADED_VALUE}; font-family: 'Kreon', serif;">$1</span>`);
+        } else {
+          // 通常の単語は単語境界をチェック（正規表現の特殊文字をエスケープ）
+          const escapedWord = escapeRegExp(word);
+          const regex = new RegExp(`\\b${escapedWord}\\b`, 'gi');
+          highlighted = highlighted.replace(regex, `<span style="color: ${COLORS.UPGRADED_VALUE}; font-family: 'Kreon', serif;">${word}</span>`);
+        }
+      });
+      
+      // アップグレード前後で数字が変化したかを確認する関数
+      const findChangedNumbers = () => {
+        // 元の説明文から数字を抽出
+        const originalNumbers: {[key: string]: number[]} = {};
+        const originalMatches = originalDescription.match(/\b(\d+)\b/g) || [];
+        originalMatches.forEach(numStr => {
+          if (!originalNumbers[numStr]) originalNumbers[numStr] = [];
+          originalNumbers[numStr].push(1);
+        });
+        
+        // 現在の説明文の数字を抽出して変化を確認
+        const changedNumbers: string[] = [];
+        const currentMatches = text.match(/\b(\d+)\b/g) || [];
+        
+        currentMatches.forEach(numStr => {
+          // 元の説明文にその数字がなければ変化したと判定
+          if (!originalNumbers[numStr]) {
+            changedNumbers.push(numStr);
             return;
           }
           
-          // 数字の場合
-          if (/^\d+$/.test(token)) {
-            // 元のテキストに同じ数字がない場合は変更とマーク
-            changes[idx] = !originalTokens.includes(token);
-            return;
+          // 元の説明文に同じ数字があっても、出現回数が違えば変化したと判定
+          if (originalNumbers[numStr].length > 0) {
+            originalNumbers[numStr].pop();
+          } else {
+            changedNumbers.push(numStr);
           }
-          
-          // その他のトークン
-          // 元のテキストに同じトークンがない場合は変更とマーク
-          changes[idx] = !originalTokens.includes(token);
         });
-
-        // 結果の生成
-        const sentenceResult: React.ReactNode[] = [];
-        upgradedTokens.forEach((token, idx) => {
-          if (/^\s+$/.test(token)) {
-            sentenceResult.push(<React.Fragment key={`space-${idx}`}>{token}</React.Fragment>);
-            return;
-          }
-
-          // 検索ワードに一致するかチェック
-          if (hasSearchTerm && token.toLowerCase().includes(searchTermLower)) {
-            const startIndex = token.toLowerCase().indexOf(searchTermLower);
-            const endIndex = startIndex + searchTermLower.length;
-            
-            sentenceResult.push(
-              <span key={`highlight-${idx}`}>
-                {token.substring(0, startIndex)}
-                <span style={{ backgroundColor: 'rgba(255, 255, 0, 0.4)', color: '#ffffff' }}>
-                  {token.substring(startIndex, endIndex)}
-                </span>
-                {token.substring(endIndex)}
-              </span>
-            );
-            return;
-          }
-
-          if (KEYWORDS.includes(token)) {
-            const isChanged = changes[idx];
-            sentenceResult.push(
-              <span
-                key={`keyword-${idx}`}
-                style={{
-                  color: isChanged ? COLORS.UPGRADE : COLORS.KEYWORD,
-                  display: 'inline-block',
-                  verticalAlign: 'baseline'
-                }}
-              >
-                {token}
-              </span>
-            );
-            return;
-          }
-
-          if (/^\d+$/.test(token)) {
-            sentenceResult.push(
-              changes[idx] ? (
-                <span key={`number-${idx}`} style={{ color: COLORS.UPGRADE }}>{token}</span>
-              ) : (
-                <React.Fragment key={`number-${idx}`}>{token}</React.Fragment>
-              )
-            );
-            return;
-          }
-
-          sentenceResult.push(
-            changes[idx] ? (
-              <span key={`text-${idx}`} style={{ color: COLORS.UPGRADE }}>{token}</span>
-            ) : (
-              <React.Fragment key={`text-${idx}`}>{token}</React.Fragment>
-            )
-          );
-        });
-
-        result.push(
-          <div key={`sentence-${index}`} style={{ textAlign: 'center' }}>
-            {sentenceResult}
-            {index < upgradedSentences.length - 1 && <br />}
-          </div>
-        );
+        
+        return changedNumbers;
+      };
+      
+      const changedNumbers = findChangedNumbers();
+      
+      // 変化した数字だけをハイライト
+      changedNumbers.forEach(numStr => {
+        const regex = new RegExp(`\\b${numStr}\\b`, 'g');
+        highlighted = highlighted.replace(regex, `<span style="color: ${COLORS.UPGRADED_VALUE}; font-family: 'Kreon', serif;">${numStr}</span>`);
       });
     }
-
-    return (
-      <div style={{ display: 'inline-block', whiteSpace: 'pre-wrap', width: '100%', textAlign: 'center' }}>
-        {result}
-      </div>
-    );
+    
+    return highlighted;
   };
+
+  // 検索語句のハイライト
+  const highlightSearchTerm = (text: string) => {
+    if (!searchTerm) return text;
+    
+    // 正規表現の特殊文字をエスケープ
+    const escapedSearchTerm = escapeRegExp(searchTerm);
+    const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+    return text.replace(regex, '<span class="bg-yellow-400 text-black">$1</span>');
+  };
+
+  // 説明文の処理
+  const highlightedDescription = getHighlightedDescription(description);
+  const finalDescription = searchTerm ? highlightSearchTerm(highlightedDescription) : highlightedDescription;
+
+  // 名前の処理（検索語句とアップグレード）
+  let displayName = name;
+  if (upgraded) {
+    displayName = `${name}+`;
+  }
+  const highlightedName = searchTerm ? highlightSearchTerm(displayName) : displayName;
+
+  // 縁取り用のテキストシャドウスタイル - より立体的で画像のような見た目に調整
+  const textOutlineStyle = '1px 1px 0 #59564f, -1px -1px 0 #59564f, 1px -1px 0 #59564f, -1px 1px 0 #59564f, 0px 2px 3px rgba(0,0,0,0.7)';
+  
+  // コスト用の太い縁取りスタイル - 16方向の縁取りで隙間をなくす
+  const costOutlineStyle = 
+    '2px 0px 0 #59564f, ' +    // 右
+    '-2px 0px 0 #59564f, ' +   // 左
+    '0px 2px 0 #59564f, ' +    // 下
+    '0px -2px 0 #59564f, ' +   // 上
+    '2px 2px 0 #59564f, ' +    // 右下
+    '-2px -2px 0 #59564f, ' +  // 左上
+    '2px -2px 0 #59564f, ' +   // 右上
+    '-2px 2px 0 #59564f, ' +   // 左下
+    '1px 2px 0 #59564f, ' +    // 右斜め下
+    '-1px 2px 0 #59564f, ' +   // 左斜め下
+    '2px 1px 0 #59564f, ' +    // 右下斜め
+    '-2px 1px 0 #59564f, ' +   // 左下斜め
+    '1px -2px 0 #59564f, ' +   // 右斜め上
+    '-1px -2px 0 #59564f, ' +  // 左斜め上
+    '2px -1px 0 #59564f, ' +   // 右上斜め
+    '-2px -1px 0 #59564f, ' +  // 左上斜め
+    '0px 3px 4px rgba(0,0,0,0.7)';
 
   return (
     <div 
@@ -375,147 +335,127 @@ const Card: React.FC<CardProps> = ({
       }}
     >
       {/* ベースとなるカードの枠 */}
-      <img
-        src={baseCardPath}
-        alt="Base Card"
-        className="absolute top-0 left-0 w-[190px] h-[252px]"
-        onError={(e) => {
-          e.currentTarget.src = `/src/assets/cards/design/colorless/colorless_${type === 'curse' ? 'skill' : type}.png`;
-        }}
-      />
+      {baseCardPath && (
+        <img
+          src={baseCardPath}
+          alt="Base Card"
+          className="absolute top-0 left-0 w-[190px] h-[252px]"
+          onError={(e) => {
+            const fallback = getAssetUrl(`cards/design/colorless/colorless_${type === 'curse' ? 'skill' : type}.png`);
+            if (fallback) e.currentTarget.src = fallback;
+          }}
+        />
+      )}
 
-      {/* カードの絵柄 */}
-      <img
-        src={cardImagePath}
-        alt={name}
-        className="absolute top-[26px] left-[17.5px] w-[162px] h-[116px]"
-        onError={(e) => {
-          e.currentTarget.src = `/src/assets/images/cards/colorless/${type === 'curse' ? 'skill' : type}/default.png`;
-        }}
-      />
+      {/* カード画像 */}
+      {cardImagePath && (
+        <img
+          src={cardImagePath}
+          alt={name}
+          className="absolute top-[25px] left-1/2 transform -translate-x-1/2 w-[220px] h-[120px] object-contain"
+          onError={(e) => {
+            const fallback = getAssetUrl(`images/cards/colorless/${type === 'curse' ? 'skill' : type}/default.png`);
+            if (fallback) e.currentTarget.src = fallback;
+          }}
+        />
+      )}
 
       {/* フレーム */}
-      <img
-        src={framePath}
-        alt="Frame"
-        className="absolute top-[3px] left-[10px] w-[171.5px] h-[147px]"
-      />
+      {framePath && (
+        <img
+          src={framePath}
+          alt="Frame"
+          className="absolute top-0 left-[10px] w-[170px] h-[150px]"
+        />
+      )}
 
-      {/* バナー */}
-      <img
-        src={bannerPath}
-        alt="Banner"
-        className="absolute top-[5px] left-[0px] w-[250px] h-[45px] transform scale-x-[1.1]"
-      />
-
-      {/* コストの枠（呪いカードまたはコストが-1以外の場合のみ表示） */}
-      {cardClass !== 'curse' && cost !== -1 && (
-        <>
-          <img
-            src={costFramePath}
-            alt="Cost Frame"
-            className="absolute top-[-16px] left-[-14px] w-[46px] h-[46px]"
-            onError={(e) => {
-              e.currentTarget.src = `/src/assets/cards/design/colorless/colorless.png`;
-            }}
-          />
-          <div 
-            className="card-cost absolute text-[20px] font-bold w-[46px] h-[46px] flex items-center justify-center"
-            style={{ 
-              color: '#FFF6E1',
-              top: '-16px',
-              left: '-14px',
-              textShadow: `
-                -2px -2px 0 #4c4943, -2px -1px 0 #4c4943, -2px 0 0 #4c4943,
-                -2px 1px 0 #4c4943, -2px 2px 0 #4c4943, -1px -2px 0 #4c4943,
-                -1px -1px 0 #4c4943, -1px 0 0 #4c4943, -1px 1px 0 #4c4943,
-                -1px 2px 0 #4c4943, 0 -2px 0 #4c4943, 0 -1px 0 #4c4943,
-                0 0 0 #4c4943, 0 1px 0 #4c4943, 0 2px 0 #4c4943,
-                1px -2px 0 #4c4943, 1px -1px 0 #4c4943, 1px 0 0 #4c4943,
-                1px 1px 0 #4c4943, 1px 2px 0 #4c4943, 2px -2px 0 #4c4943,
-                2px -1px 0 #4c4943, 2px 0 0 #4c4943, 2px 1px 0 #4c4943,
-                2px 2px 0 #4c4943
-              `
-            }}
-            lang="en"
-          >
-            {displayCost()}
-          </div>
-        </>
+      {/* バナー（カード名の背景） */}
+      {bannerPath && (
+        <img
+          src={bannerPath}
+          alt="Banner"
+          className="absolute top-[4px] left-[-10px]"
+          style={{
+            zIndex: 1,
+            width: '210px',
+            maxWidth: 'none'
+          }}
+        />
       )}
 
       {/* カード名 */}
       <div 
-        className="absolute w-full text-center text-[16px] capitalize"
+        className="absolute top-[8px] left-1/2 transform -translate-x-1/2 w-[140px] text-center"
         style={{ 
+          color: upgraded ? COLORS.UPGRADED_NAME : '#ECE8DA',
+          fontSize: '15px',
           fontFamily: 'Kreon, serif',
-          color: upgraded ? '#76F900' : '#FFF6E1',
-          top: '2.8%',
-          left: '50%',
-          transform: 'translate(-50%)',
-          textShadow: `
-            3px 3px 0 #59564f,
-            2px 2px 0 #59564f,
-            -1px -1px 0 #59564f,
-            1px -1px 0 #59564f,
-            -1px 1px 0 #59564f,
-            1px 1px 0 #59564f
-          `
+          zIndex: 3
         }}
-        lang="en"
       >
-        {searchTerm && name.toLowerCase().includes(searchTerm.toLowerCase()) ? (
-          <span>
-            {name.split(new RegExp(`(${searchTerm})`, 'i')).map((part, i) => 
-              part.toLowerCase() === searchTerm.toLowerCase() ? 
-                <span key={i} style={{ backgroundColor: 'rgba(255, 255, 0, 0.4)' }}>{part}</span> : 
-                <span key={i}>{part}</span>
-            )}
-            {upgraded && '+'}
-          </span>
-        ) : (
-          <>
-            {name}
-            {upgraded && '+'}
-          </>
-        )}
+        <div 
+          className="font-en font-semibold whitespace-nowrap overflow-hidden"
+          style={{
+            textShadow: textOutlineStyle,
+            fontWeight: 'bold',
+            letterSpacing: '0.5px'
+          }}
+          dangerouslySetInnerHTML={{ __html: highlightedName }}
+        />
       </div>
+
+      {/* コスト枠（コストが-1の場合は表示しない） */}
+      {cost !== -1 && costFramePath && (
+        <div className="absolute top-[-13px] left-[-16px] w-[45px] h-[45px]" style={{ zIndex: 2 }}>
+          <img
+            src={costFramePath}
+            alt="Cost Frame"
+            className="w-full h-full"
+            onError={(e) => {
+              const fallback = getAssetUrl('cards/design/colorless/colorless.png');
+              if (fallback) e.currentTarget.src = fallback;
+            }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span 
+              className="font-en font-bold text-2xl text-white card-cost"
+              style={{ 
+                color: upgraded && originalCost !== undefined && cost !== originalCost ? COLORS.UPGRADED_VALUE : '#ECE8DA',
+                fontFamily: 'Kreon, serif',
+                textShadow: costOutlineStyle,
+                fontWeight: 'bold'
+              }}
+            >
+              {cost}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* カードタイプ */}
-      <div 
-        className="card-type absolute"
-        style={{ 
-          color: '#595959',
-          fontWeight: 700,
-          left: '50.5%',
-          marginLeft: '0.5%',
-          top: '53.2%',
-          transform: 'translate(-50%)'
-        }}
-        lang="en"
-      >
-        {typeDisplay}
+      <div className="absolute top-[125px] left-1/2 transform -translate-x-1/2 w-full text-center">
+        <span 
+          className="font-en text-white card-type"
+          style={{ 
+            fontFamily: 'Kreon, serif',
+            color: '#59564f',
+            fontWeight: 'bold',
+            zIndex: 3
+          }}
+        >
+          {typeDisplay}
+        </span>
       </div>
 
-      {/* 説明文 */}
-      <div 
-        className="absolute flex flex-col items-center justify-center text-[12px] whitespace-pre-wrap"
-        style={{ 
-          fontFamily: 'Kreon, serif',
-          color: '#FFF6E1',
-          top: '60%',
-          left: '50%',
-          transform: 'translate(-50%)',
-          width: '69%',
-          height: '30%',
-          textShadow: '1px 1px 0 #1d1d18',
-          textAlign: 'center'
-        }}
-        lang="en"
-      >
-        {upgraded && originalDescription
-          ? highlightDifferences(originalDescription, description)
-          : colorizeKeywords(description)}
+      {/* カード説明 */}
+      <div className="absolute top-[150px] left-[98px] transform -translate-x-1/2 w-[134px] h-[78px] text-center flex items-center justify-center overflow-hidden">
+        <p 
+          className="text-white text-xs px-2 leading-tight" 
+          style={{ 
+            fontFamily: 'Kreon, serif'
+          }}
+          dangerouslySetInnerHTML={{ __html: finalDescription }}
+        />
       </div>
     </div>
   );

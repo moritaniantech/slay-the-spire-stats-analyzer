@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { app } from 'electron';
+import log from 'electron-log';
 
 /**
  * ファイルパスのバリデーション
@@ -92,5 +94,124 @@ export async function ensureDirectory(dirPath: string, allowedDirectories: strin
   } catch (error) {
     console.error('Error ensuring directory:', error);
     throw error;
+  }
+}
+
+/**
+ * macOS環境でのResourcesパス検証を行う
+ */
+function checkMacOSResourcePath() {
+  if (process.platform !== 'darwin') return null;
+  
+  try {
+    const resourcesPath = process.resourcesPath;
+    const appPath = app.getAppPath();
+    const exePath = app.getPath('exe');
+    
+    // 標準的なmacOSのバンドル構造をチェック
+    const isStandardBundle = exePath.includes('.app/Contents/MacOS/');
+    
+    // 期待されるアセットディレクトリのパス
+    const expectedAssetsPath = path.join(resourcesPath, 'assets');
+    const assetsExists = fs.existsSync(expectedAssetsPath);
+    
+    // ディレクトリが存在する場合は内容を確認
+    let assetContents: string[] = [];
+    if (assetsExists) {
+      try {
+        assetContents = fs.readdirSync(expectedAssetsPath);
+      } catch (e) {
+        log.error('Error reading assets directory:', e);
+      }
+    }
+    
+    // 詳細情報を記録
+    const pathInfo = {
+      resourcesPath,
+      appPath,
+      exePath,
+      isStandardBundle,
+      expectedAssetsPath,
+      assetsExists,
+      assetContents: assetContents.slice(0, 10) // 最初の10件のみ表示
+    };
+    
+    log.info('MacOS path validation:', pathInfo);
+    return pathInfo;
+  } catch (error) {
+    log.error('Error checking MacOS resources path:', error);
+    return null;
+  }
+}
+
+/**
+ * アセットパスを解決するユーティリティ関数
+ * @param assetPath assets フォルダからの相対パス
+ * @returns 解決された絶対パス
+ */
+export function resolveAssetPath(assetPath: string): string {
+  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+  
+  log.info('Resolving asset path:', {
+    assetPath,
+    isDev,
+    appPath: app.getAppPath(),
+    resourcesPath: process.resourcesPath,
+    isPackaged: app.isPackaged,
+    env: process.env.NODE_ENV,
+    platform: process.platform
+  });
+
+  // 開発環境の場合
+  if (isDev) {
+    const devPath = path.join(app.getAppPath(), 'src/assets', assetPath);
+    log.info('Development path:', devPath, 'exists:', fs.existsSync(devPath));
+    return devPath;
+  }
+
+  // 本番環境の場合
+  const resourcePath = path.join(process.resourcesPath, 'assets', assetPath);
+  const distPath = path.join(app.getAppPath(), 'dist', 'assets', assetPath);
+  
+  // まずresourcesPath内のアセットを探す
+  if (fs.existsSync(resourcePath)) {
+    log.info('Found asset in resources path:', resourcePath);
+    return resourcePath;
+  }
+  
+  // 次にdist内のアセットを探す
+  if (fs.existsSync(distPath)) {
+    log.info('Found asset in dist path:', distPath);
+    return distPath;
+  }
+
+  // アセットが見つからない場合は警告を出力
+  log.warn('Asset not found in any location:', {
+    resourcePath,
+    distPath,
+    exists: {
+      resourcePath: fs.existsSync(resourcePath),
+      distPath: fs.existsSync(distPath),
+      resourcesDir: fs.existsSync(path.dirname(resourcePath)),
+      distDir: fs.existsSync(path.dirname(distPath))
+    }
+  });
+
+  // デフォルトでresourcesPathを返す
+  return resourcePath;
+}
+
+/**
+ * アセットが存在するかチェックする関数
+ * @param assetPath assets フォルダからの相対パス
+ * @returns 存在する場合は true
+ */
+export function assetExists(assetPath: string): boolean {
+  try {
+    const fullPath = resolveAssetPath(assetPath);
+    return fs.existsSync(fullPath);
+  } catch (error) {
+    console.error('Error checking asset existence:', error);
+    return false;
   }
 } 

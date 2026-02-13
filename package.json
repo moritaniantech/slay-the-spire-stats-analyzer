@@ -3,11 +3,11 @@
   "productName": "StS Stats Analyzer",
   "private": true,
   "version": "1.0.0",
-  "type": "commonjs",
   "main": "./dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b --noEmit && vite build",
+    "build": "vite build",
+    "build:typecheck": "tsc -b --noEmit && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "build:electron": "tsc -p electron/tsconfig.json",
@@ -19,11 +19,15 @@
     "buildL:mdc": "ts-node -P rules/tsconfig.json rules/build-mdc.ts",
     "watchL:mdc": "ts-node -P rules/tsconfig.json rules/watch-mdc.ts",
     "build:app": "vite build && electron-builder build --mac --win -c.extraMetadata.main=dist-electron/main.js",
-    "build:win": "vite build && electron-builder build --win -c.extraMetadata.main=dist-electron/main.js",
-    "build:mac": "vite build && electron-builder build --mac -c.extraMetadata.main=dist-electron/main.js",
+    "build:win": "yarn build:electron && vite build && rimraf resources/assets && mkdir -p resources/assets && cp -r public/assets/* resources/assets/ && electron-builder build --win --config electron-builder.json",
+    "build:mac": "yarn build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false vite build && rimraf resources/assets && mkdir -p resources/assets && cp -r public/assets/* resources/assets/ && electron-builder build --mac --config electron-builder.json",
+    "build:all": "yarn clean && yarn build:electron && vite build && rimraf resources/assets && mkdir -p resources/assets && cp -r public/assets/* resources/assets/ && electron-builder build --mac --win --config electron-builder.json",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@electron/remote": "^2.1.2",
+    "@emotion/is-prop-valid": "^1.3.1",
+    "@emotion/react": "^11.14.0",
     "@eslint/config-array": "^0.19.2",
     "@eslint/object-schema": "^2.1.6",
     "@headlessui/react": "^2.2.0",
@@ -38,9 +42,14 @@
     "daisyui": "^5.0.6",
     "date-fns": "^4.1.0",
     "electron-is-dev": "^3.0.1",
-    "framer-motion": "^12.5.0",
+    "electron-log": "^5.4.0",
+    "electron-store": "8.1.0",
+    "electron-updater": "^6.6.2",
+    "framer-motion": "^12.12.1",
+    "html-react-parser": "^5.2.2",
     "i18next": "^24.2.3",
     "lru-cache": "^11.0.2",
+    "path-browserify": "^1.0.1",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
@@ -50,6 +59,7 @@
     "react-router-dom": "^7.4.0",
     "react-switch": "^7.1.0",
     "reflect-metadata": "^0.2.2",
+    "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "stream-browserify": "^3.0.0",
     "typeorm": "^0.3.21",
@@ -65,18 +75,16 @@
     "@tailwindcss/postcss": "^4.0.14",
     "@tailwindcss/postcss7-compat": "^2.2.17",
     "@types/chart.js": "^2.9.41",
+    "@types/path-browserify": "^1.0.3",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.19",
     "chokidar": "^4.0.3",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^35.0.3",
     "electron-builder": "^25.1.8",
-    "electron-log": "^5.3.2",
-    "electron-store": "^10.0.1",
-    "electron-updater": "^6.3.9",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.16",
@@ -108,95 +116,75 @@
   "homepage": "https://github.com/moritaniantech/slay-the-spire-stats-analyzer#readme",
   "keywords": [],
   "build": {
-    "appId": "com.momomo.sts-stats-analyzer",
+    "appId": "com.moritaniantech.sts-stats-analyzer",
     "productName": "StS Stats Analyzer",
     "directories": {
       "output": "release"
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "package.json",
+      "node_modules/**/*"
     ],
-    "protocols": {
-      "name": "StS Stats Analyzer",
-      "schemes": [
-        "sts-stats-analyzer"
-      ]
-    },
+    "extraResources": [
+      {
+        "from": "src/assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "resources/assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/**/*.node",
+      "dist-electron/**/*.node",
+      "resources/assets/**/*",
+      "assets/**/*"
+    ],
+    "protocols": [
+      {
+        "name": "Asset Protocol",
+        "schemes": [
+          "asset"
+        ]
+      }
+    ],
     "win": {
-      "target": "nsis",
-      "icon": "public/icons/icon.ico"
-    },
-    "mac": {
       "target": [
         {
-          "target": "dmg",
+          "target": "nsis",
           "arch": [
-            "arm64",
             "x64"
           ]
         }
       ],
-      "icon": "public/icons/icon.png",
-      "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "entitlements": null,
-      "entitlementsInherit": null,
-      "darkModeSupport": true,
-      "identity": null,
-      "extendInfo": {
-        "CFBundleIdentifier": "com.momomo.sts-stats-analyzer",
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLName": "StS Stats Analyzer",
-            "CFBundleURLSchemes": [
-              "sts-stats-analyzer"
-            ]
-          }
-        ],
-        "LSApplicationCategoryType": "public.app-category.games",
-        "NSAppleEventsUsageDescription": "StS Stats Analyzerはゲームのプレイデータを分析するためにファイルアクセスが必要です。",
-        "NSMicrophoneUsageDescription": "このアプリはマイクを使用しません。",
-        "NSCameraUsageDescription": "このアプリはカメラを使用しません。",
-        "NSLocationUsageDescription": "このアプリは位置情報を使用しません。"
-      }
+      "icon": "public/icons/icon.ico"
     },
-    "dmg": {
-      "sign": false,
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
+    "mac": {
+      "target": [
+        "dmg"
       ],
-      "window": {
-        "width": 540,
-        "height": 380
-      }
+      "category": "public.app-category.utilities",
+      "icon": "public/icons/icon.icns",
+      "darkModeSupport": true
     },
-    "afterSign": "scripts/notarize.js",
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "StS Stats Analyzer",
-      "installerIcon": "public/icons/icon.ico",
-      "uninstallerIcon": "public/icons/icon.ico"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "moritaniantech",
-      "repo": "slay-the-spire-stats-analyzer",
-      "private": false,
-      "releaseType": "release",
-      "updaterCacheDirName": "sts-stats-analyzer-updater"
+      "artifactName": "StS Stats Analyzer Setup ${version}.${ext}",
+      "uninstallDisplayName": "StS Stats Analyzer"
     }
   }
 }

@@ -59,7 +59,9 @@ yarn lint
 yarn buildL:mdc
 ```
 
-## ビルド
+## アプリケーションのビルド
+
+### 開発用ビルド
 
 ```bash
 # TypeScriptのビルド
@@ -67,6 +69,40 @@ yarn build
 
 # Electronアプリケーションのビルド
 yarn build:electron
+```
+
+### リリース用ビルド
+
+```bash
+# Windows向けビルド
+yarn build:win
+
+# macOS向けユニバーサルビルド (Intel + Apple Silicon)
+yarn build:mac
+
+# 両プラットフォーム向けビルド
+yarn build:all
+```
+
+ビルドされたアプリケーションは `release/` ディレクトリに以下のように出力されます：
+
+- Windows: `StS Stats Analyzer Setup 1.0.0.exe` (インストーラー)
+- macOS: 
+  - `StS Stats Analyzer-1.0.0-universal.dmg` (ユニバーサルDMG)
+  - `StS Stats Analyzer-1.0.0-universal-mac.zip` (ユニバーサルZIP)
+
+### macOSアプリの公証（Notarization）
+
+macOS用のアプリを公式リリースする場合は、Apple公証（Notarization）プロセスが必要です。
+公証を行うには、以下の環境変数を設定後にビルドを実行します：
+
+```bash
+export APPLE_ID="your.apple.id@example.com"
+export APPLE_APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
+export APPLE_TEAM_ID="XXXXXXXXXX"
+
+# 公証プロセスを含むビルド
+yarn build:mac
 ```
 
 ## ライセンス

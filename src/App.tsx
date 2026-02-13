@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "./components/Header";
 import { StatsOverview } from "./components/StatsOverview";
-import { RunList } from "./components/RunList";
+import RunList from "./components/RunList";
 import { FolderSelector } from "./components/FolderSelector";
 import {
   BrowserRouter as Router,
@@ -11,17 +11,25 @@ import {
   useNavigate,
   useLocation,
   Link,
+  useParams
 } from "react-router-dom";
-import { RunDetail } from "./components/RunDetail";
+import RunDetail from "./components/RunDetail";
+import PlayDetail from "./components/PlayDetail";
 import { Run, useStore } from "./store";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/20/solid";
 import CardList from "./components/CardList";
 import RelicList from "./components/RelicList";
 import { precalculateCardStats, precalculateRelicStats, clearStatsCache, setCacheMaxSize } from "./services/StatsService";
-import allCards from "./assets/cards/allCards.json";
-import allRelics from "./assets/relics/relics.json";
+// allCards と allRelics は CardList と RelicList コンポーネント内で IPC 経由で読み込むため、
+// 静的インポートは不要（public/assets に存在するため、Vite のビルド時にバンドルされない）
+// import allCards from "./assets/cards/allCards.json";
+// import allRelics from "./assets/relics/relics.json";
 import NeowBonusList from './components/NeowBonusList';
 import UpdateNotification from './components/UpdateNotification';
+import { scanAllAssetReferences } from './utils/imageAssetUtils';
+import { isDevelopment, isProduction, isElectron } from './utils/environment';
+import { FilePickerOptions } from 'electron-api';
+import { getAssetUrl } from './utils/assetUtils';
 
 // グローバル設定変数を定義
 declare global {
@@ -39,6 +47,58 @@ function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { runs, settings, setRuns } = useStore();
+
+  // アセット参照の診断を実行
+  useEffect(() => {
+    // DOMが完全に読み込まれた後にスキャンを実行
+    const runAssetScan = () => {
+      console.log('[App] アセット参照診断を開始します...');
+      try {
+        const scanResults = scanAllAssetReferences();
+        console.log('[App] アセット参照診断結果:', scanResults);
+        
+        // 環境情報も記録
+        console.log('[App] 環境情報:', {
+          isProd: isProduction(),
+          electronAvailable: isElectron(),
+          isPackaged: window.electronAPI?.isPackaged,
+          platform: window.electronAPI?.platform,
+          url: window.location.href,
+          protocol: window.location.protocol
+        });
+        
+        // 問題のある画像を特定
+        const problematicImages = scanResults.images.filter(img => 
+          !img.complete || !img.naturalSize || img.src.includes(getAssetUrl(''))
+        );
+        
+        if (problematicImages.length > 0) {
+          console.warn('[App] 問題のある画像が見つかりました:', problematicImages);
+        } else {
+          console.log('[App] すべての画像は正常に読み込まれています');
+        }
+        
+        // CSSの問題も確認
+        const problematicCssRefs = scanResults.cssBackgrounds.filter(ref => 
+          ref.url.includes(getAssetUrl(''))
+        );
+        
+        if (problematicCssRefs.length > 0) {
+          console.warn('[App] 問題のあるCSS背景参照が見つかりました:', problematicCssRefs);
+        }
+      } catch (error) {
+        console.error('[App] アセット参照診断中にエラーが発生しました:', error);
+      }
+    };
+    
+    // ページロード完了後に実行
+    if (document.readyState === 'complete') {
+      runAssetScan();
+    } else {
+      window.addEventListener('load', runAssetScan);
+      return () => window.removeEventListener('load', runAssetScan);
+    }
+  }, []);
 
   // グローバル設定変数を初期化
   useEffect(() => {
@@ -210,34 +270,37 @@ function Layout({ children }: { children: React.ReactNode }) {
 
   const handleThemeToggle = async () => {
     const newTheme = theme === "light" ? "dark" : "light";
+    console.log(`テーマを ${theme} から ${newTheme} に切り替えます`);
     try {
       if (window.electronAPI) {
         await window.electronAPI.setTheme(newTheme);
+        console.log(`テーマが ${newTheme} に設定されました`);
       }
       setTheme(newTheme);
       applyTheme(newTheme);
+      console.log(`テーマ適用完了: ${newTheme}`);
     } catch (error) {
       console.error("Error setting theme:", error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-base-100 w-full overflow-x-hidden">
+    <div className="min-h-screen bg-navy-dark w-full overflow-x-hidden">
       <div className="fixed top-0 left-0 right-0 z-50">
         <Header onThemeToggle={handleThemeToggle} theme={theme} />
-        <div className="bg-base-100 border-b border-base-300">
-          <div className="container mx-auto px-4 py-2 relative">
-            <div className="absolute left-0 flex items-center gap-2">
+        <div className="bg-navy-base border-b border-navy">
+          <div className="container mx-auto px-4 py-2 relative max-w-[1920px]">
+            <div className="absolute left-4 flex items-center gap-2">
               <button
                 onClick={() => navigate(-1)}
-                className="btn btn-ghost btn-circle"
+                className="btn btn-ghost btn-circle text-primary-custom hover:bg-navy-light transition-colors"
                 disabled={location.pathname === "/home"}
               >
                 <ArrowLeftIcon className="h-5 w-5" />
               </button>
               <button
                 onClick={() => navigate(1)}
-                className="btn btn-ghost btn-circle"
+                className="btn btn-ghost btn-circle text-primary-custom hover:bg-navy-light transition-colors"
                 disabled={
                   !window.history.state ||
                   window.history.state.idx === window.history.length - 1
@@ -246,43 +309,43 @@ function Layout({ children }: { children: React.ReactNode }) {
                 <ArrowRightIcon className="h-5 w-5" />
               </button>
             </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
               <Link
                 to="/home"
-                className={`btn btn-ghost btn-sm ${
-                  location.pathname === "/home" ? "btn-active" : ""
+                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
+                  location.pathname === "/home" ? "bg-navy-accent" : ""
                 }`}
               >
                 ホーム
               </Link>
               <Link
                 to="/cards"
-                className={`btn btn-ghost btn-sm ${
-                  location.pathname === "/cards" ? "btn-active" : ""
+                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
+                  location.pathname === "/cards" ? "bg-navy-accent" : ""
                 }`}
               >
                 カード一覧
               </Link>
               <Link
                 to="/relics"
-                className={`btn btn-ghost btn-sm ${
-                  location.pathname === "/relics" ? "btn-active" : ""
+                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
+                  location.pathname === "/relics" ? "bg-navy-accent" : ""
                 }`}
               >
                 レリック一覧
               </Link>
               <Link
                 to="/neow-bonus"
-                className={`btn btn-ghost btn-sm ${
-                  location.pathname === "/neow-bonus" ? "btn-active" : ""
+                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
+                  location.pathname === "/neow-bonus" ? "bg-navy-accent" : ""
                 }`}
               >
                 ネオーの祝福
               </Link>
               <Link
                 to="/settings"
-                className={`btn btn-ghost btn-sm ${
-                  location.pathname === "/settings" ? "btn-active" : ""
+                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
+                  location.pathname === "/settings" ? "bg-navy-accent" : ""
                 }`}
               >
                 設定
@@ -291,7 +354,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-      <div className="pt-24 pb-8">
+      <div className="pt-32 pb-8">
         {children}
       </div>
       <UpdateNotification />
@@ -305,7 +368,7 @@ function HomePage() {
   const { setRuns } = useStore();
 
   const handleFolderSelect = async (folderPath: string) => {
-    if (isLoading || !("electronAPI" in window)) return;
+    if (isLoading || !("electronAPI" in window) || !window.electronAPI) return;
 
     setIsLoading(true);
     setError(null);
@@ -327,9 +390,9 @@ function HomePage() {
   return (
     <div className="mx-auto px-4 space-y-6 max-w-[1920px]">
       <div className="grid grid-cols-1 gap-6">
-        <div className="card bg-base-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)]">
+        <div className="card-navy">
           <div className="card-body p-4">
-            <h2 className="card-title text-lg mb-4">
+            <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">
               Slay the Spireのrunsフォルダ
             </h2>
             <FolderSelector onFolderSelect={handleFolderSelect} />
@@ -337,13 +400,13 @@ function HomePage() {
         </div>
 
         {isLoading ? (
-          <div className="card bg-base-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)]">
+          <div className="card-navy">
             <div className="card-body flex items-center justify-center">
-              <div className="loading loading-spinner loading-lg" />
+              <div className="loading loading-spinner loading-lg text-navy-accent" />
             </div>
           </div>
         ) : error ? (
-          <div className="alert alert-error shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)]">
+          <div className="alert alert-error shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)] bg-status-error/20 border-status-error text-status-error">
             <div className="flex flex-col">
               <p className="font-medium">エラーが発生しました</p>
               <p>{error}</p>
@@ -351,15 +414,15 @@ function HomePage() {
           </div>
         ) : (
           <>
-            <div className="card bg-base-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)]">
+            <div className="card-navy">
               <div className="card-body p-4">
-                <h2 className="card-title text-lg mb-4">プレイ統計</h2>
+                <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ統計</h2>
                 <StatsOverview />
               </div>
             </div>
-            <div className="card bg-base-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)]">
+            <div className="card-navy">
               <div className="card-body p-4">
-                <h2 className="card-title text-lg mb-4">プレイ履歴</h2>
+                <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ履歴</h2>
                 <RunList />
               </div>
             </div>
@@ -370,7 +433,230 @@ function HomePage() {
   );
 }
 
+// パラメータ付きのリダイレクトコンポーネント
+function PlayToRunsRedirect() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // コンポーネントマウント時に一度だけ実行
+  useEffect(() => {
+    if (id) {
+      console.log(`[Redirect] ${location.pathname} から /runs/${id} へリダイレクトします`);
+      navigate(`/runs/${id}`, { replace: true });
+    } else {
+      console.error('[Redirect] リダイレクト先のIDが見つかりません', { path: location.pathname, params: useParams() });
+      navigate('/404', { replace: true });
+    }
+  }, [id, navigate, location.pathname]);
+  
+  // リダイレクト中は読み込み表示
+  return (
+    <div className="flex flex-col justify-center items-center h-screen">
+      <span className="loading loading-spinner loading-lg mb-4"></span>
+      <p className="text-lg">プレイデータへリダイレクト中...</p>
+      <p className="text-sm text-base-content/70 mt-2">ID: {id || 'なし'}</p>
+    </div>
+  );
+}
+
 function App() {
+  const { loadRuns } = useStore()
+  const [loadingRuns, setLoadingRuns] = useState(false)
+  const [runFilePaths, setRunFilePaths] = useState<string[]>([])
+  const [assetStatus, setAssetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+
+  // ランデータをロード
+  useEffect(() => {
+    const loadRunFiles = async () => {
+      if (runFilePaths.length === 0 || !window.electronAPI) return;
+      
+      setLoadingRuns(true)
+      try {
+        const promises = runFilePaths.map(path => window.electronAPI.readFile(path, 'utf8'))
+        const fileContents = await Promise.all(promises)
+        
+        // ファイルの中身をパース
+        const parsedRuns = fileContents.map((content, i) => {
+          try {
+            return JSON.parse(content)
+          } catch (e) {
+            console.error(`Failed to parse run file at ${runFilePaths[i]}:`, e)
+            return null
+          }
+        }).filter(Boolean)
+        
+        // ストアにランをロード
+        loadRuns(parsedRuns)
+      } catch (error) {
+        console.error('Failed to load run files:', error)
+      } finally {
+        setLoadingRuns(false)
+      }
+    }
+    
+    loadRunFiles()
+  }, [runFilePaths, loadRuns])
+
+  // アセットの読み込み状態をチェック
+  useEffect(() => {
+    // アセットの読み込み状態をチェックする関数
+    const checkAssetLoadStatus = async () => {
+      try {
+        console.log('[App] アセットロードステータスのチェックを開始...');
+        console.log('[App] typeof window.electronAPI:', typeof window.electronAPI);
+        if (window.electronAPI) {
+          console.log('[App] window.electronAPI object:', JSON.stringify(Object.keys(window.electronAPI)));
+        }
+        
+        // Electron環境でgetFileURLForAssetが利用可能な場合（macOS/Windows共通）
+        if (isElectron() && window.electronAPI?.getFileURLForAsset) {
+          const platform = window.electronAPI.platform || 'unknown';
+          console.log(`[App] ${platform} platform detected. Using getFileURLForAsset.`);
+          try {
+            const testAssetPath = 'ui/topPanel/deck.png'; // public/assets からの相対パス
+            console.log(`[App] ${platform}: Calling getFileURLForAsset for:`, testAssetPath);
+            const fileUrl = await window.electronAPI.getFileURLForAsset(testAssetPath);
+            
+            if (fileUrl) {
+              console.log(`[App] ${platform}: ファイルURLの取得に成功:`, fileUrl);
+              const img = new Image();
+              img.onload = () => {
+                console.log(`[App] ${platform}: 画像のロードに成功 (サイズ:`, img.width, 'x', img.height, ')');
+                setAssetStatus('ready');
+              };
+              img.onerror = (err) => {
+                console.error(`[App] ${platform}: ファイルURLでの画像ロードに失敗:`, err, 'Falling back to regular path check.');
+                checkWithRegularPath(); // 代替手段を試す
+              };
+              img.src = fileUrl;
+              return;
+            } else {
+              console.warn(`[App] ${platform}: ファイルURLの取得に失敗. Falling back to regular path check.`);
+              checkWithRegularPath(); // 代替手段を試す
+            }
+          } catch (platformErr) {
+            console.error(`[App] ${platform}固有の処理中にエラー:`, platformErr, 'Falling back to regular path check.');
+            checkWithRegularPath(); // 代替手段を試す
+          }
+          return; // プラットフォーム処理が終わったら、checkWithRegularPathは呼ばない（エラー時フォールバックを除く）
+        }
+        
+        console.log('[App] getFileURLForAsset not available or not Electron, proceeding with regular path check.');
+        checkWithRegularPath();
+        
+      } catch (error) {
+        console.error('[App] アセットステータスチェック中に予期せぬエラーが発生:', error);
+        setAssetStatus('error');
+      }
+    };
+    
+    const checkWithRegularPath = async () => {
+      console.log('[App] checkWithRegularPath: Starting...');
+      console.log('[App] checkWithRegularPath: typeof window.electronAPI:', typeof window.electronAPI);
+      if (window.electronAPI) {
+        console.log('[App] checkWithRegularPath: window.electronAPI object keys:', JSON.stringify(Object.keys(window.electronAPI)));
+        console.log('[App] checkWithRegularPath: typeof window.electronAPI.getImageBase64:', typeof window.electronAPI.getImageBase64);
+      }
+
+      try {
+        const testAssetRelativePath = 'ui/topPanel/deck.png';
+        console.log('[App] checkWithRegularPath: テストアセット相対パス:', testAssetRelativePath);
+        
+        if (window.electronAPI && typeof window.electronAPI.getImageBase64 === 'function') {
+          console.log('[App] checkWithRegularPath: Calling getImageBase64...');
+          const base64Data = await window.electronAPI.getImageBase64(testAssetRelativePath);
+          console.log('[App] checkWithRegularPath: getImageBase64 returned.', base64Data ? 'Data received' : 'No data');
+
+          if (!base64Data) {
+            console.error('[App] checkWithRegularPath: テストアセット画像のBase64データ取得に失敗。');
+            setAssetStatus('error');
+            return;
+          }
+          
+          const img = new Image();
+          img.onload = () => {
+            if (img.width === 0 || img.height === 0) {
+              console.error('[App] checkWithRegularPath: アセット画像は読み込まれましたが、サイズが0です');
+              setAssetStatus('error');
+              return;
+            }
+            console.log('[App] checkWithRegularPath: アセット画像の読み込みに成功 (サイズ:', img.width, 'x', img.height, ')');
+          setAssetStatus('ready');
+        };
+        img.onerror = (err) => {
+            console.error('[App] checkWithRegularPath: テストアセット画像の読み込みに失敗 (Base64からのロード):', err);
+            setAssetStatus('error');
+          };
+          img.src = base64Data;
+        } else {
+          console.error('[App] checkWithRegularPath: window.electronAPI.getImageBase64 が利用できません。');
+          setAssetStatus('error');
+        }
+      } catch (imgErr) {
+        console.error('[App] checkWithRegularPath: 画像読み込み処理中にエラー:', imgErr);
+        setAssetStatus('error');
+      }
+    };
+    
+    checkAssetLoadStatus();
+  }, []);
+
+  // ファイル選択ダイアログを表示
+  const handleOpenRunFiles = async () => {
+    if (loadingRuns || !window.electronAPI) return;
+    
+    try {
+      const options: FilePickerOptions = {
+        title: 'Select Slay the Spire Run Files',
+        defaultPath: await window.electronAPI.getUserDataPath(),
+        filters: [
+          { name: 'JSON Files', extensions: ['json'] },
+          { name: 'All Files', extensions: ['*'] }
+        ],
+        properties: ['openFile', 'multiSelections']
+      }
+      
+      const result = await window.electronAPI.showOpenDialog(options)
+      if (!result.canceled && result.filePaths.length > 0) {
+        setRunFilePaths(result.filePaths)
+      }
+    } catch (error) {
+      console.error('Failed to open file dialog:', error)
+    }
+  }
+
+  // アセットが読み込めないエラー
+  if (assetStatus === 'error') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
+        <h1 className="text-3xl font-bold mb-4 text-error">アセット読み込みエラー</h1>
+        <p className="mb-6">
+          ゲームアセットの読み込みに失敗しました。
+          {isProduction() 
+            ? 'アプリケーションがプロパーにインストールされていないか、必要なファイルが不足している可能性があります。'
+            : '開発モードでは /src/assets/ ディレクトリが存在し、アクセス可能である必要があります。'}
+        </p>
+        <button 
+          className="btn btn-primary"
+          onClick={() => setAssetStatus('loading')}
+        >
+          再試行
+        </button>
+      </div>
+    )
+  }
+
+  // アセットのロード中
+  if (assetStatus === 'loading') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="loading loading-spinner loading-lg mb-4"></div>
+        <p className="text-lg">アセットを読み込み中...</p>
+      </div>
+    )
+  }
+
   return (
     <Router>
       <Layout>
@@ -378,11 +664,15 @@ function App() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/runs/:id" element={<RunDetail />} />
+          <Route path="/play-detail/:id" element={<PlayDetail />} />
           <Route path="/cards" element={<CardList />} />
           <Route path="/relics" element={<RelicList />} />
           <Route path="/neow-bonus" element={<NeowBonusList />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/play/:id" element={<Navigate to={`/runs/:id`} replace />} />
+          <Route path="/play/:id" element={<PlayToRunsRedirect />} />
+          <Route path="/run/:id" element={<PlayToRunsRedirect />} />
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </Layout>
     </Router>
@@ -403,13 +693,13 @@ function SettingsPage() {
   
   return (
     <div className="mx-auto px-4 space-y-6 max-w-[1920px]">
-      <div className="card bg-base-200 shadow-xl">
+      <div className="card-navy">
         <div className="card-body">
-          <h2 className="card-title text-xl mb-4">アプリケーション設定</h2>
+          <h2 className="card-title text-xl mb-4 text-primary-custom font-jp">アプリケーション設定</h2>
           
           <div className="form-control">
             <label className="label cursor-pointer">
-              <span className="label-text">統計情報ツールチップを表示する</span>
+              <span className="label-text text-primary-custom font-jp">統計情報ツールチップを表示する</span>
               <input 
                 type="checkbox" 
                 className="toggle toggle-primary" 
@@ -417,7 +707,7 @@ function SettingsPage() {
                 onChange={handleToggleStatsTooltip}
               />
             </label>
-            <p className="text-sm text-base-content/70 ml-2">
+            <p className="text-sm text-muted-custom ml-2 font-jp">
               カードやレリックにカーソルを合わせたときに取得率や勝率を表示します。
               無効にするとパフォーマンスが向上します。
             </p>
@@ -425,7 +715,7 @@ function SettingsPage() {
           
           <div className="form-control mt-4">
             <label className="label cursor-pointer">
-              <span className="label-text">統計情報を事前計算する</span>
+              <span className="label-text text-primary-custom font-jp">統計情報を事前計算する</span>
               <input 
                 type="checkbox" 
                 className="toggle toggle-primary" 
@@ -433,19 +723,39 @@ function SettingsPage() {
                 onChange={handleTogglePrecalculate}
               />
             </label>
-            <p className="text-sm text-base-content/70 ml-2">
+            <p className="text-sm text-muted-custom ml-2 font-jp">
               アプリケーション起動時に人気のカードやレリックの統計情報を事前計算します。
               有効にすると初回表示が高速になりますが、起動時の負荷が増加します。
             </p>
           </div>
           
           <div className="mt-8">
-            <p className="text-sm text-base-content/70">
+            <p className="text-sm text-muted-custom font-jp">
               ※設定はブラウザに保存され、アプリケーションを再起動しても維持されます。
             </p>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 404 Notfoundページコンポーネント
+function NotFoundPage() {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
+      <h1 className="text-3xl font-bold mb-4 text-primary-custom font-jp">ページが見つかりません</h1>
+      <p className="mb-6 text-secondary-custom font-jp">
+        お探しのページは存在しないか、移動された可能性があります。
+      </p>
+      <button 
+        className="btn btn-navy-primary font-jp"
+        onClick={() => navigate('/home')}
+      >
+        ホームに戻る
+      </button>
     </div>
   );
 }

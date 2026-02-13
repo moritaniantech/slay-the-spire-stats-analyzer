@@ -20,7 +20,9 @@ export const COLORS = {
   RARITY_COMMON: '#FFFFFF',
   RARITY_UNCOMMON: '#80D6EF',
   RARITY_RARE: '#F7CD52',
-  RARITY_BOSS: '#FF666C'
+  RARITY_BOSS: '#FF666C',
+  UPGRADED_NAME: '#76F900',
+  UPGRADED_VALUE: '#76F900'
 } as const;
 
 // レリックのキーワード定義

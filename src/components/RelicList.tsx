@@ -1,28 +1,28 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import allRelics from '../assets/relics/relics.json';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import './RelicList.css';
+import { getAssetUrl, normalizeRelicName, RELIC_FALLBACK_URL, getRelicImageUrl } from '../utils/assetUtils';
+import ImageAsset from './common/ImageAsset';
 import { motion, AnimatePresence } from 'framer-motion';
-import './RelicList.css'; // スクロールバーのスタイル用CSSをインポート
 import { COLORS, RELIC_KEYWORDS } from '../constants/keywords';
 import { useStore } from '../store';
 import { calculateRelicStats } from '../services/StatsService';
 import { createEmptyAllCharacterStats } from '../models/StatsModel';
 import StatsTooltip from './StatsTooltip';
 
-// タブ画像のインポート
-import tabIronclad from '../assets/images/cardLibrary/tab_ironclad.png';
-import tabSilent from '../assets/images/cardLibrary/tab_silent.png';
-import tabDefect from '../assets/images/cardLibrary/tab_defect.png';
-import tabWatcher from '../assets/images/cardLibrary/tab_watcher.png';
-import tabColorless from '../assets/images/cardLibrary/tab_colorless.png';
-import tabCurse from '../assets/images/cardLibrary/tab_curse.png';
-import searchIcon from '../assets/ui/cursors/magGlass2.png';
-
 // レリックフレームのインポート
-import relicFrameCommon from '../assets/ui/relicFrames/relicFrameCommon.png';
-import relicFrameUncommon from '../assets/ui/relicFrames/relicFrameUncommon.png';
-import relicFrameRare from '../assets/ui/relicFrames/relicFrameRare.png';
-import relicFrameBoss from '../assets/ui/relicFrames/relicFrameBoss.png';
-import relicPopup from '../assets/ui/relicFrames/relicPopup.png';
+// import relicFrameCommon from '../assets/ui/relicFrames/relicFrameCommon.png';
+// import relicFrameUncommon from '../assets/ui/relicFrames/relicFrameUncommon.png';
+// import relicFrameRare from '../assets/ui/relicFrames/relicFrameRare.png';
+// import relicFrameBoss from '../assets/ui/relicFrames/relicFrameBoss.png';
+const relicFrameCommon = getAssetUrl('ui/relicFrames/relicFrameCommon.png') ?? undefined;
+const relicFrameUncommon = getAssetUrl('ui/relicFrames/relicFrameUncommon.png') ?? undefined;
+const relicFrameRare = getAssetUrl('ui/relicFrames/relicFrameRare.png') ?? undefined;
+const relicFrameBoss = getAssetUrl('ui/relicFrames/relicFrameBoss.png') ?? undefined;
+
+// 画像のパスを変数として定義
+const searchIcon = getAssetUrl('ui/cursors/magGlass2.png') ?? undefined;
+const relicPopup = getAssetUrl('ui/relicFrames/relicPopup.png') ?? undefined;
 
 interface RelicData {
   name: string;
@@ -42,17 +42,17 @@ interface FormattedRelic {
   description: string;
   class: RelicClass;
   rarity: RelicRarity;
-  imagePath: string;
+  imagePath: string | undefined;
   flavor?: string;
 }
 
 const tabImages: Record<RelicClass, string> = {
-  ironclad: tabIronclad,
-  silent: tabSilent,
-  defect: tabDefect,
-  watcher: tabWatcher,
-  all: tabColorless,
-  all_classes: tabCurse,
+  ironclad: 'images/cardLibrary/tab_ironclad.png',
+  silent: 'images/cardLibrary/tab_silent.png',
+  defect: 'images/cardLibrary/tab_defect.png',
+  watcher: 'images/cardLibrary/tab_watcher.png',
+  all: 'images/cardLibrary/tab_colorless.png',
+  all_classes: 'images/cardLibrary/tab_curse.png',
 };
 
 const classTabConfig = [
@@ -61,35 +61,35 @@ const classTabConfig = [
     name: 'IRONCLAD',
     searchBgColor: 'bg-[#ff6563]/20',
     textColor: 'text-[#ff6563]',
-    costFrame: '/src/assets/cards/design/ironclad/ironclad.png'
+    costFrame: 'cards/design/ironclad/ironclad.png'
   },
   {
     id: 'silent',
     name: 'SILENT',
     searchBgColor: 'bg-[#7fff00]/20',
     textColor: 'text-[#7fff00]',
-    costFrame: '/src/assets/cards/design/silent/silent.png'
+    costFrame: 'cards/design/silent/silent.png'
   },
   {
     id: 'defect',
     name: 'DEFECT',
     searchBgColor: 'bg-[#87ceeb]/20',
     textColor: 'text-[#87ceeb]',
-    costFrame: '/src/assets/cards/design/defect/defect.png'
+    costFrame: 'cards/design/defect/defect.png'
   },
   {
     id: 'watcher',
     name: 'WATCHER',
     searchBgColor: 'bg-[#a600ff]/20',
     textColor: 'text-[#a600ff]',
-    costFrame: '/src/assets/cards/design/watcher/watcher.png'
+    costFrame: 'cards/design/watcher/watcher.png'
   },
   {
     id: 'all',
     name: 'COLORLESS',
     searchBgColor: 'bg-base-200/50',
     textColor: 'text-base-content',
-    costFrame: '/src/assets/cards/design/colorless/colorless.png'
+    costFrame: 'cards/design/colorless/colorless.png'
   },
   {
     id: 'all_classes',
@@ -336,6 +336,21 @@ const Relic: React.FC<{
   onMouseMove: (event: React.MouseEvent) => void;
   searchTerm?: string;
 }> = ({ relic, onMouseEnter, onMouseLeave, onMouseMove, searchTerm = '' }) => {
+  const [imagePath, setImagePath] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    // レリック名から画像パスを取得
+    if (relic.englishName) {
+      const path = getRelicImageUrl(relic.englishName);
+      setImagePath(path ?? undefined);
+    } else if (relic.imagePath) {
+      const path = getAssetUrl(`images/relics/${relic.imagePath}.png`);
+      setImagePath(path ?? undefined);
+    } else {
+      setImagePath(undefined);
+    }
+  }, [relic.imagePath, relic.englishName]);
+
   const relicFrame = getRelicFrame(relic.rarity);
   const rarityColor = getRarityColor(relic.rarity);
   const rarityText = getRarityDisplayText(relic.rarity);
@@ -343,109 +358,348 @@ const Relic: React.FC<{
   // フレーバーテキストの整形
   const formattedFlavorText = formatFlavorText(relic.flavor);
   
+  // 検索語句のハイライト
+  const highlightSearchTerm = (text: string) => {
+    if (!searchTerm) return text;
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<span class="bg-yellow-400 text-black">$1</span>');
+  };
+
+  // レリック名の処理（検索語句）
+  const highlightedName = searchTerm ? highlightSearchTerm(relic.name) : relic.name;
+
+  // 縁取り用のテキストシャドウスタイル - カードと同様
+  const textOutlineStyle = '1px 1px 0 #59564f, -1px -1px 0 #59564f, 1px -1px 0 #59564f, -1px 1px 0 #59564f, 0px 2px 3px rgba(0,0,0,0.7)';
+
+  // relicPopup.pngの元のサイズは190px × 252px
+  // カードサイズ420px × 520pxに拡大表示する際のスケール比
+  // アスペクト比を維持するため、幅基準でスケール
+  const baseWidth = 190;
+  const baseHeight = 252;
+  const targetWidth = 420;
+  const targetHeight = 520;
+  
+  // 幅基準のスケール比を使用（アスペクト比を維持）
+  const scale = targetWidth / baseWidth; // ≈ 2.21
+  
   return (
     <div 
-      className="flex flex-col items-center w-full relic-card relative"
+      className="relative w-[420px] h-[520px] mx-auto overflow-hidden" 
+      style={{ 
+        filter: 'drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.5))',
+        pointerEvents: 'auto',
+        zIndex: 1,
+        cursor: 'pointer'
+      }}
+      onMouseEnter={(e) => onMouseEnter(relic.id, relic.name, e)}
+      onMouseLeave={onMouseLeave}
+      onMouseMove={onMouseMove}
     >
-      <div className="relative w-full h-full">
-        {/* 背景画像 */}
-        <div className="relative w-full h-full flex items-center justify-center rounded-lg overflow-hidden">
-          <img src={relicPopup} alt="Background" className="absolute inset-0 w-full h-full object-cover" />
-          
-          {/* レリック名 - 上部に配置 (少し下にずらす) */}
-          <div className="absolute top-[20%] left-0 right-0 flex flex-col items-center z-10">
-            <div className="text-center font-['Kreon'] font-bold text-lg relic-text-shadow px-2">
-              {searchTerm && relic.name.toLowerCase().includes(searchTerm.toLowerCase()) ? (
-                <span>
-                  {relic.name.split(new RegExp(`(${searchTerm})`, 'i')).map((part, i) => 
-                    part.toLowerCase() === searchTerm.toLowerCase() ? 
-                      <span key={i} style={{ backgroundColor: 'rgba(255, 255, 0, 0.4)' }}>{part}</span> : 
-                      <span key={i}>{part}</span>
-                  )}
-                </span>
-              ) : (
-                relic.name
-              )}
-            </div>
-            <div className="text-center text-base font-['Kreon'] relic-text-shadow mt-1" style={{ color: rarityColor }}>
-              {rarityText}
-            </div>
-          </div>
-          
-          {/* レリック画像とフレーム - 中央に配置 */}
-          <div className="absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full h-full flex items-center justify-center">
-            <div className="relative flex items-center justify-center w-full h-full">
-              {/* フレーム画像 - 別クラスで定義 */}
-              <div className="relic-frame-container w-full h-full">
-                <img 
-                  src={relicFrame} 
-                  alt="Frame" 
-                  className="relic-frame-img"
-                />
-              </div>
-              
-              {/* レリック画像 - 別クラスで定義 (下にずらす) */}
-              <div 
-                className="relic-image-container absolute inset-0 flex items-center justify-center cursor-pointer" 
-                style={{ transform: `translateY(65%)` }}
-                onMouseEnter={(e) => onMouseEnter(relic.id, relic.name, e)}
-                onMouseLeave={onMouseLeave}
-                onMouseMove={onMouseMove}
-              >
-                <img 
-                  src={`/src/assets/images/relics/${relic.imagePath}.png`}
-                  alt={relic.name}
-                  className="relic-img"
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* レリックの説明 - 下部に配置 */}
-          <div className="relic-description-wrapper">
-            <div className="relic-description-container">
-              {colorizeKeywords(relic.description, relic.rarity, searchTerm)}
-            </div>
-          </div>
-          
-          {/* フレーバーテキスト - 説明の下に配置 */}
-          {formattedFlavorText && (
-            <div className="relic-flavor-wrapper">
-              <div className="relic-flavor-text">
-                {searchTerm && formattedFlavorText.toLowerCase().includes(searchTerm.toLowerCase()) ? (
-                  <span>
-                    {formattedFlavorText.split(new RegExp(`(${searchTerm})`, 'i')).map((part, i) => 
-                      part.toLowerCase() === searchTerm.toLowerCase() ? 
-                        <span key={i} style={{ backgroundColor: 'rgba(255, 255, 0, 0.4)' }}>{part}</span> : 
-                        <span key={i}>{part}</span>
-                    )}
-                  </span>
-                ) : (
-                  formattedFlavorText
-                )}
-              </div>
-            </div>
-          )}
+      {/* レリック背景（relicPopup.png） - 最背面 */}
+      {relicPopup && (
+        <img
+          src={relicPopup}
+          alt="Relic Background"
+          className="absolute top-0 left-0 w-[420px] h-[520px]"
+          style={{ 
+            zIndex: 0,
+            objectFit: 'cover'
+          }}
+          onError={(e) => {
+            e.currentTarget.src = getAssetUrl('ui/relicFrames/relicFrameCommon.png') ?? '';
+          }}
+        />
+      )}
+
+      {/* レリック名（relicPopup.pngの上部枠内に配置） */}
+      <div 
+        className="absolute left-1/2 transform -translate-x-1/2 text-center"
+        style={{ 
+          top: `${50 * scale}px`,
+          width: `${170 * scale}px`,
+          color: '#ECE8DA',
+          fontSize: `${8 * scale}px`,
+          fontFamily: 'Kreon, serif',
+          zIndex: 4
+        }}
+      >
+        <div 
+          className="font-en font-semibold"
+          style={{
+            textShadow: textOutlineStyle,
+            fontWeight: 'bold',
+            letterSpacing: '0.5px',
+            lineHeight: '1.2'
+          }}
+          dangerouslySetInnerHTML={{ __html: highlightedName }}
+        />
+      </div>
+
+      {/* レアリティ表示（レリック名の直下に配置） */}
+      <div 
+        className="absolute left-1/2 transform -translate-x-1/2 w-full text-center"
+        style={{ 
+          top: `${60 * scale}px`,
+          zIndex: 4
+        }}
+      >
+        <span 
+          className="font-en"
+          style={{ 
+            fontFamily: 'Kreon, serif',
+            color: rarityColor,
+            fontWeight: 'bold',
+            fontSize: `${6 * scale}px`
+          }}
+        >
+          {rarityText}
+        </span>
+      </div>
+
+      {/* relicFrame（relicPopup.pngの黒い枠にぴったり重なるように配置） */}
+      {relicFrame && (
+        <img
+          src={relicFrame}
+          alt="Relic Frame"
+          className="absolute left-1/2 transform -translate-x-1/2"
+          style={{ 
+            // relicPopup.pngの元のサイズ190×252での黒い枠の位置を基準に計算
+            // 黒い枠は元のサイズで約: top=50px, left=50px, width=90px, height=90px
+            top: `${3 * scale}px`,
+            width: `${230 * scale}px`,
+            height: `${230 * scale}px`,
+            zIndex: 2,
+            objectFit: 'cover' // アスペクト比を維持しつつ、指定サイズを埋める
+          }}
+          onError={(e) => {
+            e.currentTarget.src = getAssetUrl('ui/relicFrames/relicFrameCommon.png') ?? '';
+          }}
+        />
+      )}
+
+      {/* レリック画像（relicFrameの内側、黒い枠内に収まるように配置） */}
+      <img
+        src={imagePath ?? RELIC_FALLBACK_URL ?? undefined}
+        alt={relic.name}
+        className="absolute left-1/2 transform -translate-x-1/2 object-contain"
+        style={{
+          // フレームの内側に収まるように、少し小さめに配置
+          top: `${60 * scale}px`,
+          width: `${65 * scale}px`,
+          height: `${80 * scale}px`,
+          zIndex: 3
+        }}
+        onError={(e) => {
+          const img = e.currentTarget;
+          if (!img.dataset.retried) {
+            img.dataset.retried = 'true';
+            const fallbackUrl = getAssetUrl('ui/relicSilhouette.png');
+            if (fallbackUrl) {
+              img.src = fallbackUrl;
+            }
+          }
+        }}
+      />
+
+      {/* レリック説明（フレームの下、relicPopup.pngの範囲内に配置） */}
+      <div 
+        className="absolute left-1/2 transform -translate-x-1/2 text-center"
+        style={{
+          // 黒い枠の下（元のサイズで約140px）に配置
+          top: `${140 * scale}px`,
+          width: `${120 * scale}px`,
+          maxHeight: `${50 * scale}px`,
+          zIndex: 4,
+          overflow: 'hidden'
+        }}
+      >
+        <div 
+          className="text-white px-2 leading-tight" 
+          style={{ 
+            fontFamily: 'Kreon, serif',
+            fontSize: `${6 * scale}px`,
+            color: '#ECE8DA',
+            lineHeight: '1.25'
+          }}
+        >
+          {colorizeKeywords(relic.description, relic.rarity, searchTerm)}
         </div>
       </div>
+
+      {/* フレーバーテキスト（最下部、relicPopup.pngの範囲内に配置） */}
+      {formattedFlavorText && (
+        <>
+          {/* 区切り線 */}
+          <div 
+            className="absolute left-1/2 transform -translate-x-1/2"
+            style={{
+              // 元のサイズで約190pxの位置に配置
+              top: `${190 * scale}px`,
+              width: `${120 * scale}px`,
+              height: '1px',
+              backgroundColor: '#ECE8DA',
+              opacity: 0.3,
+              zIndex: 4
+            }}
+          />
+          <div 
+            className="absolute left-1/2 transform -translate-x-1/2 text-center"
+            style={{
+              // 元のサイズで約200pxの位置に配置
+              top: `${170 * scale}px`,
+              width: `${120 * scale}px`,
+              maxHeight: `${40 * scale}px`,
+              zIndex: 4,
+              overflow: 'hidden'
+            }}
+          >
+            <p 
+              className="text-white px-2 leading-tight italic" 
+              style={{ 
+                fontFamily: 'ZillaSlab, serif',
+                color: '#FFF6E4',
+                opacity: 0.9,
+                fontSize: `${6 * scale}px`,
+                lineHeight: '1.15'
+              }}
+            >
+              {searchTerm && formattedFlavorText.toLowerCase().includes(searchTerm.toLowerCase()) ? (
+                <span
+                  dangerouslySetInnerHTML={{ 
+                    __html: highlightSearchTerm(formattedFlavorText) 
+                  }}
+                />
+              ) : (
+                formattedFlavorText
+              )}
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 const RelicList: React.FC = () => {
-  const { runs, settings, updateSettings } = useStore();
-  const [selectedClass, setSelectedClass] = useState<RelicClass>('ironclad');
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClass, setSelectedClass] = useState<RelicClass>('all_classes');
+  const [selectedRarities, setSelectedRarities] = useState<RelicRarity[]>([]);
+  const [hoveredRelic, setHoveredRelic] = useState<{ id: string, name: string, element: HTMLElement | null } | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isLoaded, setIsLoaded] = useState(false);
+  const { runs, settings } = useStore();
+  // const allCharacterStats = useMemo(() => calculateRelicStats(runs), [runs]); // この行をコメントアウト
+
+  // --- ここから追加 ---
+  const [allRelics, setAllRelics] = useState<Record<string, RelicData>>({});
+  const [loadingError, setLoadingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRelics = async () => {
+      try {
+        let jsonData: { relics: RelicData[] } & Record<string, any>;
+        
+        // Electron環境（開発環境・本番環境共通）: IPC経由でファイルを読み込む
+        if (window.electronAPI) {
+          try {
+            // getAssetPathにはassets/プレフィックスなしで渡す（getAssetPathが内部でassets/を追加するため）
+            const assetPath = 'relics/relics.json';
+            console.log('[RelicList] Requesting asset path for:', assetPath);
+            const filePath = await window.electronAPI.getAssetPath(assetPath);
+            if (!filePath) {
+              throw new Error('getAssetPath returned null');
+            }
+            console.log('[RelicList] Resolved file path:', filePath);
+            
+            // ファイルの存在確認（デバッグ用）
+            try {
+              const exists = await window.electronAPI.assetExists(assetPath);
+              console.log('[RelicList] Asset exists check result:', exists);
+            } catch (existsError) {
+              console.warn('[RelicList] Asset exists check failed:', existsError);
+            }
+            
+            const fileContent = await window.electronAPI.readFile(filePath, 'utf8');
+            if (!fileContent || fileContent.length === 0) {
+              throw new Error('File content is empty');
+            }
+            jsonData = JSON.parse(fileContent);
+            if (!jsonData || !jsonData.relics || !Array.isArray(jsonData.relics)) {
+              throw new Error('Invalid JSON structure: missing relics array');
+            }
+            console.log('[RelicList] JSON data loaded successfully via IPC. Relics count:', jsonData.relics.length);
+          } catch (ipcError) {
+            console.error('[RelicList] IPC経由の読み込みに失敗:', ipcError);
+            console.error('[RelicList] Error details:', {
+              message: ipcError instanceof Error ? ipcError.message : String(ipcError),
+              stack: ipcError instanceof Error ? ipcError.stack : undefined
+            });
+            // IPC経由の読み込みが失敗した場合、フォールバックとしてfetchを試す
+            console.warn('[RelicList] フォールバック: 通常のfetchを試行');
+            try {
+              const response = await fetch('/assets/relics/relics.json');
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              jsonData = await response.json();
+              console.log('[RelicList] JSON data loaded successfully via fallback fetch.');
+            } catch (fetchError) {
+              console.error('[RelicList] フォールバックfetchも失敗:', fetchError);
+              throw ipcError; // 元のエラーを再スロー
+            }
+          }
+        } else {
+          // 非Electron環境: 通常のfetchを使用
+          const response = await fetch('/assets/relics/relics.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          jsonData = await response.json();
+          console.log('[RelicList] JSON data loaded successfully.');
+        }
+        
+        // Assuming the JSON structure is { relics: RelicData[], ...otherKeys }
+        if (!jsonData || !Array.isArray(jsonData.relics)) {
+          console.error("Invalid data structure from relics.json. Expected an object with a 'relics' array.", jsonData);
+          setLoadingError('レリックデータの形式が正しくありません。');
+          return;
+        }
+
+        const actualRelicsArray: RelicData[] = jsonData.relics;
+        
+        // Convert array to Record<string, RelicData> using relic name as key
+        const relicsRecord = actualRelicsArray.reduce((acc, relic) => {
+          if (relic.name && typeof relic.name === 'string') {
+            acc[normalizeRelicName(relic.name)] = relic;
+          }
+          return acc;
+        }, {} as Record<string, RelicData>);
+
+        setAllRelics(relicsRecord);
+      } catch (error) {
+        console.error("Failed to fetch relics:", error);
+        setLoadingError('レリックデータの読み込みに失敗しました。');
+      }
+    };
+    fetchRelics();
+  }, []);
+  // --- ここまで追加 ---
+
+  const searchRef = useRef<HTMLInputElement>(null);
+  const rarityFilterRef = useRef<HTMLDivElement>(null);
   const [relics, setRelics] = useState<FormattedRelic[]>([]);
   const [isGlobalSearch, setIsGlobalSearch] = useState(false);
   const [rarityFilter, setRarityFilter] = useState<RelicRarity | ''>('');
   const [sortBy, setSortBy] = useState<'rarity' | 'name'>('rarity');
   
   const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [tooltipRelicId, setTooltipRelicId] = useState<string | null>(null);
-  const [tooltipRelicName, setTooltipRelicName] = useState('');
-  
+  const [tooltipRelicName, setTooltipRelicName] = useState<string | null>(null);
+
+  const [relicImages, setRelicImages] = useState<{ [key: string]: string | undefined }>({});
+
   useEffect(() => {
     // レリックデータを整形
     const formattedRelics: FormattedRelic[] = [];
@@ -453,16 +707,20 @@ const RelicList: React.FC = () => {
     // 重複チェック用のセット
     const processedRelics = new Set<string>();
 
-    allRelics.relics.forEach((relic) => {
-      // 重複チェック
-      if (processedRelics.has(relic.name)) {
+    Object.entries(allRelics).forEach(([relicId, relicData]) => {
+      // allRelics is now Record<string, RelicData>, relicId is the normalized name
+      const originalName = relicData.name; // Use original name from relicData for display and processing
+
+      // 重複チェック (originalName を使うべきか、relicId で良いか確認)
+      // ここでは relicId (normalized name) がユニークなキーとなっている前提
+      if (processedRelics.has(relicId)) {
         return;
       }
-      processedRelics.add(relic.name);
+      processedRelics.add(relicId);
 
       // クラスの判定
       let relicClass: RelicClass;
-      const normalizedClass = relic.class.toLowerCase().trim();
+      const normalizedClass = relicData.class.toLowerCase().trim();
       
       // 明示的なクラス判定
       if (normalizedClass === 'all') {
@@ -486,13 +744,13 @@ const RelicList: React.FC = () => {
             relicClass = 'watcher';
             break;
           default:
-            relicClass = 'all';
+            relicClass = 'all'; // Default to 'all' if class is not recognized
         }
       }
 
       // レアリティの判定
       let relicRarity: RelicRarity;
-      const normalizedRarity = relic.rarity.toLowerCase();
+      const normalizedRarity = relicData.rarity.toLowerCase();
       switch (normalizedRarity) {
         case 'starter':
           relicRarity = 'starter';
@@ -516,35 +774,43 @@ const RelicList: React.FC = () => {
           relicRarity = 'event';
           break;
         default:
-          relicRarity = 'common';
+          relicRarity = 'common'; // Default rarity
       }
 
-      // 画像パスの生成（キャメルケースに変換）
-      const imagePath = relic.name
-        .replace(/\s+/g, '')
-        .replace(/([A-Z])/g, (match) => match.toLowerCase())
-        .replace(/^(.)/, (match) => match.toLowerCase());
-
-      // aliasが存在する場合はそちらを使用
-      const finalImagePath = allRelics.alias && 
-        Object.prototype.hasOwnProperty.call(allRelics.alias, relic.name) 
-        ? (allRelics.alias as Record<string, string>)[relic.name] 
-        : imagePath;
+      // 画像パスの生成（getRelicImageUrl を使用）
+      const imagePath = getRelicImageUrl(originalName) ?? undefined;
 
       formattedRelics.push({
-        id: relic.name,
-        englishName: relic.name,
-        name: relic.name,
-        description: relic.effect,
+        id: relicId, // Use the normalized relicId from the allRelics record key
+        englishName: originalName, // Store original English name
+        name: originalName, // For display, assuming it's already translated or should be English
+        description: relicData.effect,
         class: relicClass,
         rarity: relicRarity,
-        imagePath: finalImagePath,
-        flavor: relic.flavor
+        imagePath: imagePath, // Use imagePath from getRelicImageUrl
+        flavor: relicData.flavor
       });
     });
 
     setRelics(formattedRelics);
-  }, []);
+  }, [allRelics]);
+
+  useEffect(() => {
+    const loadImages = () => {
+      // 画像のプリロード
+      const images: { [key: string]: string | undefined } = {};
+      // Filter out undefined image paths before trying to get asset URLs
+      const validImagePaths = relics.map(r => r.imagePath).filter(Boolean) as string[];
+      for (const relicImagePath of validImagePaths) {
+        // Assuming relicImagePath is like "ironWave" and needs full path construction
+        images[relicImagePath] = getAssetUrl(`images/relics/${relicImagePath}.png`) ?? undefined;
+      }
+      setRelicImages(images);
+    };
+    if (relics.length > 0) {
+        loadImages();
+    }
+  }, [relics]);
 
   // 全クラス検索がONになったときの処理
   useEffect(() => {
@@ -570,13 +836,15 @@ const RelicList: React.FC = () => {
     return relics
       .filter(relic => {
         const matchesSearch =
+          !searchTerm ||
           relic.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           relic.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (relic.flavor && relic.flavor.toLowerCase().includes(searchTerm.toLowerCase()));
 
         const matchesRarity = !rarityFilter || relic.rarity === rarityFilter;
 
-        const matchesClass = isGlobalSearch || relic.class === selectedClass || (selectedClass === 'all' && relic.class === 'all');
+        // selectedClass === 'all_classes' の場合はすべてのレリックを表示
+        const matchesClass = selectedClass === 'all_classes' || isGlobalSearch || relic.class === selectedClass || (selectedClass === 'all' && relic.class === 'all');
 
         return matchesSearch && matchesRarity && matchesClass;
       })
@@ -599,25 +867,30 @@ const RelicList: React.FC = () => {
     setSortBy('rarity');
   };
 
-  // レリックの統計情報を計算（メモ化）
-  const relicStats = React.useMemo(() => {
-    // ツールチップが表示されていなくても、レリックIDが設定されていれば計算する
-    if (!tooltipRelicId) {
-      return createEmptyAllCharacterStats();
+  // レリックの統計情報を計算
+  const relicStatsMap = useMemo(() => {
+    if (!relics || relics.length === 0 || !runs || runs.length === 0 || !settings.enableStatsTooltip) {
+      return new Map();
     }
-    return calculateRelicStats(runs, tooltipRelicId);
-  }, [tooltipRelicId, runs]);
+    console.time('RelicList:calculateAllRelicStats');
+    const newStatsMap = new Map();
+    relics.forEach(relic => {
+      if (relic && relic.id) { 
+        newStatsMap.set(relic.id, calculateRelicStats(runs, relic.id));
+      }
+    });
+    console.timeEnd('RelicList:calculateAllRelicStats');
+    return newStatsMap;
+  }, [relics, runs, settings.enableStatsTooltip]);
 
   // 右クリックメニューのハンドラー
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    updateSettings({ showStats: !settings.showStats });
+    console.warn("settings and updateSettings are not defined in this component.")
   };
 
   // レリックにマウスを合わせた時のハンドラー
   const handleMouseEnter = (relicId: string, relicName: string, event: React.MouseEvent) => {
-    if (!settings.showStats) return;
-    
     setTooltipRelicId(relicId);
     setTooltipRelicName(relicName);
     setTooltipVisible(true);
@@ -628,7 +901,7 @@ const RelicList: React.FC = () => {
   const handleMouseLeave = () => {
     setTooltipVisible(false);
     setTooltipRelicId(null);
-    setTooltipRelicName('');
+    setTooltipRelicName(null);
   };
 
   // マウス移動のハンドラー
@@ -639,15 +912,15 @@ const RelicList: React.FC = () => {
 
   return (
     <div 
-      className="card bg-base-100 shadow-xl overflow-hidden"
+      className="card-navy overflow-hidden"
       onContextMenu={handleContextMenu}
     >
-      <div className="w-screen h-screen flex flex-col overflow-hidden">
-        <div className="container mx-auto w-full max-w-[1920px] h-full flex flex-col overflow-hidden">
-          <h1 className="text-2xl font-bold mb-6 flex-shrink-0 pt-2 px-2">レリック一覧</h1>
+      <div className="w-full h-screen flex flex-col overflow-hidden">
+        <div className="container mx-auto w-full max-w-[1920px] px-4 h-full flex flex-col overflow-hidden">
+          <h1 className="text-2xl font-bold mb-6 flex-shrink-0 pt-2 text-primary-custom font-jp">レリック一覧</h1>
           
           {/* タブバー */}
-          <div className="w-full relative mx-auto bg-transparent">
+          <div className="w-full relative mx-auto bg-transparent overflow-x-hidden">
             <div className="flex overflow-x-auto no-scrollbar">
               {classTabConfig.map((classConfig, index) => (
                 <button
@@ -661,8 +934,8 @@ const RelicList: React.FC = () => {
                   onClick={() => handleTabSelect(classConfig.id as RelicClass)}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <img
-                      src={tabImages[classConfig.id as RelicClass]}
+                    <ImageAsset
+                      path={tabImages[classConfig.id as RelicClass] ?? 'images/cardLibrary/tab_colorless.png'}
                       alt={classConfig.name}
                       className={`
                         w-full h-[48px]
@@ -679,8 +952,8 @@ const RelicList: React.FC = () => {
                     <div className="flex items-center justify-center gap-1 w-48">
                       {classConfig.costFrame && (
                         <div className="flex-shrink-0 w-6 h-6 items-center justify-center">
-                          <img
-                            src={classConfig.costFrame}
+                          <ImageAsset
+                            path={classConfig.costFrame ?? ''}
                             alt={`${classConfig.name} cost frame`}
                             className="w-full h-full"
                           />
@@ -698,8 +971,8 @@ const RelicList: React.FC = () => {
                       </span>
                       {classConfig.costFrame && (
                         <div className="flex-shrink-0 w-6 h-6 items-center justify-center">
-                          <img
-                            src={classConfig.costFrame}
+                          <ImageAsset
+                            path={classConfig.costFrame ?? ''}
                             alt={`${classConfig.name} cost frame`}
                             className="w-full h-full"
                           />
@@ -711,126 +984,73 @@ const RelicList: React.FC = () => {
               ))}
             </div>
           </div>
-
-          {/* 検索窓と検索条件 - タブの下に配置 */}
-          <div className={`flex flex-row items-center gap-4 ${getSearchBgColor()} p-4 rounded-t-none rounded-b-lg mt-0 mb-4 z-40`}>
-            {/* 検索ボックス */}
-            <div className="relative flex-grow z-40">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <img src={searchIcon} alt="Search" className="w-5 h-5 opacity-70 z-50" />
-              </div>
-              <input
-                type="text"
-                placeholder="レリック名や効果で検索..."
-                className="input input-bordered w-full pl-10 pr-4"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* レアリティフィルター */}
-            <div className="flex-shrink-0">
-              <select
-                className="select select-bordered w-full max-w-xs"
-                value={rarityFilter}
-                onChange={(e) => setRarityFilter(e.target.value as RelicRarity | '')}
-              >
-                <option value="">全レアリティ</option>
-                <option value="starter">スターター</option>
-                <option value="common">コモン</option>
-                <option value="uncommon">アンコモン</option>
-                <option value="rare">レア</option>
-                <option value="boss">ボス</option>
-                <option value="shop">ショップ</option>
-                <option value="event">イベント</option>
-              </select>
-            </div>
-
-            {/* ソート順 */}
-            <div className="flex-shrink-0">
-              <select
-                className="select select-bordered w-full max-w-xs"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'rarity' | 'name')}
-              >
-                <option value="rarity">レアリティ順</option>
-                <option value="name">名前順</option>
-              </select>
-            </div>
-
-            {/* 全クラス検索トグル */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span>全クラス検索</span>
-              <input
-                type="checkbox"
-                className="toggle toggle-primary"
-                checked={isGlobalSearch}
-                onChange={() => setIsGlobalSearch(!isGlobalSearch)}
-              />
-            </div>
-
-            {/* リセットボタン */}
-            <button
-              className="btn btn-sm btn-outline flex-shrink-0"
-              onClick={resetFilters}
-            >
-              リセット
-            </button>
-          </div>
-
-          {/* 検索結果 */}
-          <div className="mb-4 px-2 flex-shrink-0">
-            <span className="text-base-content/70 font-['Kreon']">
-              {filteredRelics.length} 件のレリックが見つかりました
-            </span>
-          </div>
           
-          {/* レリック一覧 - スクロール可能なエリア */}
-          <div className="flex-grow overflow-y-auto overflow-x-hidden pb-8 relative no-scrollbar">
-            <AnimatePresence>
-              <motion.div 
-                className="grid gap-6 justify-items-center px-2 w-full"
-                style={{ 
-                  minHeight: '200px',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))'
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {filteredRelics.map((relic) => (
-                  <Relic 
-                    key={relic.id} 
-                    relic={relic} 
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseMove={handleMouseMove}
-                    searchTerm={searchTerm}
-                  />
-                ))}
-              </motion.div>
-            </AnimatePresence>
-            
-            {/* 結果がない場合 */}
-            {filteredRelics.length === 0 && (
-              <div className="text-center py-10 text-base-content/70 font-['Kreon']">
-                条件に一致するレリックが見つかりませんでした。
+          <div className="flex-1 overflow-y-auto px-2 pb-4 pt-6" style={{ pointerEvents: 'auto' }}>
+            <div style={{ pointerEvents: 'auto' }}>
+              <AnimatePresence>
+                <motion.div 
+                  className="grid auto-rows-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-[1920px]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {filteredRelics.map((relic) => (
+                    <motion.div
+                      key={relic.id}
+                      className="flex justify-center items-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.3,
+                        delay: Math.random() * 0.3
+                      }}
+                      whileHover={{
+                        scale: 1.05,
+                        transition: { duration: 0.2 }
+                      }}
+                      style={{ pointerEvents: 'auto', zIndex: 10 }}
+                    >
+                      <Relic
+                        relic={relic}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        onMouseMove={handleMouseMove}
+                        searchTerm={searchTerm}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            {filteredRelics.length === 0 && !loadingError && (
+              <div className="text-center py-10">
+                <p>該当するレリックは見つかりませんでした。</p>
+                {(searchTerm || rarityFilter) && (
+                  <button onClick={resetFilters} className="btn btn-sm btn-outline mt-4">フィルターをリセット</button>
+                )}
+              </div>
+            )}
+            {loadingError && (
+              <div className="text-center py-10 text-error">
+                <p>{loadingError}</p>
               </div>
             )}
           </div>
+
         </div>
-        
-        {/* 統計情報ツールチップ */}
-        <StatsTooltip
-          stats={relicStats}
-          title={tooltipRelicName}
-          visible={tooltipVisible}
-          x={tooltipPosition.x}
-          y={tooltipPosition.y}
-        />
+
+        {tooltipVisible && tooltipRelicId && tooltipRelicName && settings.enableStatsTooltip && (
+          <StatsTooltip
+            stats={relicStatsMap.get(tooltipRelicId) || createEmptyAllCharacterStats()}
+            title={tooltipRelicName}
+            visible={tooltipVisible}
+            x={tooltipPosition.x}
+            y={tooltipPosition.y}
+          />
+        )}
       </div>
+    </div>
     </div>
   );
 };
 
-export default RelicList; 
+export default RelicList;

@@ -61,6 +61,9 @@ interface ElectronAPI {
   onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
   onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void;
   onUpdateError: (callback: (error: Error) => void) => () => void;
+  getAssetPath: (assetPath: string) => Promise<string>;
+  assetExists: (assetPath: string) => Promise<boolean>;
+  readFile: (filePath: string, encoding?: string) => Promise<string>;
 }
 
 declare global {

@@ -823,7 +823,7 @@
       "class": "ironclad",
       "rarity": "uncommon",
       "effect": "If the enemy intends to attack, gain 3 Strength.",
-      "upgradedCost": 0,
+      "upgradedCost": 1,
       "upgradedEffect": "If the enemy intends to attack, gain 4 Strength."
     },
     {
@@ -934,7 +934,7 @@
       "rarity": "common",
       "effect": "Gain 8 Block. Draw 1 card.",
       "upgradedCost": 1,
-      "upgradedEffect": "Gain 11 Block. Draw 1 cards."
+      "upgradedEffect": "Gain 11 Block. Draw 1 card."
     },
     {
       "name": "Blood for Blood",
@@ -2897,7 +2897,7 @@
       "upgradedEffect": "Retain. Gain 5 Mantra."
     },
     {
-      "name": "Wreath of Flame",
+      "name": "Wreathe of Flame",
       "cost": 1,
       "type": "skill",
       "class": "watcher",
@@ -2905,6 +2905,16 @@
       "effect": "Your next Attack deals 5 additional damage.",
       "upgradedCost": 1,
       "upgradedEffect": "Your next Attack deals 8 additional damage."
+    },
+    {
+      "name": "Signature Move",
+      "cost": 2,
+      "type": "attack",
+      "class": "watcher",
+      "rarity": "uncommon",
+      "effect": "Can only be played if this is only Attack in your hand. Deal 30 damage.",
+      "upgradedCost": 2,
+      "upgradedEffect": "Can only be played if this is only Attack in your hand. Deal 40 damage."
     },
     {
       "name": "Alpha",
@@ -3034,7 +3044,7 @@
       "rarity": "rare",
       "effect": "Gain 3 Block for each card in your hand.",
       "upgradedCost": 2,
-      "upgradedEffect": "Gain 3 Block for each card in your hand."
+      "upgradedEffect": "Gain 4 Block for each card in your hand."
     },
     {
       "name": "Vault",
@@ -3646,9 +3656,13 @@
     "Steam Power": "Streamline",
     "Conserve Battery": "Charge Battery",
     "Auto Shields": "Auto-Shields",
-    "Wreath Of Flame": "Wreath of Flame",
+    "Wreathe Of Flame": "Wreathe of Flame",
     "Steam": "Steam Barrier",
-    "Path to Victory": "Pressure Points"
+    "PathToVictory": "Pressure Points",
+    "Ghostly": "Apparition",
+    "FollowUp": "Follow-Up",
+    "TalkToTheHand": "Talk to the Hand",
+    "Fasting2": "Fasting"
   }
 }
 
