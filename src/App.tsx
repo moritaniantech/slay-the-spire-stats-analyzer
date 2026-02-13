@@ -4,7 +4,8 @@ import { StatsOverview } from "./components/StatsOverview";
 import RunList from "./components/RunList";
 import { FolderSelector } from "./components/FolderSelector";
 import {
-  BrowserRouter as Router,
+  HashRouter,
+  BrowserRouter,
   Routes,
   Route,
   Navigate,
@@ -577,6 +578,10 @@ function App() {
       </div>
     )
   }
+
+  // Electron本番環境（file://プロトコル）ではHashRouterを使用
+  // BrowserRouterはHTML5 History APIに依存するため、file://では動作しない
+  const Router = window.location.protocol === 'file:' ? HashRouter : BrowserRouter;
 
   return (
     <Router>
