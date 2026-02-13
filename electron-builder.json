@@ -1,0 +1,134 @@
+{
+  "appId": "slay.the.spire.stats.analyzer",
+  "productName": "StS Stats Analyzer",
+  "files": [
+    "dist/**/*",
+    "dist-electron/**/*",
+    "package.json",
+    "!**/node_modules/**/*",
+    "node_modules/electron-store/**/*",
+    "node_modules/electron-log/**/*",
+    "node_modules/conf/**/*",
+    "node_modules/dot-prop/**/*",
+    "node_modules/is-obj/**/*",
+    "node_modules/atomically/**/*",
+    "node_modules/debounce-fn/**/*",
+    "node_modules/mimic-fn/**/*",
+    "node_modules/env-paths/**/*",
+    "node_modules/json-schema-typed/**/*",
+    "node_modules/onetime/**/*",
+    "node_modules/pkg-up/**/*",
+    "node_modules/find-up/**/*",
+    "node_modules/locate-path/**/*",
+    "node_modules/p-locate/**/*",
+    "node_modules/p-limit/**/*",
+    "node_modules/p-try/**/*",
+    "node_modules/ajv/**/*",
+    "node_modules/ajv-formats/**/*",
+    "node_modules/fast-deep-equal/**/*",
+    "node_modules/fast-uri/**/*",
+    "node_modules/json-schema-traverse/**/*",
+    "node_modules/require-from-string/**/*",
+    "node_modules/uri-js/**/*",
+    "node_modules/punycode/**/*",
+    "node_modules/semver/**/*",
+    "!run/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "public/icons",
+      "to": "icons",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "resources/assets",
+      "to": "assets",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "dist",
+      "to": "dist",
+      "filter": ["**/*"]
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "node_modules/**/*.node",
+    "resources/assets/**/*",
+    "dist-electron/main.js",
+    "dist-electron/preload.js"
+  ],
+  "directories": {
+    "output": "release",
+    "buildResources": "public"
+  },
+  "protocols": [
+    {
+      "name": "StS Stats Analyzer",
+      "schemes": ["sts-stats-analyzer"]
+    },
+    {
+      "name": "Asset Protocol",
+      "schemes": ["asset"]
+    }
+  ],
+  "afterSign": "scripts/notarize.cjs",
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["universal"]
+      },
+      {
+        "target": "zip",
+        "arch": ["universal"]
+      }
+    ],
+    "category": "public.app-category.games",
+    "darkModeSupport": true,
+    "icon": "public/icons/icon.png",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "scripts/entitlements.mac.plist",
+    "entitlementsInherit": "scripts/entitlements.mac.plist",
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    },
+    "sign": false
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "public/icons/icon.ico"
+  },
+  "linux": {
+    "target": ["AppImage", "deb"],
+    "category": "Game",
+    "icon": "public/icons"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true
+  }
+} 

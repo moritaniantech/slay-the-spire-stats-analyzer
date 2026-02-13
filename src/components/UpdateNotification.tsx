@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+// グローバル型定義は src/global.d.ts を参照
+
 interface UpdateInfo {
   version: string;
   releaseNotes?: string;
@@ -15,19 +17,6 @@ interface ProgressInfo {
 
 interface UpdateError extends Error {
   message: string;
-}
-
-declare global {
-  interface Window {
-    electronAPI: {
-      checkForUpdates: () => Promise<void>;
-      startUpdate: () => Promise<void>;
-      onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
-      onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
-      onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void;
-      onUpdateError: (callback: (error: UpdateError) => void) => () => void;
-    }
-  }
 }
 
 const UpdateNotification: React.FC = () => {
@@ -67,8 +56,9 @@ const UpdateNotification: React.FC = () => {
     });
 
     // エラー処理
-    const removeUpdateError = window.electronAPI.onUpdateError((err: UpdateError) => {
-      setError(err.message);
+    const removeUpdateError = window.electronAPI.onUpdateError((err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(errorMessage);
     });
 
     // クリーンアップ

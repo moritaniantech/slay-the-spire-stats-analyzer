@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Run, useStore } from '../store';
 import { format } from 'date-fns';
 import { ChevronUpIcon, ChevronDownIcon, FunnelIcon, ArrowPathIcon } from '@heroicons/react/20/solid';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
-
-// キャラクター画像のインポート
-import ironclad from '../assets/images/characters/ironclad.png';
-import silent from '../assets/images/characters/silent.png';
-import defect from '../assets/images/characters/defect.png';
-import watcher from '../assets/images/characters/watcher.png';
-
-const characterImages: { [key: string]: string } = {
-  IRONCLAD: ironclad,
-  SILENT: silent,
-  DEFECT: defect,
-  WATCHER: watcher,
-};
+//import './RunList.css';
+import { getAssetUrl } from '../utils/assetUtils';
+import ImageAsset from './common/ImageAsset';
+import Tab from './common/Tab';
 
 type SortKey = 'timestamp' | 'character' | 'ascension_level' | 'victory' | 'floor_reached' | 'playtime' | 'score' | 'name';
 type SortOrder = 'asc' | 'desc';
@@ -38,409 +29,548 @@ const SortIcon: React.FC<SortIconProps> = ({ active, direction }) => {
 
 interface Filters {
   character?: string;
-  result?: 'victory' | 'victory_suspicious' | 'defeat';
-  minAscension?: number;
-  maxAscension?: number;
+  ascensionLevel?: number;
   minScore?: number;
-  maxScore?: number;
+  result?: 'victory' | 'defeat';
 }
 
-export const RunList: React.FC = () => {
-  useTranslation();
-  const { runs, setRuns } = useStore();
-  const [sortKey, setSortKey] = useState<SortKey>(() => {
-    const savedSortKey = localStorage.getItem('runListSortKey');
-    return savedSortKey ? (savedSortKey as SortKey) : 'timestamp';
-  });
+// タブの設定
+const classTabConfig = [
+  {
+    id: 'ironclad',
+    name: 'IRONCLAD',
+    searchBgColor: 'bg-[#ff6563]/20',
+    textColor: 'text-[#ff6563]',
+    costFrame: getAssetUrl('cards/design/ironclad/ironclad.png')
+  },
+  {
+    id: 'silent',
+    name: 'SILENT',
+    searchBgColor: 'bg-[#7fff00]/20',
+    textColor: 'text-[#7fff00]',
+    costFrame: getAssetUrl('cards/design/silent/silent.png')
+  },
+  {
+    id: 'defect',
+    name: 'DEFECT',
+    searchBgColor: 'bg-[#87ceeb]/20',
+    textColor: 'text-[#87ceeb]',
+    costFrame: getAssetUrl('cards/design/defect/defect.png')
+  },
+  {
+    id: 'watcher',
+    name: 'WATCHER',
+    searchBgColor: 'bg-[#a600ff]/20',
+    textColor: 'text-[#a600ff]',
+    costFrame: getAssetUrl('cards/design/watcher/watcher.png')
+  },
+  {
+    id: 'all',
+    name: 'ALL',
+    searchBgColor: 'bg-base-200/50',
+    textColor: 'text-base-content',
+    costFrame: getAssetUrl('cards/design/colorless/colorless.png')
+  }
+] as const;
+
+// キャラクタータイプの型定義
+type CharacterType = 'ironclad' | 'silent' | 'defect' | 'watcher' | 'all';
+
+// 数値を3桁ごとにカンマ区切りで表示する関数
+const formatNumber = (num: number): string => {
+  return num.toLocaleString();
+};
+
+// プレイ時間をHH:mm:ss形式にフォーマットする関数
+const formatPlaytime = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
   
-  const [sortOrder, setSortOrder] = useState<SortOrder>(() => {
-    const savedSortOrder = localStorage.getItem('runListSortOrder');
-    return savedSortOrder ? (savedSortOrder as SortOrder) : 'desc';
-  });
-  
-  const [filters, setFilters] = useState<Filters>(() => {
-    const savedFilters = localStorage.getItem('runListFilters');
-    return savedFilters ? JSON.parse(savedFilters) : {};
-  });
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
 
-  // フィルターと並び順の変更を保存
-  useEffect(() => {
-    localStorage.setItem('runListSortKey', sortKey);
-    localStorage.setItem('runListSortOrder', sortOrder);
-    localStorage.setItem('runListFilters', JSON.stringify(filters));
-  }, [sortKey, sortOrder, filters]);
-
-  const removeDuplicates = async () => {
-    if (!window.electronAPI) return;
+// 勝利状態を判定する関数
+const determineVictoryStatus = (run: Run): { status: string; colorClass: string } => {
+  if (run.victory) {
+    // 57階に到達したかどうかを確認
+    const pathPerFloor = run.run_data?.path_per_floor || [];
+    const reached57Floor = Array.isArray(pathPerFloor) && pathPerFloor.length >= 57;
     
-    // キーごとに最新のrunを保持するMap
-    const latestRuns = new Map();
-    
-    // 各runについて、同じキーを持つものの中で最新のものを保持
-    runs.forEach(run => {
-      const key = `${run.character}_${run.ascension_level}_${run.victory}_${run.floor_reached}_${run.playtime}_${run.score}`;
-      if (!latestRuns.has(key) || latestRuns.get(key).timestamp < run.timestamp) {
-        latestRuns.set(key, run);
-      }
-    });
-
-    // 削除対象のrunを特定（最新以外のすべての重複）
-    const duplicates = runs.filter(run => {
-      const key = `${run.character}_${run.ascension_level}_${run.victory}_${run.floor_reached}_${run.playtime}_${run.score}`;
-      return latestRuns.get(key).id !== run.id;
-    });
-
-    // 重複が存在する場合のみ処理を実行
-    if (duplicates.length > 0) {
-      try {
-        // 重複を1つずつ削除
-        for (const run of duplicates) {
-          await window.electronAPI.deleteRun(run);
-        }
-        // 削除後にデータを再取得
-        const updatedRuns = await window.electronAPI.getAllRuns() as Run[];
-        setRuns(updatedRuns);
-      } catch (error) {
-        console.error('Error handling duplicates:', error);
-      }
+    if (reached57Floor) {
+      return { status: '勝利', colorClass: 'bg-success text-success-content' };
+    } else {
+      return { status: '勝利？', colorClass: 'bg-warning text-warning-content' };
     }
-  };
+  } else {
+    return { status: '敗北', colorClass: 'bg-error text-error-content' };
+  }
+};
 
+// メインコンポーネント
+const RunList: React.FC = () => {
+  const { runs } = useStore();
+  const [sortKey, setSortKey] = useState<SortKey>('timestamp');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const navigate = useNavigate();
+  
+  // 検索フィルター用の状態
+  const [filters, setFilters] = useState<Filters>({});
+  const [characterFilter, setCharacterFilter] = useState<string>('');
+  const [ascensionFilter, setAscensionFilter] = useState<string>('');
+  const [scoreFilter, setScoreFilter] = useState<string>('');
+  const [resultFilter, setResultFilter] = useState<string>('');
+
+  // ソート処理
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
+      // 同じキーで降順/昇順を切り替え
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
+      // 新しいキーで降順に設定
       setSortKey(key);
       setSortOrder('desc');
     }
+    // ページを先頭に戻す
+    setCurrentPage(1);
   };
 
-  const resetSort = () => {
-    setSortKey('timestamp');
-    setSortOrder('desc');
-  };
-
-  const resetFilters = () => {
-    setFilters({});
-  };
-
-  const resetAll = () => {
-    resetSort();
-    resetFilters();
-  };
-
-  const applyFilters = (run: any) => {
-    if (filters.character && run.character !== filters.character) return false;
-    if (filters.result !== undefined) {
-      if (filters.result === 'victory' && (!run.victory || run.floor_reached < 57)) return false;
-      if (filters.result === 'victory_suspicious' && (!run.victory || run.floor_reached >= 57)) return false;
-      if (filters.result === 'defeat' && run.victory) return false;
+  // フィルターの適用
+  const applyFilters = () => {
+    const newFilters: Filters = {};
+    
+    if (characterFilter) {
+      newFilters.character = characterFilter;
     }
-    if (filters.minAscension !== undefined && run.ascension_level < filters.minAscension) return false;
-    if (filters.maxAscension !== undefined && run.ascension_level > filters.maxAscension) return false;
-    if (filters.minScore !== undefined && run.score < filters.minScore) return false;
-    if (filters.maxScore !== undefined && run.score > filters.maxScore) return false;
-    return true;
-  };
-
-  // フィルター変更時にスクロール位置を保持する関数
-  const handleFilterChange = (newFilters: Filters) => {
-    // 現在のスクロール位置を保存
-    const scrollPosition = window.scrollY;
     
-    // フィルターを更新
-    setFilters(newFilters);
-    
-    // スクロール位置を復元（非同期処理後に実行）
-    setTimeout(() => {
-      window.scrollTo(0, scrollPosition);
-    }, 0);
-  };
-
-  const filteredAndSortedRuns = [...runs]
-    .filter(applyFilters)
-    .sort((a, b) => {
-      let comparison = 0;
-      switch (sortKey) {
-        case 'timestamp':
-          comparison = a.timestamp - b.timestamp;
-          break;
-        case 'character':
-          comparison = a.character.localeCompare(b.character);
-          break;
-        case 'ascension_level':
-          comparison = a.ascension_level - b.ascension_level;
-          break;
-        case 'victory':
-          comparison = (a.victory ? 1 : 0) - (b.victory ? 1 : 0);
-          break;
-        case 'floor_reached':
-          comparison = a.floor_reached - b.floor_reached;
-          break;
-        case 'playtime':
-          comparison = a.playtime - b.playtime;
-          break;
-        case 'score':
-          comparison = a.score - b.score;
-          break;
-        case 'name':
-          comparison = a.name.localeCompare(b.name);
-          break;
+    if (ascensionFilter) {
+      const ascValue = parseInt(ascensionFilter);
+      if (!isNaN(ascValue) && ascValue >= 0 && ascValue <= 20) {
+        newFilters.ascensionLevel = ascValue;
       }
-      return sortOrder === 'asc' ? comparison : -comparison;
+    }
+    
+    if (scoreFilter) {
+      const scoreValue = parseInt(scoreFilter);
+      if (!isNaN(scoreValue) && scoreValue >= 0) {
+        newFilters.minScore = scoreValue;
+      }
+    }
+    
+    if (resultFilter) {
+      newFilters.result = resultFilter as 'victory' | 'defeat';
+    }
+    
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  // フィルターのリセット
+  const resetFilters = () => {
+    setCharacterFilter('');
+    setAscensionFilter('');
+    setScoreFilter('');
+    setResultFilter('');
+    setFilters({});
+    setCurrentPage(1);
+  };
+
+  // フィルタリングされたデータ
+  const filteredRuns = useMemo(() => {
+    return runs.filter(run => {
+      // キャラクターフィルター
+      if (filters.character && run.character.toLowerCase() !== filters.character.toLowerCase()) {
+        return false;
+      }
+      
+      // アセンションレベルフィルター
+      if (filters.ascensionLevel !== undefined && run.ascension_level !== filters.ascensionLevel) {
+        return false;
+      }
+      
+      // 最小スコアフィルター
+      if (filters.minScore !== undefined && run.score < filters.minScore) {
+        return false;
+      }
+      
+      // 勝敗フィルター
+      if (filters.result === 'victory' && !run.victory) {
+        return false;
+      }
+      if (filters.result === 'defeat' && run.victory) {
+        return false;
+      }
+      
+      return true;
+    }).sort((a, b) => {
+      // ソート処理
+      if (['timestamp', 'ascension_level', 'floor_reached', 'playtime', 'score'].includes(sortKey)) {
+        // 数値によるソート
+        return sortOrder === 'asc'
+          ? a[sortKey as keyof Run] - b[sortKey as keyof Run]
+          : b[sortKey as keyof Run] - a[sortKey as keyof Run];
+      } else if (sortKey === 'character') {
+        // 文字列によるソート
+        return sortOrder === 'asc'
+          ? a.character.localeCompare(b.character)
+          : b.character.localeCompare(a.character);
+      } else if (sortKey === 'victory') {
+        // 真偽値によるソート
+        return sortOrder === 'asc'
+          ? (a.victory ? 1 : 0) - (b.victory ? 1 : 0)
+          : (b.victory ? 1 : 0) - (a.victory ? 1 : 0);
+      }
+      
+      // デフォルトは時間の降順
+      return b.timestamp - a.timestamp;
     });
+  }, [runs, filters, sortKey, sortOrder]);
 
-  const formatPlaytime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}:${remainingMinutes.toString().padStart(2, '0')}`;
-  };
-
-  const getResultBadgeClass = (run: any) => {
-    if (run.victory && run.floor_reached < 57) {
-      return 'badge-warning'; // 勝利だが57階未満の場合は警告色
-    }
-    return run.victory ? 'badge-success' : 'badge-error';
-  };
-
-  const getResultText = (run: any) => {
-    if (run.victory && run.floor_reached < 57) {
-      return '勝利？';
-    }
-    return run.victory ? '勝利' : '敗北';
-  };
+  // ページネーション
+  const totalPages = Math.ceil(filteredRuns.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = filteredRuns.slice(startIndex, startIndex + itemsPerPage);
+  
+  // 表示するページ番号の範囲
+  const maxPageButtons = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+  let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+  
+  if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
+    startPage = Math.max(1, endPage - maxPageButtons + 1);
+  }
 
   return (
-    <div className="container mx-auto px-4 space-y-4">
-      <div className="max-w-[1920px] mx-auto">
-        <div className="card bg-base-100 shadow">
-          <div className="card-body p-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="form-control">
-                <select 
-                  className="select select-bordered select-sm" 
-                  value={filters.character || ''}
-                  onChange={(e) => handleFilterChange({...filters, character: e.target.value || undefined})}
-                >
-                  <option value="">キャラクター: すべて</option>
-                  <option value="IRONCLAD">IRONCLAD</option>
-                  <option value="THE_SILENT">SILENT</option>
-                  <option value="DEFECT">DEFECT</option>
-                  <option value="WATCHER">WATCHER</option>
-                </select>
-              </div>
-              
-              <div className="form-control">
-                <select 
-                  className="select select-bordered select-sm" 
-                  value={filters.result || ''}
-                  onChange={(e) => handleFilterChange({...filters, result: e.target.value as any || undefined})}
-                >
-                  <option value="">結果: すべて</option>
-                  <option value="victory">勝利</option>
-                  <option value="victory_suspicious">勝利？</option>
-                  <option value="defeat">敗北</option>
-                </select>
-              </div>
-              
-              <div className="form-control flex-row items-center gap-2">
-                <span className="text-sm">アセンション:</span>
-                <input 
-                  type="number" 
-                  placeholder="最小" 
-                  className="input input-bordered input-sm w-20" 
-                  min="0"
-                  max="20"
-                  value={filters.minAscension || ''}
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : undefined;
-                    if (value !== undefined && (value < 0 || value > 20)) return;
-                    handleFilterChange({...filters, minAscension: value});
-                  }}
-                />
-                <span>-</span>
-                <input 
-                  type="number" 
-                  placeholder="最大" 
-                  className="input input-bordered input-sm w-20" 
-                  min="0"
-                  max="20"
-                  value={filters.maxAscension || ''}
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : undefined;
-                    if (value !== undefined && (value < 0 || value > 20)) return;
-                    handleFilterChange({...filters, maxAscension: value});
-                  }}
-                />
-              </div>
-              
-              <div className="form-control flex-row items-center gap-2">
-                <span className="text-sm">スコア:</span>
-                <input 
-                  type="number" 
-                  placeholder="最小" 
-                  className="input input-bordered input-sm w-24" 
-                  min="0"
-                  value={filters.minScore || ''}
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : undefined;
-                    if (value !== undefined && value < 0) return;
-                    handleFilterChange({...filters, minScore: value});
-                  }}
-                />
-                <span>-</span>
-                <input 
-                  type="number" 
-                  placeholder="最大" 
-                  className="input input-bordered input-sm w-24" 
-                  min="0"
-                  value={filters.maxScore || ''}
-                  onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : undefined;
-                    if (value !== undefined && value < 0) return;
-                    handleFilterChange({...filters, maxScore: value});
-                  }}
-                />
-              </div>
-              
-              <button
-                onClick={resetAll}
-                className="btn btn-ghost btn-sm gap-2"
+    <div className="container mx-auto px-4 py-8 max-w-[1920px]">
+      <div className="card-navy">
+        <div className="card-body p-4">
+          {/* 検索フィルター */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            {/* キャラクターフィルター */}
+            <div className="form-control flex-1">
+              <label className="label">
+                <span className="label-text text-primary-custom font-jp">キャラクター</span>
+              </label>
+              <select 
+                className="select input-navy w-full text-primary-custom"
+                value={characterFilter}
+                onChange={(e) => setCharacterFilter(e.target.value)}
               >
-                <ArrowPathIcon className="h-5 w-5" />
-                すべてリセット
-              </button>
-              
-              <button
-                onClick={removeDuplicates}
-                className="btn btn-ghost btn-sm gap-2"
-              >
-                重複を削除
-              </button>
+                <option value="">すべて</option>
+                <option value="ironclad">Ironclad</option>
+                <option value="silent">Silent</option>
+                <option value="defect">Defect</option>
+                <option value="watcher">Watcher</option>
+              </select>
+            </div>
+            
+            {/* アセンションフィルター */}
+            <div className="form-control flex-1">
+              <label className="label">
+                <span className="label-text text-primary-custom font-jp">アセンション (0-20)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="20"
+                placeholder="アセンション"
+                className="input input-navy w-full text-primary-custom"
+                value={ascensionFilter}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 20)) {
+                    setAscensionFilter(value);
+                  }
+                }}
+              />
+            </div>
+            
+            {/* スコアフィルター */}
+            <div className="form-control flex-1">
+              <label className="label">
+                <span className="label-text text-primary-custom font-jp">最小スコア</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                placeholder="スコア"
+                className="input input-navy w-full text-primary-custom"
+                value={scoreFilter}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '' || parseInt(value) >= 0) {
+                    setScoreFilter(value);
+                  }
+                }}
+              />
+            </div>
+            
+            {/* 検索ボタン */}
+            <div className="form-control flex-none self-end">
+              <div className="flex gap-2">
+                <button 
+                  className="btn btn-navy-primary font-jp"
+                  onClick={applyFilters}
+                >
+                  検索
+                </button>
+                <button 
+                  className="btn btn-navy-secondary font-jp"
+                  onClick={resetFilters}
+                >
+                  リセット
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+          
+          {/* フィルター表示（適用中のフィルター） */}
+          {Object.keys(filters).length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {filters.character && (
+                <div className="badge badge-outline gap-1">
+                  キャラクター: {filters.character.charAt(0).toUpperCase() + filters.character.slice(1)}
+                </div>
+              )}
+              {filters.ascensionLevel !== undefined && (
+                <div className="badge badge-outline gap-1">
+                  アセンション: {filters.ascensionLevel}
+                </div>
+              )}
+              {filters.minScore !== undefined && (
+                <div className="badge badge-outline gap-1">
+                  最小スコア: {filters.minScore}
+                </div>
+              )}
+              {filters.result && (
+                <div className="badge badge-outline gap-1">
+                  結果: {filters.result === 'victory' ? '勝利' : '敗北'}
+                </div>
+              )}
+              <button 
+                className="btn btn-xs btn-ghost"
+                onClick={resetFilters}
+              >
+                すべてクリア
+              </button>
+            </div>
+          )}
+          
+          {/* 結果件数表示 */}
+          <div className="text-sm text-base-content/70 mb-4">
+            {filteredRuns.length}件中 {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredRuns.length)}件を表示
+          </div>
 
-        <div className="card bg-base-100 shadow mt-4">
-          <div className="card-body p-4">
-            <div className="overflow-x-auto">
-              <table className="table table-zebra w-full">
-                <thead>
-                  <tr className="text-base border-b border-base-300">
-                    <th onClick={() => handleSort('timestamp')} className="cursor-pointer bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <span>日時</span>
-                        <SortIcon active={sortKey === 'timestamp'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th onClick={() => handleSort('character')} className="cursor-pointer bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <span>キャラクター</span>
-                        <SortIcon active={sortKey === 'character'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th onClick={() => handleSort('ascension_level')} className="cursor-pointer text-center bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/topPanel/ascension.png" alt="Ascension" className="w-5 h-5 mr-1.5" />
-                        <span>アセンション</span>
-                        <SortIcon active={sortKey === 'ascension_level'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th onClick={() => handleSort('victory')} className="cursor-pointer text-center bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <div className="relative w-8 h-8 flex items-center justify-center">
-                          <div className="absolute w-4 h-4">
-                            <img 
-                              src="/src/assets/ui/topPanel/key_green.png" 
-                              alt="Green Key" 
-                              className="absolute w-4 h-4 left-0 top-[-1px] transform -rotate-0 origin-center"
-                            />
-                            <img 
-                              src="/src/assets/ui/topPanel/key_blue.png" 
-                              alt="Blue Key" 
-                              className="absolute w-4 h-4 right-[-1px] top-0 transform rotate-60 origin-center"
-                            />
-                            <img 
-                              src="/src/assets/ui/topPanel/key_red.png" 
-                              alt="Red Key" 
-                              className="absolute w-4 h-4 left-[-1px] top-0 transform -rotate-60 origin-center"
-                            />
-                          </div>
-                        </div>
-                        <span>結果</span>
-                        <SortIcon active={sortKey === 'victory'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th onClick={() => handleSort('floor_reached')} className="cursor-pointer text-center bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/topPanel/floor.png" alt="Floor" className="w-5 h-5 mr-1.5" />
-                        <span>到達階層</span>
-                        <SortIcon active={sortKey === 'floor_reached'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th onClick={() => handleSort('playtime')} className="cursor-pointer text-center bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/timerIcon.png" alt="Timer" className="w-5 h-5 mr-1.5" />
-                        <span>プレイ時間</span>
-                        <SortIcon active={sortKey === 'playtime'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th onClick={() => handleSort('score')} className="cursor-pointer text-center bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/leaderboards/score.png" alt="Score" className="w-5 h-5 mr-1.5" />
-                        <span>スコア</span>
-                        <SortIcon active={sortKey === 'score'} direction={sortOrder} />
-                      </div>
-                    </th>
-                    <th className="text-center bg-base-200/50">
-                      <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/topPanel/peek_button.png" alt="Details" className="w-5 h-5 mr-1.5" />
-                        <span>詳細</span>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredAndSortedRuns.map((run) => (
-                    <tr key={run.id} className="text-base hover:bg-base-200 transition-colors">
-                      <td className="whitespace-nowrap text-center font-medium">
-                        {format(new Date(run.timestamp * 1000), 'yyyy/MM/dd HH:mm')}
-                      </td>
-                      <td>
-                        <div className="flex items-center justify-center">
-                          <img
-                            src={characterImages[run.character]}
-                            alt={run.character}
-                            title={run.character}
-                            className="w-8 h-8 rounded-full"
+          {/* 結果表示 */}
+          <div className="overflow-x-auto">
+            <table className="table table-navy w-full">
+              <thead>
+                <tr className="text-base border-b border-navy">
+                  <th onClick={() => handleSort('timestamp')} className="cursor-pointer bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <span>日時</span>
+                      <SortIcon active={sortKey === 'timestamp'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort('character')} className="cursor-pointer bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <span>キャラクター</span>
+                      <SortIcon active={sortKey === 'character'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort('ascension_level')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <ImageAsset
+                        path="ui/topPanel/ascension.png"
+                        alt="Ascension"
+                        className="w-5 h-5 mr-1.5"
+                      />
+                      <span>アセンション</span>
+                      <SortIcon active={sortKey === 'ascension_level'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort('victory')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <div className="relative w-8 h-8 flex items-center justify-center">
+                        <div className="absolute w-4 h-4">
+                          <ImageAsset 
+                            path="ui/topPanel/key_green.png" 
+                            alt="Green Key" 
+                            className="absolute w-4 h-4 left-0 top-[-1px] transform -rotate-0 origin-center"
+                          />
+                          <ImageAsset 
+                            path="ui/topPanel/key_blue.png" 
+                            alt="Blue Key" 
+                            className="absolute w-4 h-4 right-[-1px] top-0 transform rotate-60 origin-center"
+                          />
+                          <ImageAsset 
+                            path="ui/topPanel/key_red.png" 
+                            alt="Red Key" 
+                            className="absolute w-4 h-4 left-[-1px] top-0 transform -rotate-60 origin-center"
                           />
                         </div>
-                      </td>
-                      <td className="text-center">{run.ascension_level}</td>
-                      <td className="text-center">
-                        <span className={`badge ${getResultBadgeClass(run)} badge-sm font-medium`}>
-                          {getResultText(run)}
-                        </span>
-                      </td>
-                      <td className="text-center font-medium">{run.floor_reached}</td>
-                      <td className="text-center font-medium">{formatPlaytime(run.playtime)}</td>
-                      <td className="text-center font-medium">{run.score.toLocaleString()}</td>
-                      <td className="text-center">
-                        <Link
-                          to={`/runs/${run.id}`}
-                          className={`btn btn-ghost btn-sm ${!run.id ? 'btn-disabled' : ''}`}
-                          onClick={(e) => !run.id && e.preventDefault()}
-                        >
-                          <ChevronRightIcon className="h-5 w-5" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                      <span>結果</span>
+                      <SortIcon active={sortKey === 'victory'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort('floor_reached')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <ImageAsset
+                        path="ui/topPanel/floor.png"
+                        alt="Floor"
+                        className="w-5 h-5 mr-1.5"
+                      />
+                      <span>到達階層</span>
+                      <SortIcon active={sortKey === 'floor_reached'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th className="text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <span>ネオーの祝福</span>
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort('playtime')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <ImageAsset
+                        path="ui/timerIcon.png"
+                        alt="Timer"
+                        className="w-5 h-5 mr-1.5"
+                      />
+                      <span>プレイ時間</span>
+                      <SortIcon active={sortKey === 'playtime'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort('score')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <ImageAsset
+                        path="ui/leaderboards/score.png"
+                        alt="Score"
+                        className="w-5 h-5 mr-1.5"
+                      />
+                      <span>スコア</span>
+                      <SortIcon active={sortKey === 'score'} direction={sortOrder} />
+                    </div>
+                  </th>
+                  <th className="text-center bg-navy-light text-primary-custom font-jp">
+                    <div className="flex items-center justify-center">
+                      <ImageAsset
+                        path="ui/topPanel/peek_button.png"
+                        alt="Details"
+                        className="w-5 h-5 mr-1.5"
+                      />
+                      <span>詳細</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.map((run) => (
+                  <tr 
+                    key={run.id} 
+                    className="hover:bg-navy-light transition-colors cursor-pointer text-primary-custom"
+                    onClick={() => navigate(`/play-detail/${run.id}`)}
+                  >
+                    <td className="text-center">
+                      {format(new Date(run.timestamp * 1000), 'yyyy/MM/dd HH:mm')}
+                    </td>
+                    <td className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-8 h-8 rounded-full overflow-hidden bg-base-200 flex items-center justify-center">
+                          <ImageAsset 
+                            path={`images/characters/${run.character.toLowerCase()}.png`} 
+                            alt={run.character} 
+                            className="w-6 h-6 object-contain"
+                            fallbackPath="ui/char/unknown.png"
+                          />
+                        </div>
+                        <span className="capitalize">{run.character.toLowerCase()}</span>
+                      </div>
+                    </td>
+                    <td className="text-center">{run.ascension_level}</td>
+                    <td className="text-center">
+                      {(() => {
+                        const victoryStatus = determineVictoryStatus(run);
+                        return (
+                          <div className={`badge ${victoryStatus.colorClass}`}>
+                            {victoryStatus.status}
+                          </div>
+                        );
+                      })()}
+                    </td>
+                    <td className="text-center">{formatNumber(run.floor_reached)}</td>
+                    <td className="text-center">{run.run_data?.neow_bonus || '-'}</td>
+                    <td className="text-center">
+                      {formatPlaytime(run.playtime)}
+                    </td>
+                    <td className="text-center">{formatNumber(run.score)}</td>
+                    <td className="text-center">
+                      <button 
+                        className="btn btn-sm btn-ghost btn-circle"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/play-detail/${run.id}`);
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+
+          {/* ページネーション */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4">
+              <div className="btn-group">
+                <button 
+                  className="btn btn-sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(1)}
+                >
+                  «
+                </button>
+                <button 
+                  className="btn btn-sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  ‹
+                </button>
+                
+                {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(page => (
+                  <button
+                    key={page}
+                    className={`btn btn-sm ${currentPage === page ? 'btn-active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+                
+                <button 
+                  className="btn btn-sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  ›
+                </button>
+                <button 
+                  className="btn btn-sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  »
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

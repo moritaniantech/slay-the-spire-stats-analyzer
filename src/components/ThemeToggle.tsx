@@ -1,21 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
-import { Run } from '../store';
 
-declare global {
-  interface Window {
-    electronAPI: {
-      getAllRuns(): unknown;
-      deleteRun(run: Run): unknown;
-      getRunFolder(): unknown;
-      selectFolder(): unknown;
-      onLoadProgress(arg0: (data: import("../types").LoadProgress) => void): unknown;
-      loadRunFiles(folderPath: string): unknown;
-      getTheme: () => Promise<string>;
-      setTheme: (theme: string) => Promise<string>;
-    };
-  }
-}
+// グローバル型定義は src/global.d.ts を参照
 
 const ThemeToggle: React.FC = () => {
   const [theme, setTheme] = useState<string>('system');

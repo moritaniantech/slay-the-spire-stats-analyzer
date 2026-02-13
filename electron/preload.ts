@@ -53,7 +53,21 @@ interface ElectronAPI {
   onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
   onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
   onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void;
-  onUpdateError: (callback: (error: Error) => void) => () => void;
+  onUpdateError: (callback: (error: unknown) => void) => () => void;
+  resolveAssetPath: (assetPath: string) => Promise<string>;
+  getResourcePath: () => Promise<string>;
+  isDevelopment: boolean;
+  resolveImagePath: (imagePath: string) => Promise<string>;
+  getAssetPath: (assetPath: string) => Promise<string>;
+  assetExists: (assetPath: string) => Promise<boolean>;
+  debugResources: () => Promise<any>;
+  getFileURLForAsset: (assetPath: string) => Promise<string>;
+  getImageBase64: (relativeImagePath: string) => Promise<string | null>;
+  platform: string;
+  get isPackaged(): boolean;
+  readFile: (filePath: string, encoding: string) => Promise<string>;
+  getUserDataPath: () => Promise<string>;
+  showOpenDialog: (options: any) => Promise<any>;
 }
 
 // SQLite APIの実装
@@ -63,54 +77,133 @@ const sqliteAPI: SQLiteAPI = {
   get: (sql, params = []) => ipcRenderer.invoke('sqlite-get', sql, params),
 };
 
-// APIの実装
-const electronAPI: ElectronAPI = {
-  loadRunFiles: (runFolderPath) => ipcRenderer.invoke('load-run-files', runFolderPath),
+let isPackagedGlobal = process.env.NODE_ENV === 'production';
+let isDevelopmentGlobal = process.env.NODE_ENV === 'development';
+
+// APIの実装 (型注釈を削除して推論に任せるか、後で正確な ElectronAPI をつける)
+const electronAPI = {
+  loadRunFiles: (runFolderPath: string) => ipcRenderer.invoke('load-run-files', runFolderPath),
   getAllRuns: () => ipcRenderer.invoke('get-all-runs'),
   getTheme: () => ipcRenderer.invoke('get-theme'),
-  setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
+  setTheme: (theme: string) => ipcRenderer.invoke('set-theme', theme),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   getRunFolder: () => ipcRenderer.invoke('get-run-folder'),
-  onLoadProgress: (callback) => {
-    const progressHandler = (_: any, data: LoadProgress) => callback(data);
+  onLoadProgress: (callback: (progress: LoadProgress) => void) => {
+    const progressHandler = (_event: any, data: LoadProgress) => callback(data);
     ipcRenderer.on('load-progress', progressHandler);
     return () => {
       ipcRenderer.removeListener('load-progress', progressHandler);
     };
   },
-  deleteRun: (run) => ipcRenderer.invoke('delete-run', run),
+  deleteRun: (run: any) => ipcRenderer.invoke('delete-run', run),
   sqlite: sqliteAPI,
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   startUpdate: () => ipcRenderer.invoke('start-update'),
-  onUpdateAvailable: (callback) => {
-    const handler = (_: any, info: UpdateInfo) => callback(info);
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
+    const handler = (_event: any, info: UpdateInfo) => callback(info);
     ipcRenderer.on('update-available', handler);
     return () => {
       ipcRenderer.removeListener('update-available', handler);
     };
   },
-  onUpdateProgress: (callback) => {
-    const handler = (_: any, info: ProgressInfo) => callback(info);
+  onUpdateProgress: (callback: (info: ProgressInfo) => void) => {
+    const handler = (_event: any, info: ProgressInfo) => callback(info);
     ipcRenderer.on('download-progress', handler);
     return () => {
       ipcRenderer.removeListener('download-progress', handler);
     };
   },
-  onUpdateDownloaded: (callback) => {
-    const handler = (_: any, info: UpdateInfo) => callback(info);
+  onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => {
+    const handler = (_event: any, info: UpdateInfo) => callback(info);
     ipcRenderer.on('update-downloaded', handler);
     return () => {
       ipcRenderer.removeListener('update-downloaded', handler);
     };
   },
-  onUpdateError: (callback) => {
-    const handler = (_: any, error: Error) => callback(error);
+  onUpdateError: (callback: (error: unknown) => void) => {
+    const handler = (_event: any, error: unknown) => callback(error);
     ipcRenderer.on('update-error', handler);
     return () => {
       ipcRenderer.removeListener('update-error', handler);
     };
   },
+  resolveAssetPath: async (assetPath: string) => {
+    try {
+      const resolvedPath = await ipcRenderer.invoke('get-asset-path', assetPath);
+      return resolvedPath;
+    } catch (error) {
+      console.error('[preload] Error in resolveAssetPath:', error);
+      return assetPath;
+    }
+  },
+  getResourcePath: () => ipcRenderer.invoke('get-resource-path'),
+  get isDevelopment() { return isDevelopmentGlobal; },
+  get isPackaged() { return isPackagedGlobal; },
+  platform: process.platform,
+  readFile: (filePath: string, encoding: string = 'utf8') => ipcRenderer.invoke('fs-readFile', filePath, encoding),
+  getUserDataPath: () => ipcRenderer.invoke('app-getPath', 'userData'),
+  showOpenDialog: (options: any) => ipcRenderer.invoke('dialog-showOpenDialog', options),
+  resolveImagePath: (imagePath: string) => ipcRenderer.invoke('resolve-image-path', imagePath),
+  getAssetPath: async (assetPath: string): Promise<string> => {
+    try {
+      const pathResult = await ipcRenderer.invoke('get-asset-path', assetPath);
+      return pathResult;
+    } catch (error) {
+      console.error('[preload] getAssetPath エラー:', error);
+      throw error;
+    }
+  },
+  assetExists: async (assetPath: string): Promise<boolean> => {
+    try {
+      const exists = await ipcRenderer.invoke('asset-exists', assetPath);
+      return exists;
+    } catch (error) {
+      console.error('[preload] assetExists エラー:', error);
+      return false;
+    }
+  },
+  debugResources: async (): Promise<any> => ipcRenderer.invoke('debug-resources'),
+  getFileURLForAsset: async (assetPath: string) => {
+      try {
+        const fileUrl = await ipcRenderer.invoke('get-file-url-for-asset', assetPath);
+      return fileUrl || '';
+    } catch (error) {
+      console.error('[preload] Error in getFileURLForAsset:', error);
+      return '';
+    }
+  },
+  getImageBase64: (relativeImagePath: string) => ipcRenderer.invoke('get-image-base64', relativeImagePath)
 };
+
+// 型チェック用 (開発時のみ)
+// const _check: ElectronAPI = electronAPI;
+
+// 初期化時にメインプロセスからisPackagedフラグを取得
+ipcRenderer.invoke('is-app-packaged').then((value) => {
+  isPackagedGlobal = !!value;
+  isDevelopmentGlobal = !isPackagedGlobal;
+  // console.log('[preload] Received isPackaged value:', isPackagedGlobal, 'isDevelopment:', isDevelopmentGlobal);
+});
+
+console.log('[preload] Final electronAPI object before exposeInMainWorld:', JSON.stringify(Object.keys(electronAPI)));
+console.log('[preload] typeof electronAPI.getImageBase64 before expose:', typeof electronAPI.getImageBase64);
+
+// メインプロセスのログを受信するリスナーを登録
+ipcRenderer.on('main-process-log', (_event, logData: { level: string; message: string; details?: any; error?: string }) => {
+  const { level, message, details, error } = logData;
+  const logMessage = details ? `${message}\n詳細: ${JSON.stringify(details, null, 2)}` : error ? `${message}\nエラー: ${error}` : message;
+  
+  switch (level) {
+    case 'error':
+      console.error(`[Main Process] ${logMessage}`);
+      break;
+    case 'warn':
+      console.warn(`[Main Process] ${logMessage}`);
+      break;
+    default:
+      console.log(`[Main Process] ${logMessage}`);
+  }
+});
 
 // APIをウィンドウオブジェクトに公開
 contextBridge.exposeInMainWorld('electronAPI', electronAPI); 

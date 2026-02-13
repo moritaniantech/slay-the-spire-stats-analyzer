@@ -74,3 +74,5 @@ vite.config.d.ts
 # Build output
 release/
 dist-electron/
+resources/assets/
+nul

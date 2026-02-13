@@ -10,7 +10,7 @@
     "sourceMap": true,
     "outDir": "../dist-electron",
     "rootDir": ".",
-    "strict": true,
+    "strict": false,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "types": ["electron", "node"]

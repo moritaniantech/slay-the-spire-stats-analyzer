@@ -45,16 +45,16 @@ export function setCacheMaxSize(size: number): void {
   if (statsCache.cards.size > size) {
     const deleteCount = statsCache.cards.size - size;
     for (let i = 0; i < deleteCount; i++) {
-      const oldestKey = statsCache.cards.keys().next().value;
-      statsCache.cards.delete(oldestKey);
+      const oldestKey = statsCache.cards.keys().next().value as string | undefined;
+      if (oldestKey) statsCache.cards.delete(oldestKey);
     }
   }
-  
+
   if (statsCache.relics.size > size) {
     const deleteCount = statsCache.relics.size - size;
     for (let i = 0; i < deleteCount; i++) {
-      const oldestKey = statsCache.relics.keys().next().value;
-      statsCache.relics.delete(oldestKey);
+      const oldestKey = statsCache.relics.keys().next().value as string | undefined;
+      if (oldestKey) statsCache.relics.delete(oldestKey);
     }
   }
 }
@@ -89,9 +89,11 @@ function manageCacheSize(cacheMap: Map<string, AllCharacterStats>): void {
   // キャッシュが最大サイズを超えた場合、古いエントリを削除
   if (cacheMap.size > statsCache.maxSize) {
     // 最も古いエントリを削除（先頭から削除）
-    const oldestKey = cacheMap.keys().next().value;
-    cacheMap.delete(oldestKey);
-    console.log(`キャッシュサイズ制限のため、エントリを削除: ${oldestKey}`);
+    const oldestKey = cacheMap.keys().next().value as string | undefined;
+    if (oldestKey) {
+      cacheMap.delete(oldestKey);
+      console.log(`キャッシュサイズ制限のため、エントリを削除: ${oldestKey}`);
+    }
   }
 }
 
@@ -108,7 +110,7 @@ export function isCardObtained(run: Run, cardId: string): boolean {
   // master_deckにカードが含まれているか確認（高速化のためにSet変換）
   if (runData.master_deck && Array.isArray(runData.master_deck)) {
     // 一時的なSetを作成（高速検索のため）
-    const masterDeckSet = new Set(runData.master_deck.map(card => normalizeCardId(card)));
+    const masterDeckSet = new Set(runData.master_deck.map((card: any) => normalizeCardId(card)));
     if (masterDeckSet.has(normalizedCardId)) {
       return true;
     }
@@ -139,7 +141,7 @@ export function isRelicObtained(run: Run, relicId: string): boolean {
   // relicsにレリックが含まれているか確認（高速化のためにSet変換）
   if (runData.relics && Array.isArray(runData.relics)) {
     // 一時的なSetを作成（高速検索のため）
-    const relicsSet = new Set(runData.relics.map(relic => normalizeRelicId(relic)));
+    const relicsSet = new Set(runData.relics.map((relic: any) => normalizeRelicId(relic)));
     if (relicsSet.has(normalizedRelicId)) {
       return true;
     }

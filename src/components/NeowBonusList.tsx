@@ -1,32 +1,20 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { useStore } from '../store';
 import { calculateNeowBonusStats } from '../services/neowBonusService';
 import { NeowBonusData } from '../types/neowBonus';
 import './NeowBonusList.css';
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 import { XMarkIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
+import { getAssetUrl } from '../utils/assetUtils';
+import ImageAsset from './common/ImageAsset';
 
-// キャラクター画像のインポート
-import tabIronclad from '../assets/images/cardLibrary/tab_ironclad.png';
-import tabSilent from '../assets/images/cardLibrary/tab_silent.png';
-import tabDefect from '../assets/images/cardLibrary/tab_defect.png';
-import tabWatcher from '../assets/images/cardLibrary/tab_watcher.png';
-import tabColorless from '../assets/images/cardLibrary/tab_colorless.png';
-
-// キャラクターアイコンのインポート
-import ironclad from '../assets/images/characters/ironclad.png';
-import silent from '../assets/images/characters/silent.png';
-import defect from '../assets/images/characters/defect.png';
-import watcher from '../assets/images/characters/watcher.png';
-
-const characterImages: { [key: string]: string } = {
-  IRONCLAD: ironclad,
-  THE_SILENT: silent,
-  DEFECT: defect,
-  WATCHER: watcher,
+const characterImages: { [key: string]: string | null } = {
+  IRONCLAD: getAssetUrl('images/characters/ironclad.png'),
+  THE_SILENT: getAssetUrl('images/characters/silent.png'),
+  DEFECT: getAssetUrl('images/characters/defect.png'),
+  WATCHER: getAssetUrl('images/characters/watcher.png'),
 };
 
 const classTabConfig = [
@@ -35,44 +23,44 @@ const classTabConfig = [
     name: 'IRONCLAD',
     searchBgColor: 'bg-[#ff6563]/20',
     textColor: 'text-[#ff6563]',
-    costFrame: '/src/assets/cards/design/ironclad/ironclad.png'
+    costFrame: 'cards/design/ironclad/ironclad.png'
   },
   {
     id: 'silent',
     name: 'SILENT',
     searchBgColor: 'bg-[#7fff00]/20',
     textColor: 'text-[#7fff00]',
-    costFrame: '/src/assets/cards/design/silent/silent.png'
+    costFrame: 'cards/design/silent/silent.png'
   },
   {
     id: 'defect',
     name: 'DEFECT',
     searchBgColor: 'bg-[#87ceeb]/20',
     textColor: 'text-[#87ceeb]',
-    costFrame: '/src/assets/cards/design/defect/defect.png'
+    costFrame: 'cards/design/defect/defect.png'
   },
   {
     id: 'watcher',
     name: 'WATCHER',
     searchBgColor: 'bg-[#a600ff]/20',
     textColor: 'text-[#a600ff]',
-    costFrame: '/src/assets/cards/design/watcher/watcher.png'
+    costFrame: 'cards/design/watcher/watcher.png'
   },
   {
     id: 'all',
     name: 'ALL',
     searchBgColor: 'bg-base-200/50',
     textColor: 'text-base-content',
-    costFrame: '/src/assets/cards/design/colorless/colorless.png'
+    costFrame: 'cards/design/colorless/colorless.png'
   }
 ] as const;
 
 const tabImages: Record<string, string> = {
-  'all': tabColorless,
-  'watcher': tabWatcher,
-  'defect': tabDefect,
-  'ironclad': tabIronclad,
-  'silent': tabSilent
+  'all': 'images/cardLibrary/tab_colorless.png',
+  'watcher': 'images/cardLibrary/tab_watcher.png',
+  'defect': 'images/cardLibrary/tab_defect.png',
+  'ironclad': 'images/cardLibrary/tab_ironclad.png',
+  'silent': 'images/cardLibrary/tab_silent.png'
 };
 
 type SortKey = 'bonus' | 'totalSelected' | 'last50Selected' | 'totalWinRate' | 'last50WinRate';
@@ -231,7 +219,7 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
                 </th>
                 <th onClick={() => handleSort('ascension_level')} className="cursor-pointer text-center bg-base-200/50">
                   <div className="flex items-center justify-center">
-                    <img src="/src/assets/ui/topPanel/ascension.png" alt="Ascension" className="w-5 h-5 mr-1.5" />
+                    <ImageAsset path="ui/topPanel/ascension.png" alt="Ascension" className="w-5 h-5 mr-1.5" />
                     <span>アセンション</span>
                     <SortIcon active={sortKey === 'ascension_level'} direction={sortOrder} />
                   </div>
@@ -240,18 +228,18 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
                   <div className="flex items-center justify-center">
                     <div className="relative w-8 h-8 flex items-center justify-center">
                       <div className="absolute w-4 h-4">
-                        <img 
-                          src="/src/assets/ui/topPanel/key_green.png" 
+                        <ImageAsset 
+                          path="ui/topPanel/key_green.png" 
                           alt="Green Key" 
                           className="absolute w-4 h-4 left-0 top-[-1px] transform -rotate-0 origin-center"
                         />
-                        <img 
-                          src="/src/assets/ui/topPanel/key_blue.png" 
+                        <ImageAsset 
+                          path="ui/topPanel/key_blue.png" 
                           alt="Blue Key" 
                           className="absolute w-4 h-4 right-[-1px] top-0 transform rotate-60 origin-center"
                         />
-                        <img 
-                          src="/src/assets/ui/topPanel/key_red.png" 
+                        <ImageAsset 
+                          path="ui/topPanel/key_red.png" 
                           alt="Red Key" 
                           className="absolute w-4 h-4 left-[-1px] top-0 transform -rotate-60 origin-center"
                         />
@@ -263,28 +251,28 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
                 </th>
                 <th onClick={() => handleSort('floor_reached')} className="cursor-pointer text-center bg-base-200/50">
                   <div className="flex items-center justify-center">
-                    <img src="/src/assets/ui/topPanel/floor.png" alt="Floor" className="w-5 h-5 mr-1.5" />
+                    <ImageAsset path="ui/topPanel/floor.png" alt="Floor" className="w-5 h-5 mr-1.5" />
                     <span>到達階層</span>
                     <SortIcon active={sortKey === 'floor_reached'} direction={sortOrder} />
                   </div>
                 </th>
                 <th onClick={() => handleSort('playtime')} className="cursor-pointer text-center bg-base-200/50">
                   <div className="flex items-center justify-center">
-                    <img src="/src/assets/ui/timerIcon.png" alt="Timer" className="w-5 h-5 mr-1.5" />
+                    <ImageAsset path="ui/timerIcon.png" alt="Timer" className="w-5 h-5 mr-1.5" />
                     <span>プレイ時間</span>
                     <SortIcon active={sortKey === 'playtime'} direction={sortOrder} />
                   </div>
                 </th>
                 <th onClick={() => handleSort('score')} className="cursor-pointer text-center bg-base-200/50">
                   <div className="flex items-center justify-center">
-                    <img src="/src/assets/ui/leaderboards/score.png" alt="Score" className="w-5 h-5 mr-1.5" />
+                    <ImageAsset path="ui/leaderboards/score.png" alt="Score" className="w-5 h-5 mr-1.5" />
                     <span>スコア</span>
                     <SortIcon active={sortKey === 'score'} direction={sortOrder} />
                   </div>
                 </th>
                 <th className="text-center bg-base-200/50">
                   <div className="flex items-center justify-center">
-                    <img src="/src/assets/ui/topPanel/peek_button.png" alt="Details" className="w-5 h-5 mr-1.5" />
+                    <ImageAsset path="ui/topPanel/peek_button.png" alt="Details" className="w-5 h-5 mr-1.5" />
                     <span>詳細</span>
                   </div>
                 </th>
@@ -298,12 +286,25 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
                   </td>
                   <td>
                     <div className="flex items-center justify-center">
-                      <img
-                        src={characterImages[run.character_chosen || run.character]}
-                        alt={run.character_chosen || run.character}
-                        title={run.character_chosen || run.character}
-                        className="w-8 h-8 rounded-full"
-                      />
+                      {(() => {
+                        const character = run.character_chosen || run.character;
+                        const characterPathMap: { [key: string]: string } = {
+                          'IRONCLAD': 'images/characters/ironclad.png',
+                          'THE_SILENT': 'images/characters/silent.png',
+                          'SILENT': 'images/characters/silent.png',
+                          'DEFECT': 'images/characters/defect.png',
+                          'WATCHER': 'images/characters/watcher.png',
+                        };
+                        const imagePath = characterPathMap[character] || 'images/characters/ironclad.png';
+                        return (
+                          <ImageAsset
+                            path={imagePath}
+                            alt={character}
+                            title={character}
+                            className="w-8 h-8 rounded-full"
+                          />
+                        );
+                      })()}
                     </div>
                   </td>
                   <td className="text-center">{run.ascension_level}</td>
@@ -336,7 +337,7 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
 
 const NeowBonusList: React.FC = () => {
   const { t } = useTranslation();
-  const runs = useSelector((state: RootState) => state.runs.runs);
+  const runs = useStore((state) => state.runs);
   const [selectedCharacter, setSelectedCharacter] = useState<string>(() => {
     const savedCharacter = localStorage.getItem('selectedNeowBonusCharacter');
     return savedCharacter || 'ironclad';
@@ -582,8 +583,8 @@ const NeowBonusList: React.FC = () => {
                     onClick={() => handleTabSelect(classConfig.id)}
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <img
-                        src={tabImages[classConfig.id]}
+                      <ImageAsset
+                        path={tabImages[classConfig.id] || 'images/cardLibrary/tab_colorless.png'}
                         alt={classConfig.name}
                         className={`
                           w-full h-[48px]
@@ -600,8 +601,8 @@ const NeowBonusList: React.FC = () => {
                       <div className="flex items-center justify-center gap-1 w-48">
                         {classConfig.costFrame && (
                           <div className="flex-shrink-0 w-6 h-6 items-center justify-center">
-                            <img
-                              src={classConfig.costFrame}
+                            <ImageAsset
+                              path={classConfig.costFrame}
                               alt={`${classConfig.name} cost frame`}
                               className="w-full h-full"
                             />
@@ -619,8 +620,8 @@ const NeowBonusList: React.FC = () => {
                         </span>
                         {classConfig.costFrame && (
                           <div className="flex-shrink-0 w-6 h-6 items-center justify-center">
-                            <img
-                              src={classConfig.costFrame}
+                            <ImageAsset
+                              path={classConfig.costFrame}
                               alt={`${classConfig.name} cost frame`}
                               className="w-full h-full"
                             />
@@ -650,14 +651,14 @@ const NeowBonusList: React.FC = () => {
                     </th>
                     <th onClick={() => handleSort('totalSelected')} className="cursor-pointer text-center bg-base-200/50">
                       <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/topPanel/deck.png" alt="Total Selected" className="w-5 h-5 mr-1.5" />
+                        <ImageAsset path="ui/topPanel/deck.png" alt="Total Selected" className="w-5 h-5 mr-1.5" />
                         <span>選択回数（通算）</span>
                         <SortIcon active={sortKey === 'totalSelected'} direction={sortOrder} />
                       </div>
                     </th>
                     <th onClick={() => handleSort('last50Selected')} className="cursor-pointer text-center bg-base-200/50">
                       <div className="flex items-center justify-center">
-                        <img src="/src/assets/ui/topPanel/deck.png" alt="Last 50 Selected" className="w-5 h-5 mr-1.5" />
+                        <ImageAsset path="ui/topPanel/deck.png" alt="Last 50 Selected" className="w-5 h-5 mr-1.5" />
                         <span>選択回数（直近50戦）</span>
                         <SortIcon active={sortKey === 'last50Selected'} direction={sortOrder} />
                       </div>
@@ -666,18 +667,18 @@ const NeowBonusList: React.FC = () => {
                       <div className="flex items-center justify-center">
                         <div className="relative w-8 h-8 flex items-center justify-center">
                           <div className="absolute w-4 h-4">
-                            <img 
-                              src="/src/assets/ui/topPanel/key_green.png" 
+                            <ImageAsset 
+                              path="ui/topPanel/key_green.png" 
                               alt="Green Key" 
                               className="absolute w-4 h-4 left-0 top-[-1px] transform -rotate-0 origin-center"
                             />
-                            <img 
-                              src="/src/assets/ui/topPanel/key_blue.png" 
+                            <ImageAsset 
+                              path="ui/topPanel/key_blue.png" 
                               alt="Blue Key" 
                               className="absolute w-4 h-4 right-[-1px] top-0 transform rotate-60 origin-center"
                             />
-                            <img 
-                              src="/src/assets/ui/topPanel/key_red.png" 
+                            <ImageAsset 
+                              path="ui/topPanel/key_red.png" 
                               alt="Red Key" 
                               className="absolute w-4 h-4 left-[-1px] top-0 transform -rotate-60 origin-center"
                             />
@@ -691,18 +692,18 @@ const NeowBonusList: React.FC = () => {
                       <div className="flex items-center justify-center">
                         <div className="relative w-8 h-8 flex items-center justify-center">
                           <div className="absolute w-4 h-4">
-                            <img 
-                              src="/src/assets/ui/topPanel/key_green.png" 
+                            <ImageAsset 
+                              path="ui/topPanel/key_green.png" 
                               alt="Green Key" 
                               className="absolute w-4 h-4 left-0 top-[-1px] transform -rotate-0 origin-center"
                             />
-                            <img 
-                              src="/src/assets/ui/topPanel/key_blue.png" 
+                            <ImageAsset 
+                              path="ui/topPanel/key_blue.png" 
                               alt="Blue Key" 
                               className="absolute w-4 h-4 right-[-1px] top-0 transform rotate-60 origin-center"
                             />
-                            <img 
-                              src="/src/assets/ui/topPanel/key_red.png" 
+                            <ImageAsset 
+                              path="ui/topPanel/key_red.png" 
                               alt="Red Key" 
                               className="absolute w-4 h-4 left-[-1px] top-0 transform -rotate-60 origin-center"
                             />
