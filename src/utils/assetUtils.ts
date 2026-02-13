@@ -89,7 +89,7 @@ export const getAssetFallbackUrl = async (assetPath: string): Promise<string | n
 };
 
 /**
- * アセットパスを正規化する（先頭の /src/assets/ 等を削除）
+ * アセットパスを正規化する（先頭の /assets/ 等を含む入力を統一）
  * @param assetPath 正規化するアセットパス
  * @returns 正規化されたパス
  */
@@ -127,7 +127,12 @@ export const joinPaths = (base: string, relative: string): string => {
  * @returns アセットURLの場合はtrue
  */
 export const isAssetUrl = (url: string): boolean => {
-  return url.startsWith('asset://') || url.startsWith('/assets/');
+  return (
+    url.startsWith('asset://') ||
+    url.startsWith('/assets/') ||
+    url.startsWith('assets/') ||
+    url.startsWith('./assets/')
+  );
 };
 
 // カード情報の型定義 (必要に応じて拡張)
