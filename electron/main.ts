@@ -96,7 +96,7 @@ function initializeIpcHandlers() {
     if (app.isPackaged) {
       return join(process.resourcesPath, 'assets');
     } else {
-      return join(app.getAppPath(), 'src', 'assets');
+      return join(app.getAppPath(), 'public', 'assets');
     }
   });
   
@@ -170,10 +170,9 @@ function initializeIpcHandlers() {
         const devPaths = [
           join(app.getAppPath(), 'public', 'assets', normalizedAssetPath),
           join(app.getAppPath(), 'resources', 'assets', normalizedAssetPath),
-          join(app.getAppPath(), 'dist', 'assets', normalizedAssetPath),
-          join(app.getAppPath(), 'src', 'assets', normalizedAssetPath)
+          join(app.getAppPath(), 'dist', 'assets', normalizedAssetPath)
         ];
-        
+
         for (const candidatePath of devPaths) {
           const normalizedPath = normalize(candidatePath);
           if (fs.existsSync(normalizedPath)) {
@@ -395,10 +394,9 @@ function initializeIpcHandlers() {
         const devPaths = [
           join(app.getAppPath(), 'public', 'assets', normalizedAssetPath),
           join(app.getAppPath(), 'resources', 'assets', normalizedAssetPath),
-          join(app.getAppPath(), 'dist', 'assets', normalizedAssetPath),
-          join(app.getAppPath(), 'src', 'assets', normalizedAssetPath)
+          join(app.getAppPath(), 'dist', 'assets', normalizedAssetPath)
         ];
-        
+
         for (const candidatePath of devPaths) {
           // Windowsでのパスセパレータ混在問題を解決するため、normalizeを使用
           const normalizedPath = normalize(candidatePath);
@@ -407,7 +405,7 @@ function initializeIpcHandlers() {
             break;
           }
         }
-        
+
         // パスが見つからない場合はpublic/assetsを使用
         if (!resolvedPath) {
           resolvedPath = normalize(devPaths[0]);
@@ -603,10 +601,23 @@ function initializeIpcHandlers() {
   // ファイル読み込みハンドラ (preload.ts の readFile から呼び出される)
   ipcMain.handle('fs-readFile', async (event, filePath: string, encoding: string = 'utf8') => {
     try {
+      // セキュリティ: 許可ディレクトリの検証
+      const allowedDirs = [
+        app.getPath('userData'),
+        app.isPackaged
+          ? join(process.resourcesPath, 'assets')
+          : join(app.getAppPath(), 'public', 'assets')
+      ];
+      const normalizedFilePath = normalize(filePath);
+      const isAllowed = allowedDirs.some(dir => normalizedFilePath.startsWith(normalize(dir)));
+      if (!isAllowed) {
+        log.error(`[fs-readFile] Access denied: ${filePath}`);
+        throw new Error(`Access denied: ${filePath}`);
+      }
       return await fs.promises.readFile(filePath, encoding as BufferEncoding);
     } catch (error) {
       log.error(`[fs-readFile] Error reading file ${filePath}:`, error);
-      throw error; // エラーをレンダラープロセスに再スロー
+      throw error;
     }
   });
 
@@ -792,7 +803,9 @@ async function createWindow() {
         preload: join(__dirname, 'preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
-        webSecurity: false,
+        webSecurity: true,
+        // sandbox: false を維持（preloadスクリプトでipcRendererが必要なため）
+        // 将来的にはsandbox: trueに移行し、すべてのNode.js APIをIPCハンドラー経由にすることを推奨
         sandbox: false
       }
     });

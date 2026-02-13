@@ -65,7 +65,7 @@ const Card: React.FC<CardProps> = ({
           : `images/cards/${cardClass}/${type}/${name.toLowerCase().replace(/\s+/g, '_')}.png`;
 
       // Electron環境（開発環境・本番環境共通）: IPC経由でURLを取得
-      if (window.electronAPI?.getFileURLForAsset) {
+      if (typeof window.electronAPI?.getFileURLForAsset === 'function') {
         try {
           const [baseUrl, frameUrl, bannerUrl, costFrameUrl, cardImageUrl] = await Promise.all([
             getAssetFallbackUrl(normalizeAssetPath(basePath)) || getAssetUrl(basePath),

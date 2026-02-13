@@ -34,13 +34,13 @@ const AssetImage: React.FC<AssetImageProps> = ({
   
   // エラーがあり、フォールバック画像が指定されている場合はフォールバック画像を表示
   const imageUrl = (error && fallbackImageUrl) ? fallbackImageUrl : mainImageUrl;
-  
+
   return (
-    <img 
-      src={imageUrl} 
-      alt={alt} 
-      onError={handleError} 
-      {...props} 
+    <img
+      src={imageUrl ?? undefined}
+      alt={alt}
+      onError={handleError}
+      {...props}
     />
   );
 };

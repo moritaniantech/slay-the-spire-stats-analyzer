@@ -51,6 +51,7 @@
       "filter": ["**/*"]
     }
   ],
+  "asar": true,
   "asarUnpack": [
     "node_modules/**/*.node",
     "resources/assets/**/*",
@@ -65,6 +66,10 @@
     {
       "name": "StS Stats Analyzer",
       "schemes": ["sts-stats-analyzer"]
+    },
+    {
+      "name": "Asset Protocol",
+      "schemes": ["asset"]
     }
   ],
   "afterSign": "scripts/notarize.cjs",

@@ -527,14 +527,14 @@ const RunDetail: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-base-300 rounded-full flex items-center justify-center">
                           <img
-                            src={getRelicImagePath(relic)}
+                            src={getRelicImagePath(relic) ?? undefined}
                             alt={relic}
                             className="w-16 h-16 object-contain"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               if (!target.dataset.retried) {
                                 target.dataset.retried = "true";
-                                target.src = getAssetUrl('ui/relicSilhouette.png');
+                                target.src = getAssetUrl('ui/relicSilhouette.png') || '';
                               }
                             }}
                           />

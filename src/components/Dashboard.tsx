@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '../utils/dateUtils';
+import { Run } from '../store';
 
 const Dashboard: React.FC = () => {
-  const [filteredRuns, setFilteredRuns] = useState([]);
+  const [filteredRuns, setFilteredRuns] = useState<Run[]>([]);
 
   useEffect(() => {
     // Fetch runs from the backend

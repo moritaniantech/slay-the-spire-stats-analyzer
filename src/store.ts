@@ -15,6 +15,7 @@ export interface Run {
   score: number;
   run_data: any;
   neow_bonus?: string;
+  neow_cost?: string;
 }
 
 interface AppSettings {

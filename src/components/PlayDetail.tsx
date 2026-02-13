@@ -608,13 +608,13 @@ const PlayDetail: React.FC = () => {
   const renderMapIcon = (iconType: string) => {
     return (
       <div className="flex items-center justify-center">
-        <img 
-          src={getAssetUrl(`images/mapIcons/${iconType}.png`) || ''} 
-          alt={iconType} 
+        <img
+          src={getAssetUrl(`images/mapIcons/${iconType}.png`) || ''}
+          alt={iconType}
           className="w-8 h-8"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = getAssetUrl('images/mapIcons/unknown.png');
+            target.src = getAssetUrl('images/mapIcons/unknown.png') || '';
           }}
         />
       </div>
@@ -682,7 +682,7 @@ const PlayDetail: React.FC = () => {
                   const target = e.target as HTMLImageElement;
                   if (!target.dataset.retried) {
                     target.dataset.retried = "true";
-                    target.src = getAssetUrl('ui/intent/unknown.png');
+                    target.src = getAssetUrl('ui/intent/unknown.png') || '';
                   }
                 }}
               />
@@ -724,7 +724,7 @@ const PlayDetail: React.FC = () => {
                     const target = e.target as HTMLImageElement;
                     if (!target.dataset.retried) {
                       target.dataset.retried = "true";
-                      target.src = getAssetUrl('ui/intent/unknown.png');
+                      target.src = getAssetUrl('ui/intent/unknown.png') || '';
                     }
                   }}
                 />
@@ -761,7 +761,7 @@ const PlayDetail: React.FC = () => {
                         const target = e.target as HTMLImageElement;
                         if (!target.dataset.retried) {
                           target.dataset.retried = "true";
-                          target.src = getAssetUrl('ui/intent/unknown.png');
+                          target.src = getAssetUrl('ui/intent/unknown.png') || '';
                         }
                       }}
                     />
@@ -784,7 +784,7 @@ const PlayDetail: React.FC = () => {
                       const target = e.target as HTMLImageElement;
                       if (!target.dataset.retried) {
                         target.dataset.retried = "true";
-                        target.src = getAssetUrl('ui/intent/unknown.png');
+                        target.src = getAssetUrl('ui/intent/unknown.png') || '';
                       }
                     }}
                   />
@@ -1123,7 +1123,7 @@ const PlayDetail: React.FC = () => {
                             const target = e.target as HTMLImageElement;
                             if (!target.dataset.retried) {
                               target.dataset.retried = "true";
-                              target.src = getAssetUrl('ui/intent/unknown.png');
+                              target.src = getAssetUrl('ui/intent/unknown.png') || '';
                             }
                           }}
                         />

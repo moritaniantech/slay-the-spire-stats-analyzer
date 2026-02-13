@@ -68,19 +68,19 @@ function Layout({ children }: { children: React.ReactNode }) {
         });
         
         // 問題のある画像を特定
-        const problematicImages = scanResults.images.filter(img => 
-          !img.complete || !img.naturalSize || img.src.includes(getAssetUrl(''))
+        const problematicImages = scanResults.images.filter(img =>
+          !img.complete || !img.naturalSize || img.src.includes(getAssetUrl('') || '')
         );
-        
+
         if (problematicImages.length > 0) {
           console.warn('[App] 問題のある画像が見つかりました:', problematicImages);
         } else {
           console.log('[App] すべての画像は正常に読み込まれています');
         }
-        
+
         // CSSの問題も確認
-        const problematicCssRefs = scanResults.cssBackgrounds.filter(ref => 
-          ref.url.includes(getAssetUrl(''))
+        const problematicCssRefs = scanResults.cssBackgrounds.filter(ref =>
+          ref.url.includes(getAssetUrl('') || '')
         );
         
         if (problematicCssRefs.length > 0) {
@@ -461,42 +461,7 @@ function PlayToRunsRedirect() {
 }
 
 function App() {
-  const { loadRuns } = useStore()
-  const [loadingRuns, setLoadingRuns] = useState(false)
-  const [runFilePaths, setRunFilePaths] = useState<string[]>([])
   const [assetStatus, setAssetStatus] = useState<'loading' | 'ready' | 'error'>('loading')
-
-  // ランデータをロード
-  useEffect(() => {
-    const loadRunFiles = async () => {
-      if (runFilePaths.length === 0 || !window.electronAPI) return;
-      
-      setLoadingRuns(true)
-      try {
-        const promises = runFilePaths.map(path => window.electronAPI.readFile(path, 'utf8'))
-        const fileContents = await Promise.all(promises)
-        
-        // ファイルの中身をパース
-        const parsedRuns = fileContents.map((content, i) => {
-          try {
-            return JSON.parse(content)
-          } catch (e) {
-            console.error(`Failed to parse run file at ${runFilePaths[i]}:`, e)
-            return null
-          }
-        }).filter(Boolean)
-        
-        // ストアにランをロード
-        loadRuns(parsedRuns)
-      } catch (error) {
-        console.error('Failed to load run files:', error)
-      } finally {
-        setLoadingRuns(false)
-      }
-    }
-    
-    loadRunFiles()
-  }, [runFilePaths, loadRuns])
 
   // アセットの読み込み状態をチェック
   useEffect(() => {
@@ -602,50 +567,6 @@ function App() {
     checkAssetLoadStatus();
   }, []);
 
-  // ファイル選択ダイアログを表示
-  const handleOpenRunFiles = async () => {
-    if (loadingRuns || !window.electronAPI) return;
-    
-    try {
-      const options: FilePickerOptions = {
-        title: 'Select Slay the Spire Run Files',
-        defaultPath: await window.electronAPI.getUserDataPath(),
-        filters: [
-          { name: 'JSON Files', extensions: ['json'] },
-          { name: 'All Files', extensions: ['*'] }
-        ],
-        properties: ['openFile', 'multiSelections']
-      }
-      
-      const result = await window.electronAPI.showOpenDialog(options)
-      if (!result.canceled && result.filePaths.length > 0) {
-        setRunFilePaths(result.filePaths)
-      }
-    } catch (error) {
-      console.error('Failed to open file dialog:', error)
-    }
-  }
-
-  // アセットが読み込めないエラー
-  if (assetStatus === 'error') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
-        <h1 className="text-3xl font-bold mb-4 text-error">アセット読み込みエラー</h1>
-        <p className="mb-6">
-          ゲームアセットの読み込みに失敗しました。
-          {isProduction() 
-            ? 'アプリケーションがプロパーにインストールされていないか、必要なファイルが不足している可能性があります。'
-            : '開発モードでは /src/assets/ ディレクトリが存在し、アクセス可能である必要があります。'}
-        </p>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setAssetStatus('loading')}
-        >
-          再試行
-        </button>
-      </div>
-    )
-  }
 
   // アセットのロード中
   if (assetStatus === 'loading') {
@@ -659,6 +580,34 @@ function App() {
 
   return (
     <Router>
+      {/* アセットエラー時の警告バナー */}
+      {assetStatus === 'error' && (
+        <div className="fixed top-0 left-0 right-0 z-[60] bg-error/90 text-error-content p-4">
+          <div className="container mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="text-lg font-bold">⚠ アセット読み込みエラー</span>
+              <span className="text-sm">
+                ゲームアセットの読み込みに失敗しました。一部の画像が表示されない可能性があります。
+              </span>
+            </div>
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => setAssetStatus('loading')}
+            >
+              再試行
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* アセットロード中 */}
+      {assetStatus === 'loading' && (
+        <div className="fixed inset-0 z-[70] bg-base-100 flex flex-col items-center justify-center">
+          <div className="loading loading-spinner loading-lg mb-4"></div>
+          <p className="text-lg">アセットを読み込み中...</p>
+        </div>
+      )}
+
       <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
