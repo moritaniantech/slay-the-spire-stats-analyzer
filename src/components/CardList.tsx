@@ -410,7 +410,7 @@ const CardList: React.FC = () => {
       // カードクリック時にツールチップを非表示にしない
       // ツールチップが表示されていない場合は表示する
       if (!tooltipVisible && settings.enableStatsTooltip) {
-        setTooltipCardId(cardId);
+        setTooltipCardId(card?.englishName ?? cardId);
         setTooltipCardName(card?.name || '');
         // クリック位置の近くにツールチップを表示
         const event = window.event as MouseEvent;
@@ -700,7 +700,7 @@ const CardList: React.FC = () => {
                         transition: { duration: 0.2 }
                       }}
                       style={{ pointerEvents: 'auto', zIndex: 10 }}
-                      onMouseEnter={(e) => handleCardMouseEnter(card.id, card.name, e)}
+                      onMouseEnter={(e) => handleCardMouseEnter(card.englishName, card.name, e)}
                       onMouseLeave={handleCardMouseLeave}
                       onMouseMove={handleCardMouseMove}
                     >

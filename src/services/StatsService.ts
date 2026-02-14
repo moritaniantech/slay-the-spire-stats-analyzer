@@ -168,13 +168,15 @@ export function isRelicObtained(run: Run, relicId: string): boolean {
 function normalizeCardId(cardId: string): string {
   // +1などのアップグレード情報を削除
   const withoutUpgrade = cardId.replace(/\+\d+$/, '');
-  
+
   // キャラクター固有のサフィックスを削除
   const baseName = withoutUpgrade.replace(/_(R|G|B|P)$/, "");
 
-  return baseName
+  // クラスプレフィックスを削除（CardListが生成する複合ID対応）
+  const withoutClassPrefix = baseName.replace(/^(ironclad|silent|defect|watcher|colorless|curse)_/i, '');
+
+  return withoutClassPrefix
     .replace(/^the\s+/i, "") // 先頭の'the'を削除
-    .replace(/s$/, "") // 末尾のsを削除（単純な複数形）
     .replace(/\s+/g, "") // 空白を削除
     .toLowerCase(); // 小文字に変換
 }
