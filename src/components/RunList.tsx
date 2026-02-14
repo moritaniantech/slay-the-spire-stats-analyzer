@@ -9,6 +9,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { getAssetUrl } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
 import Tab from './common/Tab';
+import { normalizeCharacterName, getCharacterImagePath } from '../utils/characterUtils';
 
 type SortKey = 'timestamp' | 'character' | 'ascension_level' | 'victory' | 'floor_reached' | 'playtime' | 'score' | 'name';
 type SortOrder = 'asc' | 'desc';
@@ -181,7 +182,7 @@ const RunList: React.FC = () => {
   const filteredRuns = useMemo(() => {
     return runs.filter(run => {
       // キャラクターフィルター
-      if (filters.character && run.character.toLowerCase() !== filters.character.toLowerCase()) {
+      if (filters.character && normalizeCharacterName(run.character) !== filters.character.toLowerCase()) {
         return false;
       }
       
@@ -479,14 +480,14 @@ const RunList: React.FC = () => {
                     <td className="text-center">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-base-200 flex items-center justify-center">
-                          <ImageAsset 
-                            path={`images/characters/${run.character.toLowerCase()}.png`} 
-                            alt={run.character} 
+                          <ImageAsset
+                            path={getCharacterImagePath(run.character)}
+                            alt={run.character}
                             className="w-6 h-6 object-contain"
                             fallbackPath="ui/char/unknown.png"
                           />
                         </div>
-                        <span className="capitalize">{run.character.toLowerCase()}</span>
+                        <span className="capitalize">{normalizeCharacterName(run.character)}</span>
                       </div>
                     </td>
                     <td className="text-center">{run.ascension_level}</td>
@@ -528,41 +529,41 @@ const RunList: React.FC = () => {
           {/* ページネーション */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-4">
-              <div className="btn-group">
-                <button 
-                  className="btn btn-sm"
+              <div className="flex gap-1">
+                <button
+                  className="btn btn-md px-3"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(1)}
                 >
                   «
                 </button>
-                <button 
-                  className="btn btn-sm"
+                <button
+                  className="btn btn-md px-3"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(currentPage - 1)}
                 >
                   ‹
                 </button>
-                
+
                 {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(page => (
                   <button
                     key={page}
-                    className={`btn btn-sm ${currentPage === page ? 'btn-active' : ''}`}
+                    className={`btn btn-md min-w-[2.5rem] ${currentPage === page ? 'btn-active' : ''}`}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}
                   </button>
                 ))}
-                
-                <button 
-                  className="btn btn-sm"
+
+                <button
+                  className="btn btn-md px-3"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
                 >
                   ›
                 </button>
-                <button 
-                  className="btn btn-sm"
+                <button
+                  className="btn btn-md px-3"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(totalPages)}
                 >

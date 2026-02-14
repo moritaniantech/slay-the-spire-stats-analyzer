@@ -4,6 +4,7 @@ import { Run, useStore } from '../store';
 import { Tab } from './common/Tab';
 import ImageAsset from './common/ImageAsset';
 import { WinRateChart } from './charts/WinRateChart';
+import { normalizeCharacterName, getCharacterImagePath } from '../utils/characterUtils';
 
 // キャラクター画像のインポートは削除
 // import ironclad from '../assets/images/characters/ironclad.png';
@@ -21,14 +22,14 @@ import { WinRateChart } from './charts/WinRateChart';
 
 // キャラクターごとの色クラスを取得する関数
 const getCharacterColorClass = (character: string): string => {
-  switch (character.toUpperCase()) {
-    case 'IRONCLAD':
+  switch (normalizeCharacterName(character)) {
+    case 'ironclad':
       return 'text-red-500';
-    case 'SILENT':
+    case 'silent':
       return 'text-green-500';
-    case 'DEFECT':
+    case 'defect':
       return 'text-blue-500';
-    case 'WATCHER':
+    case 'watcher':
       return 'text-purple-500';
     default:
       return '';
@@ -91,7 +92,7 @@ export const StatsOverview: React.FC = () => {
 
     // キャラクターごとの統計
     const characterGroups = runs.reduce((acc, run) => {
-      const char = run.character.toUpperCase();
+      const char = normalizeCharacterName(run.character).toUpperCase();
       if (!acc[char]) {
         acc[char] = [];
       }
@@ -317,9 +318,9 @@ export const StatsOverview: React.FC = () => {
                           <div className="flex items-center space-x-3">
                             <div className="avatar">
                               <div className="mask mask-squircle w-10 h-10 bg-base-300">
-                                <ImageAsset 
-                                  path={`images/characters/${charStat.character.toLowerCase()}.png`} 
-                                alt={charStat.character} 
+                                <ImageAsset
+                                  path={getCharacterImagePath(charStat.character)}
+                                alt={charStat.character}
                                   className="w-10 h-10 object-contain"
                                   fallbackPath="ui/char/unknown.png"
                               />
@@ -327,7 +328,7 @@ export const StatsOverview: React.FC = () => {
                             </div>
                             <div>
                               <div className={`font-bold ${getCharacterColorClass(charStat.character)}`}>
-                                {t(charStat.character.toLowerCase())}
+                                {t(normalizeCharacterName(charStat.character))}
                               </div>
                             </div>
                           </div>

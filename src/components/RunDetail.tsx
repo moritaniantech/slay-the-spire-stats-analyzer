@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 //import './RunDetail.css';
 import { getAssetUrl, getRelicImageUrl } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
+import { normalizeCharacterName } from '../utils/characterUtils';
 
 // RunDetailコンポーネント
 const RunDetail: React.FC = () => {
@@ -115,7 +116,7 @@ const RunDetail: React.FC = () => {
 
   // キャラクターのフルネームを取得
   const getCharacterFullName = (character: string) => {
-    switch (character.toLowerCase()) {
+    switch (normalizeCharacterName(character)) {
       case 'ironclad': return 'The Ironclad';
       case 'silent': return 'The Silent';
       case 'defect': return 'The Defect';
@@ -126,7 +127,7 @@ const RunDetail: React.FC = () => {
 
   // キャラクターの色を取得
   const getCharacterColor = (character: string) => {
-    switch (character.toLowerCase()) {
+    switch (normalizeCharacterName(character)) {
       case 'ironclad': return 'text-[#ff6563]';
       case 'silent': return 'text-[#7fff00]';
       case 'defect': return 'text-[#87ceeb]';
@@ -137,7 +138,7 @@ const RunDetail: React.FC = () => {
 
   // キャラクターの背景色を取得
   const getCharacterBgColor = (character: string) => {
-    switch (character.toLowerCase()) {
+    switch (normalizeCharacterName(character)) {
       case 'ironclad': return 'bg-[#ff6563]/10';
       case 'silent': return 'bg-[#7fff00]/10';
       case 'defect': return 'bg-[#87ceeb]/10';
@@ -148,13 +149,8 @@ const RunDetail: React.FC = () => {
 
   // キャラクターのアイコンを取得
   const getCharacterIcon = (character: string) => {
-    switch (character.toLowerCase()) {
-      case 'ironclad': return getAssetUrl('characters/ironclad/button.png');
-      case 'silent': return getAssetUrl('characters/silent/button.png');
-      case 'defect': return getAssetUrl('characters/defect/button.png');
-      case 'watcher': return getAssetUrl('characters/watcher/button.png');
-      default: return '';
-    }
+    const normalized = normalizeCharacterName(character);
+    return getAssetUrl(`characters/${normalized}/button.png`);
   };
 
   // カードタイプのアイコンを取得
@@ -229,7 +225,7 @@ const RunDetail: React.FC = () => {
             <div className="w-24 h-24 rounded-full overflow-hidden bg-base-100/50 flex items-center justify-center">
               {getCharacterIcon(run.character) && (
                 <ImageAsset
-                  path={`characters/${run.character.toLowerCase()}/button.png`}
+                  path={`characters/${normalizeCharacterName(run.character)}/button.png`}
                       alt={run.character}
                   className="w-20 h-20 object-contain"
                     />

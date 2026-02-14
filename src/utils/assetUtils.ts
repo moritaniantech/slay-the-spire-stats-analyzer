@@ -218,17 +218,41 @@ export function getCardCostFrameUrl(cardClass: CardInfo['class'], type: CardInfo
 }
 
 /**
- * レリック名を正規化します。
+ * レリック名を正規化します（camelCase変換）。
+ * ゲーム内のレリック名をファイル名形式に変換する。
+ * 例: "Du-Vu Doll" → "duvuDoll", "Gold-Plated Cables" → "goldPlatedCables"
  */
 export function normalizeRelicName(name: string): string {
   if (!name) return 'unknown';
-  if (name === 'Red Mask') return 'redmask';
 
-  return name.toLowerCase()
-    .replace(/\s+/g, '')
+  // 特殊ケース（ファイル名がパターンに合わないもの）
+  const specialCases: Record<string, string> = {
+    'Red Mask': 'redMask',
+    'Frozen Egg 2': 'frozenEgg2',
+    'Molten Egg 2': 'moltenEgg2',
+    'Toxic Egg 2': 'toxicEgg2',
+    "Philosopher's Stone": 'philosophersStone',
+    'Du-Vu Doll': 'duvuDoll',
+    'Black Star': 'blackstar',
+    'Prismatic Shard': 'prism',
+    "Neow's Lament": 'neowsBlessing',
+  };
+  if (specialCases[name]) return specialCases[name];
+
+  // "The " プレフィックスを除去（The Boot → boot, The Courier → courier）
+  let cleaned = name.replace(/^The\s+/i, '');
+
+  // 一般: camelCase変換（アポストロフィ・ピリオド除去、ハイフン・スペースで分割）
+  return cleaned
     .replace(/'/g, '')
     .replace(/\./g, '')
-    .replace(/\+/g, 'plus');
+    .replace(/\+/g, 'plus')
+    .split(/[\s-]+/)
+    .map((word, i) => i === 0
+      ? word.toLowerCase()
+      : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join('');
 }
 
 /**

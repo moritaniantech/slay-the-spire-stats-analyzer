@@ -1,11 +1,12 @@
 import { Run, useStore } from '../store';
-import { 
-  AllCharacterStats, 
-  CharacterStats, 
-  CharacterType, 
-  createEmptyAllCharacterStats, 
-  createEmptyCharacterStats 
+import {
+  AllCharacterStats,
+  CharacterStats,
+  CharacterType,
+  createEmptyAllCharacterStats,
+  createEmptyCharacterStats
 } from '../models/StatsModel';
+import { normalizeCharacterName } from '../utils/characterUtils';
 
 // 統計情報のキャッシュ
 const statsCache: {
@@ -243,31 +244,28 @@ export function calculateCardStats(runs: Run[], cardId: string): AllCharacterSta
   const recent50RunsMap = new Map<CharacterType, Run[]>();
   
   characters.forEach(character => {
-    // キャラクター名を大文字に変換（RunのcharacterフィールドはIRONCLADのような形式）
-    const characterUpperCase = character.toUpperCase();
-    
-    // キャラクターのプレイを抽出
-    const characterRuns = runs.filter(run => run.character === characterUpperCase);
+    // キャラクターのプレイを抽出（normalizeCharacterNameで正規化して比較）
+    const characterRuns = runs.filter(run => normalizeCharacterName(run.character) === character);
     characterRunsMap.set(character, characterRuns);
-    
+
     // 直近50戦を抽出
     const recent50Runs = [...characterRuns]
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 50);
     recent50RunsMap.set(character, recent50Runs);
-    
+
     // 統計情報の基本データを設定
     const characterStat = stats[character];
     characterStat.totalPlays = characterRuns.length;
     characterStat.recent50Plays = recent50Runs.length;
   });
-  
+
   // 各キャラクターの統計を並列計算
   characters.forEach(character => {
     const characterStat = stats[character];
     const characterRuns = characterRunsMap.get(character) || [];
     const recent50Runs = recent50RunsMap.get(character) || [];
-    
+
     // カードの取得回数と勝利回数を計算
     characterRuns.forEach(run => {
       if (isCardObtained(run, cardId)) {
@@ -341,31 +339,28 @@ export function calculateRelicStats(runs: Run[], relicId: string): AllCharacterS
   const recent50RunsMap = new Map<CharacterType, Run[]>();
   
   characters.forEach(character => {
-    // キャラクター名を大文字に変換（RunのcharacterフィールドはIRONCLADのような形式）
-    const characterUpperCase = character.toUpperCase();
-    
-    // キャラクターのプレイを抽出
-    const characterRuns = runs.filter(run => run.character === characterUpperCase);
+    // キャラクターのプレイを抽出（normalizeCharacterNameで正規化して比較）
+    const characterRuns = runs.filter(run => normalizeCharacterName(run.character) === character);
     characterRunsMap.set(character, characterRuns);
-    
+
     // 直近50戦を抽出
     const recent50Runs = [...characterRuns]
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 50);
     recent50RunsMap.set(character, recent50Runs);
-    
+
     // 統計情報の基本データを設定
     const characterStat = stats[character];
     characterStat.totalPlays = characterRuns.length;
     characterStat.recent50Plays = recent50Runs.length;
   });
-  
+
   // 各キャラクターの統計を並列計算
   characters.forEach(character => {
     const characterStat = stats[character];
     const characterRuns = characterRunsMap.get(character) || [];
     const recent50Runs = recent50RunsMap.get(character) || [];
-    
+
     // レリックの取得回数と勝利回数を計算
     characterRuns.forEach(run => {
       if (isRelicObtained(run, relicId)) {

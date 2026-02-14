@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { ArrowUpIcon, ArrowDownIcon, ArrowRightIcon } from '@heroicons/react/20/solid';
 import { getAssetUrl, normalizeRelicName } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
+import { normalizeCharacterName } from '../utils/characterUtils';
 import Tab from './common/Tab';
 import { useTranslation } from 'react-i18next';
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
@@ -517,7 +518,7 @@ const PlayDetail: React.FC = () => {
 
   // キャラクターのフルネームを取得
   const getCharacterFullName = (character: string) => {
-    switch (character.toLowerCase()) {
+    switch (normalizeCharacterName(character)) {
       case 'ironclad': return 'The Ironclad';
       case 'silent': return 'The Silent';
       case 'defect': return 'The Defect';
@@ -528,7 +529,7 @@ const PlayDetail: React.FC = () => {
 
   // キャラクターの色を取得
   const getCharacterColor = (character: string) => {
-    switch (character.toLowerCase()) {
+    switch (normalizeCharacterName(character)) {
       case 'ironclad': return 'text-[#ff6563]';
       case 'silent': return 'text-[#7fff00]';
       case 'defect': return 'text-[#87ceeb]';
@@ -539,7 +540,7 @@ const PlayDetail: React.FC = () => {
 
   // キャラクターの背景色を取得
   const getCharacterBgColor = (character: string) => {
-    switch (character.toLowerCase()) {
+    switch (normalizeCharacterName(character)) {
       case 'ironclad': return 'bg-[#ff6563]/10';
       case 'silent': return 'bg-[#7fff00]/10';
       case 'defect': return 'bg-[#87ceeb]/10';
@@ -867,7 +868,7 @@ const PlayDetail: React.FC = () => {
             {/* キャラクターアイコン */}
             <div className="w-24 h-24 rounded-full overflow-hidden bg-base-100/50 flex items-center justify-center">
               <ImageAsset
-                path={`images/characters/${run.character.toLowerCase()}.png`}
+                path={`images/characters/${normalizeCharacterName(run.character)}.png`}
                 alt={run.character}
                 className="w-20 h-20 object-contain"
                 fallbackPath="ui/char/unknown.png"

@@ -1,4 +1,5 @@
 import { AllCharacterStats, CharacterStats, createEmptyCharacterStats } from '../models/StatsModel';
+import { normalizeCharacterName } from './characterUtils';
 
 export function createEmptyAllCharacterStats(): AllCharacterStats {
   return {
@@ -14,7 +15,7 @@ export function calculateCardStats(runs: any[], cardId: string): AllCharacterSta
   
   // キャラクター毎の統計を計算
   ['ironclad', 'silent', 'defect', 'watcher'].forEach(character => {
-    const characterRuns = runs.filter(run => run.character.toLowerCase() === character);
+    const characterRuns = runs.filter(run => normalizeCharacterName(run.character) === character);
     const totalGames = characterRuns.length;
     
     if (totalGames === 0) return;
