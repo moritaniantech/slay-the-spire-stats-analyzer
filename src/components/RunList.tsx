@@ -116,13 +116,15 @@ const RunList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const navigate = useNavigate();
-  
+
   // 検索フィルター用の状態
-  const [filters, setFilters] = useState<Filters>({});
   const [characterFilter, setCharacterFilter] = useState<string>('');
   const [ascensionFilter, setAscensionFilter] = useState<string>('');
   const [scoreFilter, setScoreFilter] = useState<string>('');
   const [resultFilter, setResultFilter] = useState<string>('');
+
+  // デバウンス用のタイマーRef
+  const debounceTimerRef = React.useRef<number | null>(null);
 
   // ソート処理
   const handleSort = (key: SortKey) => {
@@ -138,43 +140,12 @@ const RunList: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // フィルターの適用
-  const applyFilters = () => {
-    const newFilters: Filters = {};
-    
-    if (characterFilter) {
-      newFilters.character = characterFilter;
-    }
-    
-    if (ascensionFilter) {
-      const ascValue = parseInt(ascensionFilter);
-      if (!isNaN(ascValue) && ascValue >= 0 && ascValue <= 20) {
-        newFilters.ascensionLevel = ascValue;
-      }
-    }
-    
-    if (scoreFilter) {
-      const scoreValue = parseInt(scoreFilter);
-      if (!isNaN(scoreValue) && scoreValue >= 0) {
-        newFilters.minScore = scoreValue;
-      }
-    }
-    
-    if (resultFilter) {
-      newFilters.result = resultFilter as 'victory' | 'defeat';
-    }
-    
-    setFilters(newFilters);
-    setCurrentPage(1);
-  };
-
   // フィルターのリセット
   const resetFilters = () => {
     setCharacterFilter('');
     setAscensionFilter('');
     setScoreFilter('');
     setResultFilter('');
-    setFilters({});
     setCurrentPage(1);
   };
 
@@ -182,28 +153,34 @@ const RunList: React.FC = () => {
   const filteredRuns = useMemo(() => {
     return runs.filter(run => {
       // キャラクターフィルター
-      if (filters.character && normalizeCharacterName(run.character) !== filters.character.toLowerCase()) {
+      if (characterFilter && normalizeCharacterName(run.character) !== characterFilter.toLowerCase()) {
         return false;
       }
-      
+
       // アセンションレベルフィルター
-      if (filters.ascensionLevel !== undefined && run.ascension_level !== filters.ascensionLevel) {
-        return false;
+      if (ascensionFilter) {
+        const ascValue = parseInt(ascensionFilter);
+        if (!isNaN(ascValue) && run.ascension_level !== ascValue) {
+          return false;
+        }
       }
-      
+
       // 最小スコアフィルター
-      if (filters.minScore !== undefined && run.score < filters.minScore) {
-        return false;
+      if (scoreFilter) {
+        const scoreValue = parseInt(scoreFilter);
+        if (!isNaN(scoreValue) && run.score < scoreValue) {
+          return false;
+        }
       }
-      
+
       // 勝敗フィルター
-      if (filters.result === 'victory' && !run.victory) {
+      if (resultFilter === 'victory' && !run.victory) {
         return false;
       }
-      if (filters.result === 'defeat' && run.victory) {
+      if (resultFilter === 'defeat' && run.victory) {
         return false;
       }
-      
+
       return true;
     }).sort((a, b) => {
       // ソート処理
@@ -223,11 +200,11 @@ const RunList: React.FC = () => {
           ? (a.victory ? 1 : 0) - (b.victory ? 1 : 0)
           : (b.victory ? 1 : 0) - (a.victory ? 1 : 0);
       }
-      
+
       // デフォルトは時間の降順
       return b.timestamp - a.timestamp;
     });
-  }, [runs, filters, sortKey, sortOrder]);
+  }, [runs, characterFilter, ascensionFilter, scoreFilter, resultFilter, sortKey, sortOrder]);
 
   // ページネーション
   const totalPages = Math.ceil(filteredRuns.length / itemsPerPage);
@@ -254,10 +231,13 @@ const RunList: React.FC = () => {
               <label className="label">
                 <span className="label-text text-primary-custom font-jp">キャラクター</span>
               </label>
-              <select 
+              <select
                 className="select input-navy w-full text-primary-custom"
                 value={characterFilter}
-                onChange={(e) => setCharacterFilter(e.target.value)}
+                onChange={(e) => {
+                  setCharacterFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
               >
                 <option value="">すべて</option>
                 <option value="ironclad">Ironclad</option>
@@ -266,7 +246,7 @@ const RunList: React.FC = () => {
                 <option value="watcher">Watcher</option>
               </select>
             </div>
-            
+
             {/* アセンションフィルター */}
             <div className="form-control flex-1">
               <label className="label">
@@ -283,11 +263,18 @@ const RunList: React.FC = () => {
                   const value = e.target.value;
                   if (value === '' || (parseInt(value) >= 0 && parseInt(value) <= 20)) {
                     setAscensionFilter(value);
+                    // デバウンス
+                    if (debounceTimerRef.current) {
+                      clearTimeout(debounceTimerRef.current);
+                    }
+                    debounceTimerRef.current = window.setTimeout(() => {
+                      setCurrentPage(1);
+                    }, 300);
                   }
                 }}
               />
             </div>
-            
+
             {/* スコアフィルター */}
             <div className="form-control flex-1">
               <label className="label">
@@ -303,54 +290,53 @@ const RunList: React.FC = () => {
                   const value = e.target.value;
                   if (value === '' || parseInt(value) >= 0) {
                     setScoreFilter(value);
+                    // デバウンス
+                    if (debounceTimerRef.current) {
+                      clearTimeout(debounceTimerRef.current);
+                    }
+                    debounceTimerRef.current = window.setTimeout(() => {
+                      setCurrentPage(1);
+                    }, 300);
                   }
                 }}
               />
             </div>
-            
-            {/* 検索ボタン */}
+
+            {/* リセットボタン */}
             <div className="form-control flex-none self-end">
-              <div className="flex gap-2">
-                <button 
-                  className="btn btn-navy-primary font-jp"
-                  onClick={applyFilters}
-                >
-                  検索
-                </button>
-                <button 
-                  className="btn btn-navy-secondary font-jp"
-                  onClick={resetFilters}
-                >
-                  リセット
-                </button>
-              </div>
+              <button
+                className="btn btn-navy-secondary font-jp"
+                onClick={resetFilters}
+              >
+                リセット
+              </button>
             </div>
           </div>
           
           {/* フィルター表示（適用中のフィルター） */}
-          {Object.keys(filters).length > 0 && (
+          {(characterFilter || ascensionFilter || scoreFilter || resultFilter) && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {filters.character && (
+              {characterFilter && (
                 <div className="badge badge-outline gap-1">
-                  キャラクター: {filters.character.charAt(0).toUpperCase() + filters.character.slice(1)}
+                  キャラクター: {characterFilter.charAt(0).toUpperCase() + characterFilter.slice(1)}
                 </div>
               )}
-              {filters.ascensionLevel !== undefined && (
+              {ascensionFilter && (
                 <div className="badge badge-outline gap-1">
-                  アセンション: {filters.ascensionLevel}
+                  アセンション: {ascensionFilter}
                 </div>
               )}
-              {filters.minScore !== undefined && (
+              {scoreFilter && (
                 <div className="badge badge-outline gap-1">
-                  最小スコア: {filters.minScore}
+                  最小スコア: {scoreFilter}
                 </div>
               )}
-              {filters.result && (
+              {resultFilter && (
                 <div className="badge badge-outline gap-1">
-                  結果: {filters.result === 'victory' ? '勝利' : '敗北'}
+                  結果: {resultFilter === 'victory' ? '勝利' : '敗北'}
                 </div>
               )}
-              <button 
+              <button
                 className="btn btn-xs btn-ghost"
                 onClick={resetFilters}
               >
@@ -358,14 +344,39 @@ const RunList: React.FC = () => {
               </button>
             </div>
           )}
-          
-          {/* 結果件数表示 */}
-          <div className="text-sm text-base-content/70 mb-4">
-            {filteredRuns.length}件中 {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredRuns.length)}件を表示
-          </div>
+
+          {/* 空状態メッセージ */}
+          {runs.length === 0 ? (
+            <div className="alert alert-info bg-info/10 border-info/30 text-info mb-4">
+              <div className="flex flex-col">
+                <p className="font-medium">プレイデータがありません</p>
+                <p className="text-sm">フォルダを選択してください。</p>
+              </div>
+            </div>
+          ) : filteredRuns.length === 0 ? (
+            <div className="alert alert-warning bg-warning/10 border-warning/30 text-warning mb-4">
+              <div className="flex flex-col gap-2">
+                <p className="font-medium">条件に一致するデータがありません</p>
+                <button
+                  className="btn btn-sm btn-outline"
+                  onClick={resetFilters}
+                >
+                  フィルターをリセット
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* 結果件数表示 */}
+              <div className="text-sm text-base-content/70 mb-4">
+                {filteredRuns.length}件中 {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredRuns.length)}件を表示
+              </div>
+            </>
+          )}
 
           {/* 結果表示 */}
-          <div className="overflow-x-auto">
+          {filteredRuns.length > 0 && (
+            <div className="overflow-x-auto">
             <table className="table table-navy w-full">
               <thead>
                 <tr className="text-base border-b border-navy">
@@ -524,10 +535,11 @@ const RunList: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          )}
 
           {/* ページネーション */}
-          {totalPages > 1 && (
+          {filteredRuns.length > 0 && totalPages > 1 && (
             <div className="flex justify-center mt-4">
               <div className="flex gap-1">
                 <button

@@ -72,49 +72,59 @@ export const FolderSelector: React.FC<Props> = ({ onFolderSelect }) => {
   };
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="card bg-base-100 shadow">
-        <div className="card-body max-w-[1920px] mx-auto w-full p-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handleClick}
-              disabled={!!progress}
-              className={`btn btn-ghost btn-sm gap-2 ${
-                progress ? 'btn-disabled' : ''
-              }`}
-            >
-              <FolderIcon className="h-5 w-5" />
-              フォルダを選択
-            </button>
-          </div>
-          {currentPath && (
-            <p className="text-xs opacity-70 truncate">
+    <div className="flex items-center gap-3 px-4 py-2 bg-base-200/50 rounded-lg">
+      <FolderIcon className="h-5 w-5 text-primary flex-shrink-0" />
+
+      {currentPath ? (
+        <>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm truncate text-base-content">
               {currentPath}
             </p>
-          )}
-          {progress && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs opacity-70">
-                <span>ファイル読み込み中...</span>
-                <span>{Math.round((progress.progress / progress.total) * 100)}%</span>
+            {progress && (
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1 bg-base-300 rounded-full h-1">
+                  <div
+                    className="bg-primary h-1 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${(progress.progress / progress.total) * 100}%`
+                    }}
+                  />
+                </div>
+                <span className="text-xs opacity-70 flex-shrink-0">
+                  {Math.round((progress.progress / progress.total) * 100)}%
+                </span>
               </div>
-              <div className="w-full bg-base-200 rounded-full h-1.5">
-                <div
-                  className="bg-primary h-1.5 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${(progress.progress / progress.total) * 100}%`
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          {error && (
-            <p className="text-xs text-error">
-              {error}
-            </p>
-          )}
-        </div>
-      </div>
+            )}
+          </div>
+          <button
+            onClick={handleClick}
+            disabled={!!progress}
+            className="btn btn-sm btn-ghost flex-shrink-0"
+          >
+            変更
+          </button>
+        </>
+      ) : (
+        <>
+          <span className="text-sm text-base-content/70 flex-1">
+            フォルダを選択してください
+          </span>
+          <button
+            onClick={handleClick}
+            disabled={!!progress}
+            className="btn btn-sm btn-primary flex-shrink-0"
+          >
+            選択
+          </button>
+        </>
+      )}
+
+      {error && (
+        <p className="text-xs text-error ml-2">
+          {error}
+        </p>
+      )}
     </div>
   );
 };
