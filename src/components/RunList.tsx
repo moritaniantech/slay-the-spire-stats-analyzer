@@ -126,6 +126,13 @@ const RunList: React.FC = () => {
   // デバウンス用のタイマーRef
   const debounceTimerRef = React.useRef<number | null>(null);
 
+  // デバウンスタイマーのクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
   // ソート処理
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {

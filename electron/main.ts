@@ -765,6 +765,11 @@ function initializeIpcHandlers() {
       const runFiles = findRunFiles(folderPath);
       log.info(`[get-all-runs] 見つかった.runファイル数: ${runFiles.length}`);
 
+      // ファイル監視を開始（0件でも監視して新規追加を検出する）
+      if (folderPath && mainWindow) {
+        startWatching(folderPath, mainWindow);
+      }
+
       if (runFiles.length === 0) {
         log.warn('[get-all-runs] .runファイルが見つかりませんでした');
         return [];
@@ -785,12 +790,6 @@ function initializeIpcHandlers() {
       }
 
       log.info(`[get-all-runs] 読み込み完了: ${runs.length}件のランを読み込みました`);
-
-      // ファイル監視を開始（フォルダパスがある場合のみ）
-      if (folderPath && mainWindow) {
-        startWatching(folderPath, mainWindow);
-      }
-
       return runs;
     } catch (error) {
       log.error('[get-all-runs] エラー:', error);

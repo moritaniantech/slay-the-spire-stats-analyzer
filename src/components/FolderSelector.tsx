@@ -43,7 +43,7 @@ export const FolderSelector: React.FC<Props> = ({ onFolderSelect }) => {
         const path = await window.electronAPI.getRunFolder() as string;
         if (path) {
           setCurrentPath(path);
-          onFolderSelect(path);
+          // 起動時はパス表示のみ（getAllRunsで既にデータ読み込み済み）
         }
         setIsInitialized(true);
       } catch (error) {

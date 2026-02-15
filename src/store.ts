@@ -89,9 +89,9 @@ export const useStore = create<Store>()(
       },
       addRun: (run) => {
         set((state) => {
-          // 重複チェック（id または timestamp ベース）
+          // 重複チェック（id ベース。timestamp 単独では誤除外の可能性があるため使用しない）
           const exists = state.runs.some(
-            (r) => (r.id && run.id && r.id === run.id) || r.timestamp === run.timestamp
+            (r) => r.id && run.id && r.id === run.id
           );
           if (exists) return state;
 
