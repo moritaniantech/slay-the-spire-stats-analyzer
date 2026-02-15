@@ -104,6 +104,11 @@ interface Window {
      * アップデートを開始する
      */
     startUpdate: () => Promise<void>;
+
+    /**
+     * 新しいランが検出された時のコールバック
+     */
+    onNewRunDetected: (callback: (run: any) => void) => () => void;
   };
   
   /**

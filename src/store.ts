@@ -30,6 +30,7 @@ interface Store {
   runs: Run[];
   settings: AppSettings;
   setRuns: (runs: Run[]) => void;
+  addRun: (run: Run) => void;
   updateSettings: (settings: Partial<AppSettings>) => void;
 }
 
@@ -74,7 +75,7 @@ export const useStore = create<Store>()(
       setRuns: (runs) => {
         // プレイデータが更新されたらキャッシュをクリア
         clearStatsCache();
-        
+
         set({ runs: runs.map(run => {
           const runData = typeof run.run_data === 'string' ? JSON.parse(run.run_data) : run.run_data;
           return {
@@ -85,6 +86,30 @@ export const useStore = create<Store>()(
         })});
         // Reduxストアも更新
         store.dispatch(runsSlice.actions.setRuns(runs));
+      },
+      addRun: (run) => {
+        set((state) => {
+          // 重複チェック（id または timestamp ベース）
+          const exists = state.runs.some(
+            (r) => (r.id && run.id && r.id === run.id) || r.timestamp === run.timestamp
+          );
+          if (exists) return state;
+
+          // キャッシュクリア
+          clearStatsCache();
+
+          const runData = typeof run.run_data === 'string' ? JSON.parse(run.run_data) : run.run_data;
+          const newRun = {
+            ...run,
+            run_data: runData,
+            neow_bonus: run.neow_bonus || runData?.neow_bonus
+          };
+
+          const newRuns = [...state.runs, newRun];
+          // Reduxストアも更新
+          store.dispatch(runsSlice.actions.setRuns(newRuns));
+          return { runs: newRuns };
+        });
       },
       updateSettings: (newSettings) => set((state) => {
         // 設定が変更されたらキャッシュをクリア

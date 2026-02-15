@@ -42,6 +42,7 @@ declare global {
 // 共通レイアウトコンポーネント
 function Layout({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<string>("dark");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { runs, settings, setRuns } = useStore();
@@ -98,24 +99,20 @@ function Layout({ children }: { children: React.ReactNode }) {
     loadInitialData();
   }, []); // 初回マウント時のみ実行
 
-  // リロード時のデータ再読み込み
+  // 新しいランの検出リスナー
   useEffect(() => {
-    const handleReload = async () => {
-      try {
-        if (window.electronAPI) {
-          const allRuns = await window.electronAPI.getAllRuns() as Run[];
-          setRuns(allRuns);
-        }
-      } catch (error) {
-        console.error('Error reloading data:', error);
-      }
-    };
+    if (!window.electronAPI?.onNewRunDetected) return;
 
-    window.addEventListener('load', handleReload);
+    const addRun = useStore.getState().addRun;
+    const unsubscribe = window.electronAPI.onNewRunDetected((run: Run) => {
+      console.log('[Layout] 新しいランを検出:', run.id);
+      addRun(run);
+    });
+
     return () => {
-      window.removeEventListener('load', handleReload);
+      unsubscribe();
     };
-  }, [setRuns]);
+  }, []);
 
   // プレイデータが読み込まれたら統計情報を事前計算
   useEffect(() => {
@@ -230,6 +227,19 @@ function Layout({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const handleFolderSelect = async (folderPath: string) => {
+    if (isLoading || !window.electronAPI) return;
+    setIsLoading(true);
+    try {
+      const runs = (await window.electronAPI.loadRunFiles(folderPath)) as Run[];
+      setRuns(runs);
+    } catch (error) {
+      console.error("Error loading runs:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-navy-dark w-full overflow-x-hidden">
       <div className="fixed top-0 left-0 right-0 z-50">
@@ -299,8 +309,14 @@ function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
+        {/* フォルダセレクターバーを追加 */}
+        <div className="bg-navy-dark/95 border-b border-navy/50">
+          <div className="container mx-auto px-4 max-w-[1920px]">
+            <FolderSelector onFolderSelect={handleFolderSelect} />
+          </div>
+        </div>
       </div>
-      <div className="pt-32 pb-8">
+      <div className="pt-40 pb-8">
         {children}
       </div>
       <UpdateNotification />
@@ -309,71 +325,21 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function HomePage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { setRuns } = useStore();
-
-  const handleFolderSelect = async (folderPath: string) => {
-    if (isLoading || !("electronAPI" in window) || !window.electronAPI) return;
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const runs = (await window.electronAPI.loadRunFiles(folderPath)) as Run[];
-      setRuns(runs);
-    } catch (error) {
-      console.error("Error loading runs:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "データの読み込みに失敗しました"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="mx-auto px-4 space-y-6 max-w-[1920px]">
       <div className="grid grid-cols-1 gap-6">
         <div className="card-navy">
           <div className="card-body p-4">
-            <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">
-              Slay the Spireのrunsフォルダ
-            </h2>
-            <FolderSelector onFolderSelect={handleFolderSelect} />
+            <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ統計</h2>
+            <StatsOverview />
           </div>
         </div>
-
-        {isLoading ? (
-          <div className="card-navy">
-            <div className="card-body flex items-center justify-center">
-              <div className="loading loading-spinner loading-lg text-navy-accent" />
-            </div>
+        <div className="card-navy">
+          <div className="card-body p-4">
+            <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ履歴</h2>
+            <RunList />
           </div>
-        ) : error ? (
-          <div className="alert alert-error shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2),0_2px_4px_-2px_rgba(0,0,0,0.1)] bg-status-error/20 border-status-error text-status-error">
-            <div className="flex flex-col">
-              <p className="font-medium">エラーが発生しました</p>
-              <p>{error}</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="card-navy">
-              <div className="card-body p-4">
-                <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ統計</h2>
-                <StatsOverview />
-              </div>
-            </div>
-            <div className="card-navy">
-              <div className="card-body p-4">
-                <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ履歴</h2>
-                <RunList />
-              </div>
-            </div>
-          </>
-        )}
+        </div>
       </div>
     </div>
   );

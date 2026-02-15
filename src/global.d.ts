@@ -65,6 +65,7 @@ interface Window {
     selectFolder: () => Promise<string | null>;
     getRunFolder: () => Promise<string | null>;
     onLoadProgress: (callback: (progress: { progress: number; total: number }) => void) => () => void;
+    onNewRunDetected: (callback: (run: any) => void) => () => void;
     readFile: (filePath: string, encoding?: string) => Promise<string>;
     getUserDataPath: () => Promise<string>;
     showOpenDialog: (options: any) => Promise<any>;
