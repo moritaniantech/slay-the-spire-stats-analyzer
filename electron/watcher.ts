@@ -1,10 +1,10 @@
-import chokidar from 'chokidar';
+import { watch, FSWatcher } from 'chokidar';
 import { BrowserWindow } from 'electron';
 import { parseRunFile } from './utils/fileUtils';
 import fs from 'fs';
 import log from 'electron-log';
 
-let watcher: chokidar.FSWatcher | null = null;
+let watcher: FSWatcher | null = null;
 
 /**
  * ファイル監視を開始する
@@ -17,7 +17,7 @@ export function startWatching(folderPath: string, mainWindow: BrowserWindow): vo
 
   log.info(`[watcher] ファイル監視を開始: ${folderPath}`);
 
-  watcher = chokidar.watch(folderPath, {
+  watcher = watch(folderPath, {
     ignoreInitial: true,
     awaitWriteFinish: { stabilityThreshold: 1000 },
     depth: 10,
