@@ -1,5 +1,54 @@
 # SESSION NOTES
 
+### [2026-02-16] v1.1.0 機能追加 — データ永続化・自動更新・UI改善（Agent Teams）
+
+- **決定事項**:
+  - フォルダパスは electron-store に永続化（`runFolderPath`）
+  - 起動時は `get-all-runs` で自動データロード、FolderSelector はパス表示のみ（二重読み込み防止）
+  - chokidar でファイル監視、`new-run-detected` IPC で新ラン通知
+  - 重複判定は `id` ベースのみ（timestamp 単独では誤除外の可能性）
+  - ナビゲーションはタブのみ（サイドバーは既に削除済みだった）
+
+- **実装した内容**:
+  - `electron/main.ts` — StoreSchema 拡張、`get-all-runs`/`get-run-folder` 実装、`select-folder` にパス保存+監視開始
+  - `electron/utils/fileUtils.ts` — `findRunFiles()`/`parseRunFile()` 共通ヘルパー抽出、`load-run-files` リファクタ
+  - `electron/watcher.ts`（新規）— chokidar ファイル監視モジュール
+  - `electron/preload.ts` — `onNewRunDetected` IPC ブリッジ追加
+  - `src/store.ts` — `addRun` メソッド追加（重複チェック + キャッシュクリア + Redux 同期）
+  - `src/App.tsx` — リロードハンドラ削除、新ラン検出リスナー追加、FolderSelector を Layout に移動、HomePage 簡素化
+  - `src/global.d.ts`, `src/types/electron-api.d.ts` — `onNewRunDetected` 型定義
+  - `src/components/FolderSelector.tsx` — コンパクトバースタイルに変更
+  - `src/components/RunList.tsx` — デバウンスフィルタ、空状態メッセージ、フィルタリセット、クリーンアップ追加
+  - `package.json` — chokidar を dependencies に移動
+  - `vite.config.ts` — chokidar を external に追加
+  - `CLAUDE.md` 新規作成
+
+- **Codexレビュー結果**: CRITICAL 0 / WARNING 3 / INFO 2 / GOOD 4
+  - WARNING 1: get-all-runs で0件だと監視未開始 → 修正済み（startWatching を早期実行）
+  - WARNING 2: 起動時二重読み込み → 修正済み（FolderSelector は起動時パス表示のみ）
+  - WARNING 3: timestamp 重複判定 → 修正済み（id ベースのみに変更）
+  - INFO 1: デバウンスクリーンアップ漏れ → 修正済み
+  - INFO 2: IPC入力パスの境界チェック → 今回は見送り（既存の load-run-files と同等）
+
+- **ビルド結果**:
+  - TypeScript 型チェック: エラー 0件
+  - Vite ビルド: 成功（メインバンドル 536KB）
+  - 変更ファイル: 15ファイル、+534 / -342行
+
+- **Agent Teams**: feature-v1.1（3 teammate: feat-backend/Sonnet, feat-store/Sonnet, feat-ui/Sonnet）
+
+- **コミット**: 54b38be, 19ddbbc, b99b405, 805ac38, c984719
+
+- **未解決の課題**:
+  - Viteビルドのchunkサイズ警告（536KB > 500KB）— 前回と同等
+  - IPC入力パスの境界チェック（Codex INFO指摘、load-run-files に上限設定）
+  - Windowsでの実機テストが必要（データ永続化・自動更新の動作確認）
+
+- **次のステップ**:
+  - v1.1.0 バージョンバンプ
+  - Windowsでの実機テスト
+  - 必要に応じてリリースビルド
+
 ### [2026-02-15] パフォーマンス最適化 — Agent Teams 並列実装
 
 - **決定事項**:
