@@ -76,3 +76,6 @@ release/
 dist-electron/
 resources/assets/
 nul
+
+# Claude Code local settings
+.claude/
