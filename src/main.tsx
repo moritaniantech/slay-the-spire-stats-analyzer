@@ -6,8 +6,8 @@ import { initializeI18n } from './i18n'; // 名前付きインポートに変更
 import './index.css';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { getAssetBasePath, getEnvironmentInfo, logEnvironmentInfo } from './utils/environment';
-import { getAssetUrl, getAssetFallbackUrl } from './utils/assetUtils';
+import { getAssetBasePath, logEnvironmentInfo } from './utils/environment';
+import { getAssetUrl } from './utils/assetUtils';
 
 // CSS変数を設定：アセットパスを動的に設定
 const setUpCssVariables = () => {
@@ -23,8 +23,7 @@ const setUpCssVariables = () => {
 // フォントを動的に読み込む関数
 const loadFonts = async () => {
   const isElectron = typeof window !== 'undefined' && !!window.electronAPI;
-  
-  // フォントファイルのリスト
+
   const fonts = [
     { family: 'Kreon', path: 'fonts/eng/Kreon-Regular.ttf', weight: '400', style: 'normal' },
     { family: 'Kreon', path: 'fonts/eng/Kreon-Bold.ttf', weight: '700', style: 'normal' },
@@ -33,128 +32,43 @@ const loadFonts = async () => {
     { family: 'NotoSansCJKjp', path: 'fonts/jpn/NotoSansCJKjp-Bold.otf', weight: '700', style: 'normal' },
   ];
 
-  // Electron環境では、asset://プロトコルを使用してフォントを読み込む
   if (isElectron) {
-    console.log('[main] Electron環境でフォントを動的に読み込みます...');
-    
-    for (const font of fonts) {
-      try {
-        // フォントパスを正規化（normalizeAssetPathを使用）
-        const normalizedPath = font.path.startsWith('assets/') ? font.path : `assets/${font.path}`;
-        console.log(`[main] フォント読み込み開始: ${font.family} (${font.weight}) - パス: ${normalizedPath}`);
-        
-        // IPC経由でURLを取得（フォールバック付き）
-        let fontUrl = await getAssetFallbackUrl(font.path);
-        console.log(`[main] getAssetFallbackUrl結果: ${fontUrl}`);
-        
-        if (!fontUrl) {
-          // フォールバック: asset://スキームを使用
-          fontUrl = getAssetUrl(font.path);
-          console.log(`[main] getAssetUrl結果: ${fontUrl}`);
-          
-          if (!fontUrl) {
-            // 最終フォールバック: 直接asset://スキームを使用
-            fontUrl = `asset://${normalizedPath}`;
-            console.log(`[main] 最終フォールバックURL: ${fontUrl}`);
-          }
-        }
-        
-        // FontFace APIを使用してフォントを読み込む
-        const fontFace = new FontFace(font.family, `url(${fontUrl})`, {
-          weight: font.weight,
-          style: font.style,
-          display: 'swap'
-        });
-        
-        await fontFace.load();
-        document.fonts.add(fontFace);
-        console.log(`[main] フォント読み込み成功: ${font.family} (${font.weight}) - ${fontUrl}`);
-      } catch (error) {
-        console.error(`[main] フォント読み込みエラー: ${font.family} (${font.weight}) - ${font.path}`, error);
-        // エラーが発生しても処理を続行（フォールバックフォントを使用）
+    console.log('[main] Electron環境でフォントを並列読み込みします...');
+
+    const results = await Promise.allSettled(fonts.map(async (font) => {
+      const fontUrl = getAssetUrl(font.path);
+      if (!fontUrl) {
+        console.warn(`[main] フォントURL取得失敗: ${font.family} (${font.weight})`);
+        return;
       }
+
+      const fontFace = new FontFace(font.family, `url(${fontUrl})`, {
+        weight: font.weight,
+        style: font.style,
+        display: 'swap'
+      });
+
+      const loaded = await fontFace.load();
+      document.fonts.add(loaded);
+      console.log(`[main] フォント読み込み成功: ${font.family} (${font.weight})`);
+    }));
+
+    const failed = results.filter(r => r.status === 'rejected');
+    if (failed.length > 0) {
+      console.warn(`[main] ${failed.length}件のフォント読み込みに失敗:`, failed);
     }
   } else {
-    // 非Electron環境では、CSS内のフォント定義に依存
     console.log('[main] 非Electron環境: CSS内のフォント定義を使用します');
   }
-};
-
-// フォント適用のための初期化
-const initializeFonts = () => {
-  // 日本語のパターン - ひらがな、カタカナ、漢字を検出
-  const japanesePattern = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/;
-  
-  // MutationObserverを設定して動的に追加される要素にもフォント設定を適用
-  const fontObserver = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
-      if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach(node => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            processElement(node as Element);
-          }
-        });
-      } else if (mutation.type === 'characterData') {
-        // テキスト内容が変更された場合、親要素を再処理
-        if (mutation.target.parentElement) {
-          processElement(mutation.target.parentElement as Element);
-        }
-      }
-    });
-  });
-  
-  // 要素を処理してlang属性を設定する関数
-  const processElement = (element: Element) => {
-    // テキストノードを持つ要素に対して処理
-    if (element.textContent) {
-      const text = element.textContent;
-      
-      // 日本語テキストが含まれているかチェック
-      if (japanesePattern.test(text)) {
-        // lang属性がまだない場合のみ設定
-        if (!element.hasAttribute('lang')) {
-          element.setAttribute('lang', 'ja');
-        }
-      }
-    }
-    
-    // 子要素も再帰的に処理
-    element.querySelectorAll('*').forEach(child => {
-      if (child.textContent && !child.hasAttribute('lang')) {
-        if (japanesePattern.test(child.textContent)) {
-          child.setAttribute('lang', 'ja');
-        }
-      }
-    });
-  };
-  
-  // ドキュメント全体に対してMutationObserverを適用
-  fontObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-    characterData: true
-  });
-  
-  // 初期ロード時に既存の要素に対して処理を実行
-  processElement(document.body);
-  
-  console.log('[main] フォント適用処理を初期化しました');
 };
 
 // グローバル設定の初期化
 const initializeGlobals = async () => {
   setUpCssVariables();
   logEnvironmentInfo();
-  
+
   // フォントを動的に読み込む（Electron環境の場合）
   await loadFonts();
-  
-  // フォント初期化（DOMロード後に実行）
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    initializeFonts();
-  } else {
-    document.addEventListener('DOMContentLoaded', initializeFonts);
-  }
   
   // ソースマップエラーの抑制
   window.addEventListener('error', (event) => {

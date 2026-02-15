@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { KEYWORDS, COLORS } from '../constants/keywords';
-import { getAssetUrl, getAssetFallbackUrl, normalizeAssetPath } from '../utils/assetUtils';
+import { getAssetUrl } from '../utils/assetUtils';
 
 interface CardProps {
   name: string;
@@ -29,76 +29,40 @@ const Card: React.FC<CardProps> = ({
   onClick,
   searchTerm = ''
 }) => {
-  // 画像パスの状態管理（本番環境でIPC経由でURLを取得するため）
-  const [baseCardPath, setBaseCardPath] = useState<string | null>(null);
-  const [framePath, setFramePath] = useState<string | null>(null);
-  const [bannerPath, setBannerPath] = useState<string | null>(null);
-  const [costFramePath, setCostFramePath] = useState<string | null>(null);
-  const [cardImagePath, setCardImagePath] = useState<string | null>(null);
+  // 画像パスを同期的に生成（useMemoでメモ化）
+  const urls = useMemo(() => {
+    // カードのベース画像パスを生成
+    const basePath = cardClass === 'curse'
+      ? 'cards/design/curse/curse_curse.png'
+      : type === 'status'
+        ? 'cards/design/colorless/colorless_skill.png'
+        : `cards/design/${cardClass}/${cardClass}_${type}.png`;
 
-  // 画像パスの初期化
-  useEffect(() => {
-    const loadImagePaths = async () => {
-      // カードのベース画像パスを生成
-      const basePath = cardClass === 'curse' 
-        ? 'cards/design/curse/curse_curse.png'
-        : type === 'status'
-          ? 'cards/design/colorless/colorless_skill.png'
-          : `cards/design/${cardClass}/${cardClass}_${type}.png`;
-      
-      // フレームとバナーのパスを生成
-      const adjustedRarity = rarity === 'starter' || rarity === 'special' || rarity === 'curse' ? 'common' : rarity;
-      const adjustedType = type === 'curse' || type === 'status' ? 'skill' : type;
-      const framePathStr = `cards/design/frame/frame_${adjustedRarity}_${adjustedType}.png`;
-      const bannerPathStr = `cards/design/banner/banner_${adjustedRarity}.png`;
-      
-      // コストの枠画像パスを生成
-      const costFramePathStr = type === 'status'
-        ? 'cards/design/colorless/colorless.png'
-        : `cards/design/${cardClass}/${cardClass}.png`;
-      
-      // カード画像のパスを生成（英語名を小文字に変換し、スペースをアンダースコアに置換）
-      const cardImagePathStr = cardClass === 'curse'
-        ? `images/cards/${cardClass}/${name.toLowerCase().replace(/\s+/g, '_')}.png`
-        : type === 'status'
-          ? `images/cards/status/${name.toLowerCase().replace(/\s+/g, '_')}.png`
-          : `images/cards/${cardClass}/${type}/${name.toLowerCase().replace(/\s+/g, '_')}.png`;
+    // フレームとバナーのパスを生成
+    const adjustedRarity = rarity === 'starter' || rarity === 'special' || rarity === 'curse' ? 'common' : rarity;
+    const adjustedType = type === 'curse' || type === 'status' ? 'skill' : type;
+    const framePathStr = `cards/design/frame/frame_${adjustedRarity}_${adjustedType}.png`;
+    const bannerPathStr = `cards/design/banner/banner_${adjustedRarity}.png`;
 
-      // Electron環境（開発環境・本番環境共通）: IPC経由でURLを取得
-      if (typeof window.electronAPI?.getFileURLForAsset === 'function') {
-        try {
-          const [baseUrl, frameUrl, bannerUrl, costFrameUrl, cardImageUrl] = await Promise.all([
-            getAssetFallbackUrl(normalizeAssetPath(basePath)) || getAssetUrl(basePath),
-            getAssetFallbackUrl(normalizeAssetPath(framePathStr)) || getAssetUrl(framePathStr),
-            getAssetFallbackUrl(normalizeAssetPath(bannerPathStr)) || getAssetUrl(bannerPathStr),
-            getAssetFallbackUrl(normalizeAssetPath(costFramePathStr)) || getAssetUrl(costFramePathStr),
-            getAssetFallbackUrl(normalizeAssetPath(cardImagePathStr)) || getAssetUrl(cardImagePathStr),
-          ]);
-          setBaseCardPath(baseUrl);
-          setFramePath(frameUrl);
-          setBannerPath(bannerUrl);
-          setCostFramePath(costFrameUrl);
-          setCardImagePath(cardImageUrl);
-        } catch (error) {
-          console.error('[Card] Error loading image paths via IPC:', error);
-          // フォールバック: 通常のgetAssetUrlを使用
-          setBaseCardPath(getAssetUrl(basePath));
-          setFramePath(getAssetUrl(framePathStr));
-          setBannerPath(getAssetUrl(bannerPathStr));
-          setCostFramePath(getAssetUrl(costFramePathStr));
-          setCardImagePath(getAssetUrl(cardImagePathStr));
-        }
-      } else {
-        // 非Electron環境
-        setBaseCardPath(getAssetUrl(basePath));
-        setFramePath(getAssetUrl(framePathStr));
-        setBannerPath(getAssetUrl(bannerPathStr));
-        setCostFramePath(getAssetUrl(costFramePathStr));
-        setCardImagePath(getAssetUrl(cardImagePathStr));
-      }
+    // コストの枠画像パスを生成
+    const costFramePathStr = type === 'status'
+      ? 'cards/design/colorless/colorless.png'
+      : `cards/design/${cardClass}/${cardClass}.png`;
+
+    // カード画像のパスを生成（英語名を小文字に変換し、スペースをアンダースコアに置換）
+    const cardImagePathStr = cardClass === 'curse'
+      ? `images/cards/${cardClass}/${name.toLowerCase().replace(/\s+/g, '_')}.png`
+      : type === 'status'
+        ? `images/cards/status/${name.toLowerCase().replace(/\s+/g, '_')}.png`
+        : `images/cards/${cardClass}/${type}/${name.toLowerCase().replace(/\s+/g, '_')}.png`;
+
+    return {
+      base: getAssetUrl(basePath),
+      frame: getAssetUrl(framePathStr),
+      banner: getAssetUrl(bannerPathStr),
+      costFrame: getAssetUrl(costFramePathStr),
+      cardImage: getAssetUrl(cardImagePathStr),
     };
-
-    loadImagePaths();
   }, [cardClass, type, rarity, name]);
 
   // カードタイプの英語表示
@@ -335,9 +299,9 @@ const Card: React.FC<CardProps> = ({
       }}
     >
       {/* ベースとなるカードの枠 */}
-      {baseCardPath && (
+      {urls.base && (
         <img
-          src={baseCardPath}
+          src={urls.base}
           alt="Base Card"
           className="absolute top-0 left-0 w-[190px] h-[252px]"
           onError={(e) => {
@@ -348,9 +312,9 @@ const Card: React.FC<CardProps> = ({
       )}
 
       {/* カード画像 */}
-      {cardImagePath && (
+      {urls.cardImage && (
         <img
-          src={cardImagePath}
+          src={urls.cardImage}
           alt={name}
           className="absolute top-[25px] left-1/2 transform -translate-x-1/2 w-[220px] h-[120px] object-contain"
           onError={(e) => {
@@ -361,18 +325,18 @@ const Card: React.FC<CardProps> = ({
       )}
 
       {/* フレーム */}
-      {framePath && (
+      {urls.frame && (
         <img
-          src={framePath}
+          src={urls.frame}
           alt="Frame"
           className="absolute top-0 left-[10px] w-[170px] h-[150px]"
         />
       )}
 
       {/* バナー（カード名の背景） */}
-      {bannerPath && (
+      {urls.banner && (
         <img
-          src={bannerPath}
+          src={urls.banner}
           alt="Banner"
           className="absolute top-[4px] left-[-10px]"
           style={{
@@ -405,10 +369,10 @@ const Card: React.FC<CardProps> = ({
       </div>
 
       {/* コスト枠（コストが-1の場合は表示しない） */}
-      {cost !== -1 && costFramePath && (
+      {cost !== -1 && urls.costFrame && (
         <div className="absolute top-[-13px] left-[-16px] w-[45px] h-[45px]" style={{ zIndex: 2 }}>
           <img
-            src={costFramePath}
+            src={urls.costFrame}
             alt="Cost Frame"
             className="w-full h-full"
             onError={(e) => {

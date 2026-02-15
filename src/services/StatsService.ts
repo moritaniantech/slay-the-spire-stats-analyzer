@@ -1,10 +1,8 @@
-import { Run, useStore } from '../store';
+import { Run } from '../store';
 import {
   AllCharacterStats,
-  CharacterStats,
   CharacterType,
   createEmptyAllCharacterStats,
-  createEmptyCharacterStats
 } from '../models/StatsModel';
 import { normalizeCharacterName } from '../utils/characterUtils';
 
@@ -24,6 +22,66 @@ const statsCache: {
 // キャッシュの有効期限（ミリ秒）
 const CACHE_EXPIRY = 60 * 60 * 1000; // 1時間
 
+// キャラクターインデックスのキャッシュ
+interface CharacterIndex {
+  byCharacter: Map<CharacterType, Run[]>;
+  recent50: Map<CharacterType, Run[]>;
+}
+
+let characterIndexCache = new WeakMap<Run[], CharacterIndex>();
+
+function buildCharacterIndex(runs: Run[]): CharacterIndex {
+  const characters: CharacterType[] = ['ironclad', 'silent', 'defect', 'watcher'];
+  const byCharacter = new Map<CharacterType, Run[]>();
+  const recent50 = new Map<CharacterType, Run[]>();
+
+  characters.forEach(character => {
+    const characterRuns = runs.filter(run => normalizeCharacterName(run.character) === character);
+    byCharacter.set(character, characterRuns);
+
+    const recent50Runs = [...characterRuns]
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 50);
+    recent50.set(character, recent50Runs);
+  });
+
+  return { byCharacter, recent50 };
+}
+
+function getCharacterIndex(runs: Run[]): CharacterIndex {
+  const hit = characterIndexCache.get(runs);
+  if (hit) return hit;
+  const built = buildCharacterIndex(runs);
+  characterIndexCache.set(runs, built);
+  return built;
+}
+
+// Run の run_data から正規化済み master_deck Set をキャッシュ
+let normalizedDeckCache = new WeakMap<object, Set<string>>();
+
+function getNormalizedDeckSet(runData: any): Set<string> {
+  const hit = normalizedDeckCache.get(runData);
+  if (hit) return hit;
+  const set = new Set<string>(
+    (runData.master_deck || []).map((card: string) => normalizeCardId(card))
+  );
+  normalizedDeckCache.set(runData, set);
+  return set;
+}
+
+// Run の run_data から正規化済み relics Set をキャッシュ
+let normalizedRelicsCache = new WeakMap<object, Set<string>>();
+
+function getNormalizedRelicsSet(runData: any): Set<string> {
+  const hit = normalizedRelicsCache.get(runData);
+  if (hit) return hit;
+  const set = new Set<string>(
+    (runData.relics || []).map((relic: string) => normalizeRelicId(relic))
+  );
+  normalizedRelicsCache.set(runData, set);
+  return set;
+}
+
 /**
  * キャッシュをクリアする
  */
@@ -31,6 +89,9 @@ export function clearStatsCache(): void {
   statsCache.cards.clear();
   statsCache.relics.clear();
   statsCache.lastUpdated = Date.now();
+  characterIndexCache = new WeakMap();
+  normalizedDeckCache = new WeakMap();
+  normalizedRelicsCache = new WeakMap();
   console.log('統計情報キャッシュをクリアしました');
 }
 
@@ -107,16 +168,14 @@ function manageCacheSize(cacheMap: Map<string, AllCharacterStats>): void {
 export function isCardObtained(run: Run, cardId: string): boolean {
   const runData = run.run_data;
   const normalizedCardId = normalizeCardId(cardId);
-  
-  // master_deckにカードが含まれているか確認（高速化のためにSet変換）
+
+  // キャッシュ済みSetを使用
   if (runData.master_deck && Array.isArray(runData.master_deck)) {
-    // 一時的なSetを作成（高速検索のため）
-    const masterDeckSet = new Set(runData.master_deck.map((card: any) => normalizeCardId(card)));
-    if (masterDeckSet.has(normalizedCardId)) {
+    if (getNormalizedDeckSet(runData).has(normalizedCardId)) {
       return true;
     }
   }
-  
+
   // カード取得履歴からも確認
   if (runData.card_choices && Array.isArray(runData.card_choices)) {
     for (const choice of runData.card_choices) {
@@ -125,7 +184,7 @@ export function isCardObtained(run: Run, cardId: string): boolean {
       }
     }
   }
-  
+
   return false;
 }
 
@@ -138,16 +197,14 @@ export function isCardObtained(run: Run, cardId: string): boolean {
 export function isRelicObtained(run: Run, relicId: string): boolean {
   const runData = run.run_data;
   const normalizedRelicId = normalizeRelicId(relicId);
-  
-  // relicsにレリックが含まれているか確認（高速化のためにSet変換）
+
+  // キャッシュ済みSetを使用
   if (runData.relics && Array.isArray(runData.relics)) {
-    // 一時的なSetを作成（高速検索のため）
-    const relicsSet = new Set(runData.relics.map((relic: any) => normalizeRelicId(relic)));
-    if (relicsSet.has(normalizedRelicId)) {
+    if (getNormalizedRelicsSet(runData).has(normalizedRelicId)) {
       return true;
     }
   }
-  
+
   // レリック取得履歴からも確認
   if (runData.relics_obtained && Array.isArray(runData.relics_obtained)) {
     for (const relic of runData.relics_obtained) {
@@ -156,7 +213,7 @@ export function isRelicObtained(run: Run, relicId: string): boolean {
       }
     }
   }
-  
+
   return false;
 }
 
@@ -235,29 +292,20 @@ export function calculateCardStats(runs: Run[], cardId: string): AllCharacterSta
   }
   
   console.time(`calculateCardStats:${normalizedCardId}`);
-  
+
   const stats = createEmptyAllCharacterStats();
-  
+
   // キャラクターごとに統計を計算
   const characters: CharacterType[] = ['ironclad', 'silent', 'defect', 'watcher'];
-  
-  // キャラクターごとのプレイを事前に抽出（パフォーマンス向上）
-  const characterRunsMap = new Map<CharacterType, Run[]>();
-  const recent50RunsMap = new Map<CharacterType, Run[]>();
-  
+
+  // キャラクターインデックスキャッシュを使用
+  const index = getCharacterIndex(runs);
+
   characters.forEach(character => {
-    // キャラクターのプレイを抽出（normalizeCharacterNameで正規化して比較）
-    const characterRuns = runs.filter(run => normalizeCharacterName(run.character) === character);
-    characterRunsMap.set(character, characterRuns);
-
-    // 直近50戦を抽出
-    const recent50Runs = [...characterRuns]
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 50);
-    recent50RunsMap.set(character, recent50Runs);
-
     // 統計情報の基本データを設定
     const characterStat = stats[character];
+    const characterRuns = index.byCharacter.get(character) || [];
+    const recent50Runs = index.recent50.get(character) || [];
     characterStat.totalPlays = characterRuns.length;
     characterStat.recent50Plays = recent50Runs.length;
   });
@@ -265,14 +313,14 @@ export function calculateCardStats(runs: Run[], cardId: string): AllCharacterSta
   // 各キャラクターの統計を並列計算
   characters.forEach(character => {
     const characterStat = stats[character];
-    const characterRuns = characterRunsMap.get(character) || [];
-    const recent50Runs = recent50RunsMap.get(character) || [];
+    const characterRuns = index.byCharacter.get(character) || [];
+    const recent50Runs = index.recent50.get(character) || [];
 
     // カードの取得回数と勝利回数を計算
     characterRuns.forEach(run => {
       if (isCardObtained(run, cardId)) {
         characterStat.obtainCount++;
-        
+
         if (run.victory) {
           characterStat.victoryCount++;
         }
@@ -330,29 +378,20 @@ export function calculateRelicStats(runs: Run[], relicId: string): AllCharacterS
   }
   
   console.time(`calculateRelicStats:${normalizedRelicId}`);
-  
+
   const stats = createEmptyAllCharacterStats();
-  
+
   // キャラクターごとに統計を計算
   const characters: CharacterType[] = ['ironclad', 'silent', 'defect', 'watcher'];
-  
-  // キャラクターごとのプレイを事前に抽出（パフォーマンス向上）
-  const characterRunsMap = new Map<CharacterType, Run[]>();
-  const recent50RunsMap = new Map<CharacterType, Run[]>();
-  
+
+  // キャラクターインデックスキャッシュを使用
+  const index = getCharacterIndex(runs);
+
   characters.forEach(character => {
-    // キャラクターのプレイを抽出（normalizeCharacterNameで正規化して比較）
-    const characterRuns = runs.filter(run => normalizeCharacterName(run.character) === character);
-    characterRunsMap.set(character, characterRuns);
-
-    // 直近50戦を抽出
-    const recent50Runs = [...characterRuns]
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 50);
-    recent50RunsMap.set(character, recent50Runs);
-
     // 統計情報の基本データを設定
     const characterStat = stats[character];
+    const characterRuns = index.byCharacter.get(character) || [];
+    const recent50Runs = index.recent50.get(character) || [];
     characterStat.totalPlays = characterRuns.length;
     characterStat.recent50Plays = recent50Runs.length;
   });
@@ -360,8 +399,8 @@ export function calculateRelicStats(runs: Run[], relicId: string): AllCharacterS
   // 各キャラクターの統計を並列計算
   characters.forEach(character => {
     const characterStat = stats[character];
-    const characterRuns = characterRunsMap.get(character) || [];
-    const recent50Runs = recent50RunsMap.get(character) || [];
+    const characterRuns = index.byCharacter.get(character) || [];
+    const recent50Runs = index.recent50.get(character) || [];
 
     // レリックの取得回数と勝利回数を計算
     characterRuns.forEach(run => {

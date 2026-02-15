@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Header } from "./components/Header";
 import { StatsOverview } from "./components/StatsOverview";
 import RunList from "./components/RunList";
@@ -14,23 +14,20 @@ import {
   Link,
   useParams
 } from "react-router-dom";
-import RunDetail from "./components/RunDetail";
-import PlayDetail from "./components/PlayDetail";
+const RunDetail = React.lazy(() => import("./components/RunDetail"));
+const PlayDetail = React.lazy(() => import("./components/PlayDetail"));
 import { Run, useStore } from "./store";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/20/solid";
-import CardList from "./components/CardList";
-import RelicList from "./components/RelicList";
+const CardList = React.lazy(() => import("./components/CardList"));
+const RelicList = React.lazy(() => import("./components/RelicList"));
 import { precalculateCardStats, precalculateRelicStats, clearStatsCache, setCacheMaxSize } from "./services/StatsService";
 // allCards と allRelics は CardList と RelicList コンポーネント内で IPC 経由で読み込むため、
 // 静的インポートは不要（public/assets に存在するため、Vite のビルド時にバンドルされない）
 // import allCards from "./assets/cards/allCards.json";
 // import allRelics from "./assets/relics/relics.json";
-import NeowBonusList from './components/NeowBonusList';
+const NeowBonusList = React.lazy(() => import('./components/NeowBonusList'));
 import UpdateNotification from './components/UpdateNotification';
-import { scanAllAssetReferences } from './utils/imageAssetUtils';
-import { isDevelopment, isProduction, isElectron } from './utils/environment';
-import { FilePickerOptions } from 'electron-api';
-import { getAssetUrl } from './utils/assetUtils';
+import { isElectron } from './utils/environment';
 
 // グローバル設定変数を定義
 declare global {
@@ -48,58 +45,6 @@ function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { runs, settings, setRuns } = useStore();
-
-  // アセット参照の診断を実行
-  useEffect(() => {
-    // DOMが完全に読み込まれた後にスキャンを実行
-    const runAssetScan = () => {
-      console.log('[App] アセット参照診断を開始します...');
-      try {
-        const scanResults = scanAllAssetReferences();
-        console.log('[App] アセット参照診断結果:', scanResults);
-        
-        // 環境情報も記録
-        console.log('[App] 環境情報:', {
-          isProd: isProduction(),
-          electronAvailable: isElectron(),
-          isPackaged: window.electronAPI?.isPackaged,
-          platform: window.electronAPI?.platform,
-          url: window.location.href,
-          protocol: window.location.protocol
-        });
-        
-        // 問題のある画像を特定
-        const problematicImages = scanResults.images.filter(img =>
-          !img.complete || !img.naturalSize || img.src.includes(getAssetUrl('') || '')
-        );
-
-        if (problematicImages.length > 0) {
-          console.warn('[App] 問題のある画像が見つかりました:', problematicImages);
-        } else {
-          console.log('[App] すべての画像は正常に読み込まれています');
-        }
-
-        // CSSの問題も確認
-        const problematicCssRefs = scanResults.cssBackgrounds.filter(ref =>
-          ref.url.includes(getAssetUrl('') || '')
-        );
-        
-        if (problematicCssRefs.length > 0) {
-          console.warn('[App] 問題のあるCSS背景参照が見つかりました:', problematicCssRefs);
-        }
-      } catch (error) {
-        console.error('[App] アセット参照診断中にエラーが発生しました:', error);
-      }
-    };
-    
-    // ページロード完了後に実行
-    if (document.readyState === 'complete') {
-      runAssetScan();
-    } else {
-      window.addEventListener('load', runAssetScan);
-      return () => window.removeEventListener('load', runAssetScan);
-    }
-  }, []);
 
   // グローバル設定変数を初期化
   useEffect(() => {
@@ -609,11 +554,31 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="/runs/:id" element={<RunDetail />} />
-          <Route path="/play-detail/:id" element={<PlayDetail />} />
-          <Route path="/cards" element={<CardList />} />
-          <Route path="/relics" element={<RelicList />} />
-          <Route path="/neow-bonus" element={<NeowBonusList />} />
+          <Route path="/runs/:id" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <RunDetail />
+            </Suspense>
+          } />
+          <Route path="/play-detail/:id" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <PlayDetail />
+            </Suspense>
+          } />
+          <Route path="/cards" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <CardList />
+            </Suspense>
+          } />
+          <Route path="/relics" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <RelicList />
+            </Suspense>
+          } />
+          <Route path="/neow-bonus" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <NeowBonusList />
+            </Suspense>
+          } />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/play/:id" element={<PlayToRunsRedirect />} />
           <Route path="/run/:id" element={<PlayToRunsRedirect />} />
