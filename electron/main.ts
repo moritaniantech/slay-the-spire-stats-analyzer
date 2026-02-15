@@ -2,6 +2,8 @@ import { app, BrowserWindow, ipcMain, protocol, dialog } from 'electron';
 import { join, normalize } from 'path';
 import log from 'electron-log';
 import { validateAssetPaths } from './utils/assetUtils';
+import { findRunFiles, parseRunFile } from './utils/fileUtils';
+import { startWatching, stopWatching } from './watcher';
 import fs from 'fs';
 
 // ログレベルを設定
@@ -33,6 +35,7 @@ interface StoreSchema {
     theme: 'light' | 'dark';
     language: 'en' | 'ja';
   };
+  runFolderPath: string | null;
 }
 
 // Store のインスタンス
@@ -53,7 +56,8 @@ try {
       settings: {
         theme: 'light',
         language: 'ja'
-      }
+      },
+      runFolderPath: null
     }
   });
   log.info('Store initialized successfully');
@@ -659,14 +663,24 @@ function initializeIpcHandlers() {
         properties: ['openDirectory'],
         title: 'Slay the Spireのrunsフォルダを選択'
       });
-      
+
       if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
         log.info('[select-folder] フォルダ選択がキャンセルされました');
         return null;
       }
-      
+
       const selectedPath = result.filePaths[0];
       log.info(`[select-folder] 選択されたフォルダ: ${selectedPath}`);
+
+      // electron-store にパスを保存
+      store.set('runFolderPath', selectedPath);
+      log.info(`[select-folder] フォルダパスを保存: ${selectedPath}`);
+
+      // ファイル監視を開始
+      if (mainWindow) {
+        startWatching(selectedPath, mainWindow);
+      }
+
       return selectedPath;
     } catch (error) {
       log.error('[select-folder] フォルダ選択エラー:', error);
@@ -678,29 +692,15 @@ function initializeIpcHandlers() {
   ipcMain.handle('load-run-files', async (_, runFolderPath: string) => {
     try {
       log.info(`[load-run-files] フォルダパス: ${runFolderPath}`);
-      
+
       if (!fs.existsSync(runFolderPath)) {
         throw new Error(`フォルダが見つかりません: ${runFolderPath}`);
       }
 
-      // すべての.runファイルを再帰的に検索
-      const runFiles: string[] = [];
-      
-      const findRunFiles = (dir: string) => {
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
-        for (const entry of entries) {
-          const fullPath = join(dir, entry.name);
-          if (entry.isDirectory()) {
-            findRunFiles(fullPath);
-          } else if (entry.isFile() && entry.name.endsWith('.run')) {
-            runFiles.push(fullPath);
-          }
-        }
-      };
-      
-      findRunFiles(runFolderPath);
+      // 共通ヘルパーを使用して .run ファイルを検索
+      const runFiles = findRunFiles(runFolderPath);
       log.info(`[load-run-files] 見つかった.runファイル数: ${runFiles.length}`);
-      
+
       if (runFiles.length === 0) {
         log.warn('[load-run-files] .runファイルが見つかりませんでした');
         return [];
@@ -718,27 +718,13 @@ function initializeIpcHandlers() {
       for (let i = 0; i < runFiles.length; i++) {
         const filePath = runFiles[i];
         try {
-          const content = await fs.promises.readFile(filePath, 'utf8');
-          const runData = JSON.parse(content);
-          
-          // Runオブジェクトの形式に変換
-          const run = {
-            id: runData.play_id || filePath,
-            timestamp: runData.timestamp || 0,
-            character: runData.character_chosen || runData.character || 'UNKNOWN',
-            character_chosen: runData.character_chosen || runData.character || 'UNKNOWN',
-            ascension_level: runData.ascension_level || 0,
-            victory: runData.victory || false,
-            floor_reached: runData.floor_reached || 0,
-            playtime: runData.playtime || 0,
-            score: runData.score || 0,
-            run_data: runData,
-            neow_bonus: runData.neow_bonus || runData.run_data?.neow_bonus || undefined,
-            neow_cost: runData.neow_cost || runData.run_data?.neow_cost || undefined
-          };
-          
-          runs.push(run);
-          
+          const content = await fs.promises.readFile(filePath, 'utf-8');
+          const run = parseRunFile(filePath, content);
+
+          if (run) {
+            runs.push(run);
+          }
+
           // 進捗状況を送信
           sendProgress(i + 1, runFiles.length);
         } catch (error) {
@@ -746,7 +732,7 @@ function initializeIpcHandlers() {
           // エラーが発生しても処理を続行
         }
       }
-      
+
       log.info(`[load-run-files] 読み込み完了: ${runs.length}件のランを読み込みました`);
       return runs;
     } catch (error) {
@@ -757,14 +743,80 @@ function initializeIpcHandlers() {
 
   // ダミーハンドラ: get-all-runs
   ipcMain.handle('get-all-runs', async () => {
-    log.info('[IPC DUMMY] get-all-runs called');
-    return []; // とりあえず空の配列を返す
+    try {
+      log.info('[get-all-runs] 開始');
+
+      // 保存されたフォルダパスを取得
+      const folderPath = store.get('runFolderPath') as string | null;
+
+      if (!folderPath) {
+        log.info('[get-all-runs] フォルダパスが設定されていません');
+        return [];
+      }
+
+      // フォルダの存在確認
+      if (!fs.existsSync(folderPath)) {
+        log.warn(`[get-all-runs] フォルダが存在しません: ${folderPath}`);
+        store.set('runFolderPath', null);
+        return [];
+      }
+
+      // 共通ヘルパーを使用して .run ファイルを検索
+      const runFiles = findRunFiles(folderPath);
+      log.info(`[get-all-runs] 見つかった.runファイル数: ${runFiles.length}`);
+
+      if (runFiles.length === 0) {
+        log.warn('[get-all-runs] .runファイルが見つかりませんでした');
+        return [];
+      }
+
+      // 各ファイルをパース
+      const runs: any[] = [];
+      for (const filePath of runFiles) {
+        try {
+          const content = await fs.promises.readFile(filePath, 'utf-8');
+          const run = parseRunFile(filePath, content);
+          if (run) {
+            runs.push(run);
+          }
+        } catch (error) {
+          log.error(`[get-all-runs] ファイル読み込みエラー: ${filePath}`, error);
+        }
+      }
+
+      log.info(`[get-all-runs] 読み込み完了: ${runs.length}件のランを読み込みました`);
+
+      // ファイル監視を開始（フォルダパスがある場合のみ）
+      if (folderPath && mainWindow) {
+        startWatching(folderPath, mainWindow);
+      }
+
+      return runs;
+    } catch (error) {
+      log.error('[get-all-runs] エラー:', error);
+      throw error;
+    }
   });
 
   // ダミーハンドラ: get-run-folder
   ipcMain.handle('get-run-folder', async () => {
-    log.info('[IPC DUMMY] get-run-folder called');
-    return null; // とりあえずnullを返す
+    try {
+      const runFolderPath = store.get('runFolderPath') as string | null;
+      log.info(`[get-run-folder] 保存されたフォルダパス: ${runFolderPath}`);
+
+      // フォルダの存在確認
+      if (runFolderPath && !fs.existsSync(runFolderPath)) {
+        log.warn(`[get-run-folder] 保存されたフォルダが存在しません: ${runFolderPath}`);
+        // フォルダが存在しない場合は保存パスをクリア
+        store.set('runFolderPath', null);
+        return null;
+      }
+
+      return runFolderPath;
+    } catch (error) {
+      log.error('[get-run-folder] エラー:', error);
+      throw error;
+    }
   });
 
   // ダミーハンドラ: check-for-updates（アップデート機能が無効な場合）
@@ -1309,5 +1361,7 @@ app.on('ready', async () => {
 // アプリケーションの終了
 app.on('window-all-closed', () => {
   log.info('All windows closed, quitting application');
+  // ファイル監視を停止
+  stopWatching();
   app.quit();
 }); 

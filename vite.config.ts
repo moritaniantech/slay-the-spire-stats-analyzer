@@ -28,6 +28,7 @@ export default defineConfig(({ command, mode }) => {
                   'electron-store',
                   'electron-log',
                   'sqlite3',
+                  'chokidar',
                   'path',
                   'fs'
                 ],
@@ -60,6 +61,7 @@ export default defineConfig(({ command, mode }) => {
                   'electron',
                   'electron-store',
                   'electron-log',
+                  'chokidar',
                   'path',
                   'fs'
                 ],
@@ -87,7 +89,7 @@ export default defineConfig(({ command, mode }) => {
       outDir: 'dist',
       emptyOutDir: true,
       rollupOptions: {
-        external: ['electron-store', 'sqlite3', 'path', 'fs'],
+        external: ['electron-store', 'sqlite3', 'chokidar', 'path', 'fs'],
         output: {
           format: 'cjs',
           assetFileNames: 'assets/[name]-[hash][extname]',
@@ -95,11 +97,11 @@ export default defineConfig(({ command, mode }) => {
           entryFileNames: 'js/[name]-[hash].js',
         }
       },
-      assetsInlineLimit: 0, 
+      assetsInlineLimit: 0,
       sourcemap: isDev, // 開発環境でのみ sourcemap
     },
     optimizeDeps: {
-      exclude: ['sqlite3', 'path', 'fs']
+      exclude: ['sqlite3', 'chokidar', 'path', 'fs']
     },
     resolve: {
       alias: {

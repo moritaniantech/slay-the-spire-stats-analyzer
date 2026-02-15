@@ -46,6 +46,7 @@ interface ElectronAPI {
   selectFolder: () => Promise<string | null>;
   getRunFolder: () => Promise<string | null>;
   onLoadProgress: (callback: (progress: LoadProgress) => void) => () => void;
+  onNewRunDetected: (callback: (run: any) => void) => () => void;
   deleteRun: (run: any) => Promise<void>;
   sqlite: SQLiteAPI;
   checkForUpdates: () => Promise<void>;
@@ -93,6 +94,13 @@ const electronAPI = {
     ipcRenderer.on('load-progress', progressHandler);
     return () => {
       ipcRenderer.removeListener('load-progress', progressHandler);
+    };
+  },
+  onNewRunDetected: (callback: (run: any) => void) => {
+    const handler = (_event: any, run: any) => callback(run);
+    ipcRenderer.on('new-run-detected', handler);
+    return () => {
+      ipcRenderer.removeListener('new-run-detected', handler);
     };
   },
   deleteRun: (run: any) => ipcRenderer.invoke('delete-run', run),

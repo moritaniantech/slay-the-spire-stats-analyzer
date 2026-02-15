@@ -214,4 +214,65 @@ export function assetExists(assetPath: string): boolean {
     console.error('Error checking asset existence:', error);
     return false;
   }
+}
+
+/**
+ * 指定ディレクトリ内の .run ファイルを再帰的に検索する
+ * @param dir 検索対象のディレクトリ
+ * @returns .run ファイルのパスの配列
+ */
+export function findRunFiles(dir: string): string[] {
+  const runFiles: string[] = [];
+
+  const search = (currentDir: string) => {
+    try {
+      const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(currentDir, entry.name);
+        if (entry.isDirectory()) {
+          search(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith('.run')) {
+          runFiles.push(fullPath);
+        }
+      }
+    } catch (error) {
+      log.error(`[findRunFiles] ディレクトリ読み込みエラー: ${currentDir}`, error);
+    }
+  };
+
+  search(dir);
+  return runFiles;
+}
+
+/**
+ * .run ファイルの内容をパースして Run オブジェクトを作成する
+ * @param filePath ファイルパス
+ * @param content ファイル内容（JSON文字列）
+ * @returns Run オブジェクト、パース失敗時は null
+ */
+export function parseRunFile(filePath: string, content: string): any | null {
+  try {
+    const runData = JSON.parse(content);
+
+    // Run オブジェクトの形式に変換
+    const run = {
+      id: runData.play_id || filePath,
+      timestamp: runData.timestamp || 0,
+      character: runData.character_chosen || runData.character || 'UNKNOWN',
+      character_chosen: runData.character_chosen || runData.character || 'UNKNOWN',
+      ascension_level: runData.ascension_level || 0,
+      victory: runData.victory || false,
+      floor_reached: runData.floor_reached || 0,
+      playtime: runData.playtime || 0,
+      score: runData.score || 0,
+      run_data: runData,
+      neow_bonus: runData.neow_bonus || runData.run_data?.neow_bonus || undefined,
+      neow_cost: runData.neow_cost || runData.run_data?.neow_cost || undefined
+    };
+
+    return run;
+  } catch (error) {
+    log.error(`[parseRunFile] パースエラー: ${filePath}`, error);
+    return null;
+  }
 } 
