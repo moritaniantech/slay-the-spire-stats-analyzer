@@ -4,13 +4,18 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-02-17
+
 ### Added
 - 自動アップデート機能（新バージョンを自動検出・通知）
 - CI/CD の改善（ビルドとリリースのジョブ分離、blockmap / latest.yml の自動アップロード）
+- CHANGELOG.md（Keep a Changelog 形式）
+- GitHub Issue テンプレート（バグ報告・機能要望）
 
 ### Changed
 - アセットコピーの廃止（`extraResources` で `public/assets` を直接参照するように変更）
 - ビルドスクリプトの簡素化（`cp -r` ステップを削除）
+- README をエンドユーザー向けにリライト
 
 ## [1.1.0] - 2026-02-16
 
@@ -63,7 +68,8 @@
 - 日本語 / 英語対応
 - Windows / macOS 対応
 
-[Unreleased]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.0.1...v1.0.2
