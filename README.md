@@ -1,118 +1,101 @@
-# Slay the Spire Stats Analyzer
+# StS Stats Analyzer
 
-Slay the Spireのプレイデータを分析し、詳細な統計情報を提供するデスクトップアプリケーションです。
+Slay the Spire のプレイデータを解析し、統計情報を可視化するデスクトップアプリケーションです。
+
+<!-- スクリーンショットをここに配置してください -->
+<!-- ![StS Stats Analyzer](docs/screenshots/overview.png) -->
+
+## ダウンロード
+
+[GitHub Releases](https://github.com/moritaniantech/slay-the-spire-stats-analyzer/releases/latest) から最新版をダウンロードできます。
+
+| OS | ファイル |
+|----|---------|
+| Windows (x64) | `StS Stats Analyzer Setup X.X.X.exe` |
+| macOS (Universal) | `StS Stats Analyzer-X.X.X-universal.dmg` |
+
+## 使い方
+
+1. アプリを起動します
+2. Slay the Spire の `runs` フォルダを選択します
+   - **Windows**: `C:\Program Files (x86)\Steam\steamapps\common\SlayTheSpire\runs`
+   - **macOS**: `~/Library/Application Support/Steam/steamapps/common/SlayTheSpire/runs`
+3. プレイデータが自動的に読み込まれ、統計情報が表示されます
+4. 新しいランが追加されると自動的に検出・反映されます
 
 ## 機能
 
-- プレイデータの自動読み込みと解析
-- 詳細な統計情報の表示
-- グラフを用いた視覚的なデータ表現
-- 多言語対応（i18n）
+- 全キャラクターの統計概要（勝率、平均スコア、到達階数など）
+- ラン一覧のフィルタリング・ソート
+- 各ランの詳細表示（デッキ構築の推移、戦闘ログ）
+- カード・レリックの使用統計
+- Neow ボーナスの選択傾向
+- 日本語 / 英語対応
 
-## 技術スタック
+## よくある質問
 
-- **フレームワーク**: React + TypeScript + Vite
-- **デスクトップ**: Electron
-- **スタイリング**: Tailwind CSS + DaisyUI
-- **状態管理**: Redux Toolkit + Zustand
-- **データベース**: SQLite3 + TypeORM
-- **グラフ**: Chart.js + React-ChartJS-2
-- **その他**:
-  - Framer Motion (アニメーション)
-  - React Router (ルーティング)
-  - i18next (国際化)
+### Windows Defender の警告が表示される
 
-## 開発環境のセットアップ
+コード署名なしの個人開発アプリのため、Windows SmartScreen が警告を表示する場合があります。
+「詳細情報」→「実行」で起動できます。ウイルスではありません。
 
-### 必要条件
+### macOS で「開発元が未確認」と表示される
 
-- Node.js (最新の安定版)
-- Yarn
+コード署名・公証なしのため、初回起動時に警告が表示されます。
+「システム設定」→「プライバシーとセキュリティ」→「このまま開く」で起動できます。
 
-### インストール
+### データはどこに保存される？
+
+アプリの設定とフォルダパスは以下に保存されます:
+- **Windows**: `%APPDATA%/sts-stats-analyzer/`
+- **macOS**: `~/Library/Application Support/sts-stats-analyzer/`
+
+ゲームデータ自体は元の `runs` フォルダから読み取るだけで、変更しません。
+
+<details>
+<summary><h2>開発者向け情報</h2></summary>
+
+### 技術スタック
+
+- **フレームワーク**: Electron + React + TypeScript + Vite
+- **UI**: TailwindCSS + DaisyUI + Framer Motion
+- **状態管理**: Zustand + Redux Toolkit
+- **グラフ**: Chart.js + react-chartjs-2
+- **i18n**: i18next
+
+### セットアップ
 
 ```bash
-# リポジトリのクローン
 git clone https://github.com/moritaniantech/slay-the-spire-stats-analyzer.git
 cd slay-the-spire-stats-analyzer
-
-# 依存関係のインストール
 yarn install
-
-# SQLite3のリビルド（必要な場合）
-yarn rebuild
+yarn rebuild  # sqlite3 のリビルド
 ```
 
-### 開発用コマンド
+### コマンド
 
 ```bash
-# 開発モードでの起動
-yarn electron:dev
-
-# ビルド
-yarn build
-
-# リント
-yarn lint
-
-# MDCファイルのビルド
-yarn buildL:mdc
+yarn electron:dev   # 開発モードで起動
+yarn build:win      # Windows ビルド
+yarn build:mac      # macOS ビルド
+yarn build:all      # 全プラットフォームビルド
+yarn lint           # リント
 ```
 
-## アプリケーションのビルド
+### ビルド出力
 
-### 開発用ビルド
+ビルドされたアプリは `release/` ディレクトリに出力されます。
 
-```bash
-# TypeScriptのビルド
-yarn build
-
-# Electronアプリケーションのビルド
-yarn build:electron
-```
-
-### リリース用ビルド
-
-```bash
-# Windows向けビルド
-yarn build:win
-
-# macOS向けユニバーサルビルド (Intel + Apple Silicon)
-yarn build:mac
-
-# 両プラットフォーム向けビルド
-yarn build:all
-```
-
-ビルドされたアプリケーションは `release/` ディレクトリに以下のように出力されます：
-
-- Windows: `StS Stats Analyzer Setup 1.0.0.exe` (インストーラー)
-- macOS: 
-  - `StS Stats Analyzer-1.0.0-universal.dmg` (ユニバーサルDMG)
-  - `StS Stats Analyzer-1.0.0-universal-mac.zip` (ユニバーサルZIP)
-
-### macOSアプリの公証（Notarization）
-
-macOS用のアプリを公式リリースする場合は、Apple公証（Notarization）プロセスが必要です。
-公証を行うには、以下の環境変数を設定後にビルドを実行します：
-
-```bash
-export APPLE_ID="your.apple.id@example.com"
-export APPLE_APP_SPECIFIC_PASSWORD="xxxx-xxxx-xxxx-xxxx"
-export APPLE_TEAM_ID="XXXXXXXXXX"
-
-# 公証プロセスを含むビルド
-yarn build:mac
-```
+</details>
 
 ## ライセンス
 
-MIT
+[MIT](LICENSE)
 
 ## 作者
 
-moritaniantech
+[moritaniantech](https://github.com/moritaniantech)
 
 ## バグ報告・機能要望
 
-バグ報告や機能要望は[GitHub Issues](https://github.com/moritaniantech/slay-the-spire-stats-analyzer/issues)にお願いします。
+[GitHub Issues](https://github.com/moritaniantech/slay-the-spire-stats-analyzer/issues) にお願いします。

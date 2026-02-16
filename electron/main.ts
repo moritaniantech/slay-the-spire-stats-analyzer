@@ -4,6 +4,7 @@ import log from 'electron-log';
 import { validateAssetPaths } from './utils/assetUtils';
 import { findRunFiles, parseRunFile } from './utils/fileUtils';
 import { startWatching, stopWatching } from './watcher';
+import { UpdateHandler } from './updater';
 import fs from 'fs';
 
 // ログレベルを設定
@@ -818,12 +819,6 @@ function initializeIpcHandlers() {
     }
   });
 
-  // ダミーハンドラ: check-for-updates（アップデート機能が無効な場合）
-  ipcMain.handle('check-for-updates', async () => {
-    log.info('[IPC DUMMY] check-for-updates called');
-    // アップデート機能は現在無効化されているため、何もしない
-    return null;
-  });
 }
 
 // メインウィンドウの作成と初期化
@@ -875,6 +870,10 @@ async function createWindow() {
 
       // IPC ハンドラーの初期化
       initializeIpcHandlers();
+
+      // 自動アップデート機能を有効化（loadURL/loadFile より前に登録）
+      new UpdateHandler(window);
+      log.info('UpdateHandler initialized');
 
       // ウィンドウのロード
       if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
@@ -1326,17 +1325,6 @@ app.on('ready', async () => {
           log.info(`[asset-protocol] --------------- Request End (Error) ---------------`);
         }
       });
-    }
-
-    // 自動更新を無効化
-    if (app.isPackaged) {
-      log.info('Auto-update is disabled in production');
-      // autoUpdater関連の処理をコメントアウト
-      /*
-      autoUpdater.checkForUpdatesAndNotify().catch((error) => {
-        log.error('Auto-update error:', error);
-      });
-      */
     }
 
     const mainWindow = await createWindow();

@@ -1,0 +1,65 @@
+name: バグ報告
+description: 不具合や問題を報告する
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - Windows 10
+        - Windows 11
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: アプリバージョン
+      description: "タイトルバーまたは設定画面に表示されるバージョン（例: 1.1.0）"
+      placeholder: "1.1.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: バグを再現するための手順を記述してください
+      placeholder: |
+        1. アプリを起動
+        2. '...' をクリック
+        3. '...' が表示される
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する動作
+      description: 正しくはどう動作すべきかを記述してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作
+      description: 実際にどう動作したかを記述してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ・スクリーンショット
+      description: |
+        エラーログやスクリーンショットがあれば添付してください。
+        ログの場所:
+        - Windows: `%APPDATA%/sts-stats-analyzer/logs/`
+        - macOS: `~/Library/Logs/sts-stats-analyzer/`
+    validations:
+      required: false

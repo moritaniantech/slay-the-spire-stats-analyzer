@@ -19,9 +19,9 @@
     "buildL:mdc": "ts-node -P rules/tsconfig.json rules/build-mdc.ts",
     "watchL:mdc": "ts-node -P rules/tsconfig.json rules/watch-mdc.ts",
     "build:app": "vite build && electron-builder build --mac --win -c.extraMetadata.main=dist-electron/main.js",
-    "build:win": "yarn build:electron && vite build && rimraf resources/assets && mkdir -p resources/assets && cp -r public/assets/* resources/assets/ && electron-builder build --win --config electron-builder.json",
-    "build:mac": "yarn build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false vite build && rimraf resources/assets && mkdir -p resources/assets && cp -r public/assets/* resources/assets/ && electron-builder build --mac --config electron-builder.json",
-    "build:all": "yarn clean && yarn build:electron && vite build && rimraf resources/assets && mkdir -p resources/assets && cp -r public/assets/* resources/assets/ && electron-builder build --mac --win --config electron-builder.json",
+    "build:win": "yarn build:electron && vite build && electron-builder build --win --config electron-builder.json",
+    "build:mac": "yarn build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false vite build && electron-builder build --mac --config electron-builder.json",
+    "build:all": "yarn clean && yarn build:electron && vite build && electron-builder build --mac --win --config electron-builder.json",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {

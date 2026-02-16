@@ -41,7 +41,7 @@
       "filter": ["**/*"]
     },
     {
-      "from": "resources/assets",
+      "from": "public/assets",
       "to": "assets",
       "filter": ["**/*"]
     },
@@ -54,7 +54,6 @@
   "asar": true,
   "asarUnpack": [
     "node_modules/**/*.node",
-    "resources/assets/**/*",
     "dist-electron/main.js",
     "dist-electron/preload.js"
   ],
@@ -130,5 +129,11 @@
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": true
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "moritaniantech",
+    "repo": "slay-the-spire-stats-analyzer",
+    "releaseType": "release"
   }
 } 
