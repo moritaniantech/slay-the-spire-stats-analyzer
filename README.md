@@ -11,8 +11,8 @@ Slay the Spire のプレイデータを解析し、統計情報を可視化す�
 
 | OS | ファイル |
 |----|---------|
-| Windows (x64) | `StS Stats Analyzer Setup X.X.X.exe` |
-| macOS (Universal) | `StS Stats Analyzer-X.X.X-universal.dmg` |
+| Windows (x64) | `StS-Stats-Analyzer-Setup-X.X.X.exe` |
+| macOS (Universal) | `StS-Stats-Analyzer-X.X.X-universal.dmg` |
 
 ## 使い方
 

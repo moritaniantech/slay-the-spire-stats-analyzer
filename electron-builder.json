@@ -90,7 +90,7 @@
     "gatekeeperAssess": false,
     "entitlements": "scripts/entitlements.mac.plist",
     "entitlementsInherit": "scripts/entitlements.mac.plist",
-    "artifactName": "${productName}-${version}-${arch}.${ext}"
+    "artifactName": "StS-Stats-Analyzer-${version}-${arch}.${ext}"
   },
   "dmg": {
     "contents": [
@@ -126,6 +126,7 @@
     "icon": "public/icons"
   },
   "nsis": {
+    "artifactName": "StS-Stats-Analyzer-Setup-${version}.${ext}",
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": true
