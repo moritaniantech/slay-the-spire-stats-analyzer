@@ -2,8 +2,8 @@ import { autoUpdater } from 'electron-updater';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import log from 'electron-log';
 
-// ロギングの設定
-log.transports.file.level = 'debug';
+// ロギングの設定（本番はinfo以上、開発はdebug）
+log.transports.file.level = app.isPackaged ? 'info' : 'debug';
 autoUpdater.logger = log;
 
 // アップデートの確認間隔（12時間）
@@ -30,29 +30,40 @@ autoUpdater.setFeedURL({
 
 export class UpdateHandler {
   private mainWindow: BrowserWindow;
+  private checkIntervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor(window: BrowserWindow) {
     this.mainWindow = window;
     this.initialize();
   }
 
+  /** ウィンドウが破棄されていない場合のみ webContents.send を実行 */
+  private safeSend(channel: string, ...args: any[]) {
+    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+      this.mainWindow.webContents.send(channel, ...args);
+    }
+  }
+
   private initialize() {
+    // 既存リスナーをクリアして重複登録を防止
+    autoUpdater.removeAllListeners();
+
     // アップデートが利用可能な場合
     autoUpdater.on('update-available', (info) => {
       log.info('Update available:', info);
-      this.mainWindow.webContents.send('update-available', info);
+      this.safeSend('update-available', info);
     });
 
     // アップデートのダウンロード進捗
     autoUpdater.on('download-progress', (progressObj) => {
       log.debug('Download progress:', progressObj);
-      this.mainWindow.webContents.send('download-progress', progressObj);
+      this.safeSend('download-progress', progressObj);
     });
 
     // アップデートのダウンロード完了
     autoUpdater.on('update-downloaded', (info) => {
       log.info('Update downloaded:', info);
-      this.mainWindow.webContents.send('update-downloaded', info);
+      this.safeSend('update-downloaded', info);
     });
 
     // エラーハンドリング
@@ -62,24 +73,41 @@ export class UpdateHandler {
         log.info('No updates available or release not found');
         return;
       }
-      this.mainWindow.webContents.send('update-error', err);
+      // エラーオブジェクトをサニタイズ（内部パス・スタックトレースを除去）
+      const sanitizedError = {
+        message: err instanceof Error ? err.message : 'Unknown update error'
+      };
+      this.safeSend('update-error', sanitizedError);
     });
 
-    // IPCハンドラーの設定
-    ipcMain.handle('check-for-updates', () => {
-      return this.checkForUpdates();
-    });
+    // IPCハンドラーの設定（二重登録を防止）
+    try {
+      ipcMain.handle('check-for-updates', () => {
+        return this.checkForUpdates();
+      });
+    } catch {
+      // 既に登録済みの場合はスキップ
+      log.warn('[UpdateHandler] check-for-updates handler already registered');
+    }
 
-    ipcMain.handle('download-update', () => {
-      return autoUpdater.downloadUpdate();
-    });
+    try {
+      ipcMain.handle('download-update', () => {
+        return autoUpdater.downloadUpdate();
+      });
+    } catch {
+      log.warn('[UpdateHandler] download-update handler already registered');
+    }
 
-    ipcMain.handle('start-update', () => {
-      autoUpdater.quitAndInstall();
-    });
+    try {
+      ipcMain.handle('start-update', () => {
+        autoUpdater.quitAndInstall();
+      });
+    } catch {
+      log.warn('[UpdateHandler] start-update handler already registered');
+    }
 
-    // 定期的なアップデートチェック
-    setInterval(() => {
+    // 定期的なアップデートチェック（戻り値を保存してクリーンアップ可能に）
+    this.checkIntervalId = setInterval(() => {
       this.checkForUpdates();
     }, CHECK_INTERVAL);
 
@@ -91,12 +119,21 @@ export class UpdateHandler {
     }
   }
 
+  /** リソースのクリーンアップ */
+  destroy() {
+    if (this.checkIntervalId) {
+      clearInterval(this.checkIntervalId);
+      this.checkIntervalId = null;
+    }
+    autoUpdater.removeAllListeners();
+  }
+
   private async checkForUpdates() {
     if (!app.isPackaged) {
       log.info('App is not packaged, skipping update check');
       return;
     }
-    
+
     try {
       log.info('Checking for updates...');
       const result = await autoUpdater.checkForUpdates();
@@ -111,4 +148,4 @@ export class UpdateHandler {
       return null;
     }
   }
-} 
+}

@@ -37,6 +37,7 @@ const UpdateNotification: React.FC = () => {
     // エラーは静かに処理（次回起動時に再チェック）
     const removeError = window.electronAPI.onUpdateError(() => {
       setState('idle');
+      setProgress(0);
     });
 
     return () => {

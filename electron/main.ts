@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, protocol, dialog } from 'electron';
-import { join, normalize } from 'path';
+import { join, normalize, relative, isAbsolute, resolve } from 'path';
 import log from 'electron-log';
 import { validateAssetPaths } from './utils/assetUtils';
 import { findRunFiles, parseRunFile } from './utils/fileUtils';
@@ -7,9 +7,9 @@ import { startWatching, stopWatching } from './watcher';
 import { UpdateHandler } from './updater';
 import fs from 'fs';
 
-// ログレベルを設定
-log.transports.file.level = 'debug';
-log.transports.console.level = 'debug';
+// ログレベルを設定（本番はinfo以上、開発はdebug）
+log.transports.file.level = app.isPackaged ? 'info' : 'debug';
+log.transports.console.level = app.isPackaged ? 'info' : 'debug';
 
 log.info('Application starting...');
 log.info('Process type:', process.type);
@@ -83,8 +83,14 @@ function initializeIpcHandlers() {
     }
   });
 
-  ipcMain.handle('set-theme', (_, theme: 'light' | 'dark') => {
+  // セキュリティ: テーマ値のバリデーション
+  const ALLOWED_THEMES = new Set(['light', 'dark']);
+  ipcMain.handle('set-theme', (_, theme: string) => {
     try {
+      if (!ALLOWED_THEMES.has(theme)) {
+        log.error(`[set-theme] Invalid theme value: "${theme}"`);
+        throw new Error(`Invalid theme: "${theme}". Allowed values: light, dark`);
+      }
       const settings = store.get('settings');
       settings.theme = theme;
       store.set('settings', settings);
@@ -578,8 +584,12 @@ function initializeIpcHandlers() {
     return assetUrl;
   });
   
-  // デバッグ用: リソース情報取得ハンドラー
+  // デバッグ用: リソース情報取得ハンドラー（本番ビルドでは無効化）
   ipcMain.handle('debug-resources', () => {
+    if (app.isPackaged) {
+      log.warn('[debug-resources] 本番ビルドではデバッグ情報を返しません');
+      return { isPackaged: true, message: 'Debug info is disabled in production' };
+    }
     try {
       return {
         isPackaged: app.isPackaged,
@@ -613,13 +623,19 @@ function initializeIpcHandlers() {
           ? join(process.resourcesPath, 'assets')
           : join(app.getAppPath(), 'public', 'assets')
       ];
-      const normalizedFilePath = normalize(filePath);
-      const isAllowed = allowedDirs.some(dir => normalizedFilePath.startsWith(normalize(dir)));
+      // パスを正規化し、ディレクトリ境界を正確にチェック（/allowed vs /allowed_evil を区別）
+      const resolvedFilePath = resolve(normalize(filePath));
+      const isAllowed = allowedDirs.some(dir => {
+        const resolvedDir = resolve(normalize(dir));
+        const rel = relative(resolvedDir, resolvedFilePath);
+        // 相対パスが空（同じパス）、または .. で始まらず絶対パスでない（配下のファイル）
+        return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+      });
       if (!isAllowed) {
         log.error(`[fs-readFile] Access denied: ${filePath}`);
         throw new Error(`Access denied: ${filePath}`);
       }
-      return await fs.promises.readFile(filePath, encoding as BufferEncoding);
+      return await fs.promises.readFile(resolvedFilePath, encoding as BufferEncoding);
     } catch (error) {
       log.error(`[fs-readFile] Error reading file ${filePath}:`, error);
       throw error;
@@ -630,9 +646,15 @@ function initializeIpcHandlers() {
   ipcMain.handle('app-getVersion', () => app.getVersion());
 
   // app.getPath ハンドラ (preload.ts の getUserDataPath から呼び出される)
+  // セキュリティ: 許可リスト方式で取得可能なパス名を制限
+  const ALLOWED_PATH_NAMES = new Set(['userData', 'appData', 'temp', 'desktop', 'documents', 'downloads']);
   ipcMain.handle('app-getPath', (event, name: string) => {
     try {
-      return app.getPath(name as any); // name の型を electron の PathName に合わせる必要があるが、一旦 any
+      if (!ALLOWED_PATH_NAMES.has(name)) {
+        log.error(`[app-getPath] Access denied: "${name}" is not in the allowed list`);
+        throw new Error(`Access denied: path name "${name}" is not allowed`);
+      }
+      return app.getPath(name as any);
     } catch (error) {
       log.error(`[app-getPath] Error getting path for ${name}:`, error);
       throw error;
@@ -875,8 +897,13 @@ async function createWindow() {
       initializeIpcHandlers();
 
       // 自動アップデート機能を有効化（loadURL/loadFile より前に登録）
-      new UpdateHandler(window);
+      const updateHandler = new UpdateHandler(window);
       log.info('UpdateHandler initialized');
+
+      // ウィンドウ閉時にUpdateHandlerのリソースをクリーンアップ
+      window.on('closed', () => {
+        updateHandler.destroy();
+      });
 
       // ウィンドウのロード
       if (process.env.NODE_ENV === 'development' || !app.isPackaged) {

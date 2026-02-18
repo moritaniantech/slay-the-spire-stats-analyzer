@@ -4,8 +4,9 @@ on:
     tags:
       - 'v*'
 
+# ワークフロー全体はデフォルト read（最小権限）、release ジョブのみ write に昇格
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -65,18 +66,23 @@ jobs:
       - name: Verify latest YAML URLs match build artifacts
         shell: bash
         run: |
+          verify_failed=0
           for y in release/latest.yml release/latest-mac.yml; do
             [ -f "$y" ] || continue
             echo "Checking $y ..."
-            grep 'url:' "$y" | awk '{print $NF}' | while read -r f; do
+            while IFS= read -r f; do
               if [ ! -f "release/$f" ]; then
                 echo "::error::$y references missing file: $f"
                 ls -1 release/
-                exit 1
+                verify_failed=1
+              else
+                echo "  OK: $f"
               fi
-              echo "  OK: $f"
-            done
+            done < <(grep 'url:' "$y" | awk '{print $NF}')
           done
+          if [ "$verify_failed" -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -94,6 +100,8 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Download all artifacts

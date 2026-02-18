@@ -187,18 +187,12 @@ const electronAPI = {
   getImageBase64: (relativeImagePath: string) => ipcRenderer.invoke('get-image-base64', relativeImagePath)
 };
 
-// 型チェック用 (開発時のみ)
-// const _check: ElectronAPI = electronAPI;
-
 // 初期化時にメインプロセスからisPackagedフラグを取得
 ipcRenderer.invoke('is-app-packaged').then((value) => {
   isPackagedGlobal = !!value;
   isDevelopmentGlobal = !isPackagedGlobal;
   // console.log('[preload] Received isPackaged value:', isPackagedGlobal, 'isDevelopment:', isDevelopmentGlobal);
 });
-
-console.log('[preload] Final electronAPI object before exposeInMainWorld:', JSON.stringify(Object.keys(electronAPI)));
-console.log('[preload] typeof electronAPI.getImageBase64 before expose:', typeof electronAPI.getImageBase64);
 
 // メインプロセスのログを受信するリスナーを登録
 ipcRenderer.on('main-process-log', (_event, logData: { level: string; message: string; details?: any; error?: string }) => {
