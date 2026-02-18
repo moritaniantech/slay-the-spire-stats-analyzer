@@ -159,6 +159,7 @@ interface Window {
      * ユーザーデータパスを取得する
      */
     getUserDataPath: () => string;
+    getAppVersion: () => Promise<string>;
     
     /**
      * ファイル選択ダイアログを開く

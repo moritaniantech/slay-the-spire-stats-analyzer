@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStore } from '../store';
 
 const Settings: React.FC = () => {
   const { settings, updateSettings } = useStore();
+  const [appVersion, setAppVersion] = useState('');
 
   const handleEnableStatsTooltipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateSettings({ enableStatsTooltip: e.target.checked });
@@ -15,6 +16,10 @@ const Settings: React.FC = () => {
   const handleLowMemoryModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateSettings({ lowMemoryMode: e.target.checked });
   };
+
+  useEffect(() => {
+    window.electronAPI?.getAppVersion?.().then(setAppVersion).catch(() => {});
+  }, []);
 
   const handleMaxCacheSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateSettings({ maxCacheSize: parseInt(e.target.value, 10) });
@@ -103,6 +108,12 @@ const Settings: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {appVersion && (
+          <div className="text-center text-sm text-base-content/50 mt-8">
+            StS Stats Analyzer v{appVersion}
+          </div>
+        )}
       </div>
     </div>
   );

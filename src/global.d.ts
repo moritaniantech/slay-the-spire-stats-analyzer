@@ -69,6 +69,7 @@ interface Window {
     onNewRunDetected: (callback: (run: any) => void) => () => void;
     readFile: (filePath: string, encoding?: string) => Promise<string>;
     getUserDataPath: () => Promise<string>;
+    getAppVersion: () => Promise<string>;
     showOpenDialog: (options: any) => Promise<any>;
     // 画像・アセット関連
     getImageBase64: (relativeImagePath: string) => Promise<string | null>;

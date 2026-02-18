@@ -559,7 +559,12 @@ function App() {
 // 設定ページコンポーネント
 function SettingsPage() {
   const { settings, updateSettings } = useStore();
-  
+  const [appVersion, setAppVersion] = useState('');
+
+  useEffect(() => {
+    window.electronAPI?.getAppVersion?.().then(setAppVersion).catch(() => {});
+  }, []);
+
   const handleToggleStatsTooltip = () => {
     updateSettings({ enableStatsTooltip: !settings.enableStatsTooltip });
   };
@@ -613,6 +618,12 @@ function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {appVersion && (
+        <div className="text-center text-sm text-muted-custom mt-8">
+          StS Stats Analyzer v{appVersion}
+        </div>
+      )}
     </div>
   );
 }

@@ -65,6 +65,7 @@ interface IElectronAPI {
   getImageBase64: (relativeImagePath: string) => Promise<string | null>;
   readFile: (filePath: string, encoding?: string) => Promise<string>;
   getUserDataPath: () => Promise<string>;
+  getAppVersion: () => Promise<string>;
   showOpenDialog: (options: any) => Promise<any>;
 }
 

@@ -52,6 +52,7 @@ interface ElectronAPI {
   checkForUpdates: () => Promise<void>;
   downloadUpdate: () => Promise<void>;
   startUpdate: () => Promise<void>;
+  getAppVersion: () => Promise<string>;
   onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
   onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
   onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void;
@@ -152,6 +153,7 @@ const electronAPI = {
   platform: process.platform,
   readFile: (filePath: string, encoding: string = 'utf8') => ipcRenderer.invoke('fs-readFile', filePath, encoding),
   getUserDataPath: () => ipcRenderer.invoke('app-getPath', 'userData'),
+  getAppVersion: () => ipcRenderer.invoke('app-getVersion'),
   showOpenDialog: (options: any) => ipcRenderer.invoke('dialog-showOpenDialog', options),
   resolveImagePath: (imagePath: string) => ipcRenderer.invoke('resolve-image-path', imagePath),
   getAssetPath: async (assetPath: string): Promise<string> => {

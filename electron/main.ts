@@ -626,6 +626,9 @@ function initializeIpcHandlers() {
     }
   });
 
+  // アプリバージョン取得
+  ipcMain.handle('app-getVersion', () => app.getVersion());
+
   // app.getPath ハンドラ (preload.ts の getUserDataPath から呼び出される)
   ipcMain.handle('app-getPath', (event, name: string) => {
     try {
