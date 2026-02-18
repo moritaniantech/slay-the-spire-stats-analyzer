@@ -10,7 +10,7 @@ autoUpdater.logger = log;
 const CHECK_INTERVAL = 12 * 60 * 60 * 1000;
 
 // アップデーターの設定
-autoUpdater.autoDownload = false;
+autoUpdater.autoDownload = true;
 autoUpdater.allowDowngrade = false;
 autoUpdater.allowPrerelease = false;
 autoUpdater.channel = 'latest';
