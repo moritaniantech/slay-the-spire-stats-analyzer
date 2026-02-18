@@ -1,5 +1,97 @@
 # SESSION NOTES
 
+### [2026-02-18] auto-update 修正・実機テスト・バージョン表示
+
+- **決定事項**:
+  - `artifactName` を明示的にハイフン区切りで指定（`productName` のスペースがドット/ハイフンに不一致変換される問題を回避）
+  - リポジトリを private → public に変更（`releases.atom` への未認証アクセスに必要）
+  - `autoDownload = true` に変更（バックグラウンド自動ダウンロード方式、UIはダウンロード完了後に「再起動して更新」ボタンのみ）
+  - GitHub Releases で auto-update は十分に対応可能（CDN 不要、GitHub 自体が Fastly CDN 経由で配信）
+  - 実際の設定ページは `App.tsx` 内の `SettingsPage`（`Settings.tsx` は未使用の重複コンポーネント）
+
+- **実装した内容**:
+  - `electron-builder.json` — `mac.artifactName` を `StS-Stats-Analyzer-${version}-${arch}.${ext}` に変更、`nsis.artifactName` を追加
+  - `.github/workflows/release.yml` — `Verify latest YAML URLs match build artifacts` 検証ステップを追加
+  - `README.md` — ダウンロードファイル名をハイフン区切りに更新
+  - `electron/updater.ts` — `autoDownload = true` に変更、`download-update` IPCハンドラ追加
+  - `src/components/UpdateNotification.tsx` — DaisyUI toast スタイルに全面改修（ダウンロード中→再起動の2状態）
+  - `electron/main.ts` — `app-getVersion` IPCハンドラ追加
+  - `electron/preload.ts` — `downloadUpdate`, `getAppVersion` メソッド追加
+  - `src/App.tsx` — `SettingsPage` にバージョン表示を追加
+  - 型定義5ファイル — `downloadUpdate`, `getAppVersion` 追加
+
+- **Codexレビュー結果**:
+  - v1.2.1（ファイル名修正）: WARNING 1 / INFO 1 / GOOD 3 → 全対応済み
+  - v1.2.2（UI改善）: WARNING 2 / INFO 2 / GOOD 2 → WARNING 2件対応済み
+
+- **リリース**:
+  - v1.2.1: auto-update ファイル名不一致修正 — CI 成功、全アセット名一致確認
+  - v1.2.2: UpdateNotification UI 改善（DaisyUI、ダウンロードボタン）— CI 成功
+  - v1.2.3: autoDownload=true、UIシンプル化 — CI 成功
+
+- **実機テスト結果**:
+  - v1.2.0 インストール → releases.atom 404（private リポジトリ）→ public 化で解決
+  - v1.2.0 再起動 → v1.2.1 検出成功（`isUpdateAvailable: true`）
+  - v1.2.3 インストール → 最新版のため `isUpdateAvailable: false`（正常）
+  - 開発サーバーで設定画面バージョン表示を確認
+
+- **コミット**: 95fc30f, 454d22e, dd0d256, eb74090, e48a33b
+
+- **未解決の課題**:
+  - Dependabot が32件の脆弱性を検出（4 critical, 13 high, 8 moderate, 7 low）— public 化で有効に
+  - asset-protocol の `ReferenceError: Cannot access 'o' before initialization`（既存問題、auto-update とは無関係）
+  - `src/components/Settings.tsx` が未使用（`App.tsx` 内の `SettingsPage` と重複）— 削除候補
+  - README にスクリーンショットを追加（未着手）
+  - auto-update のダウンロード→再起動フローの完全な E2E テストは未実施（v1.2.3 が最新のため次回リリース時に検証）
+
+- **次のステップ**:
+  - Dependabot の脆弱性対応（特に critical 4件）
+  - 次回リリース時に auto-update の E2E テスト（ダウンロード→再起動→バージョン更新の確認）
+  - README にスクリーンショットを追加
+  - `Settings.tsx` の削除（未使用コンポーネント整理）
+
+### [2026-02-17] 公開リリース運用整備 — ビルド安定化・CI修正・自動アップデート・ドキュメント
+
+- **決定事項**:
+  - `extraResources` を `public/assets` に直接向け、`resources/assets` への `cp` ステップを廃止
+  - CI を build ジョブ（matrix）と release ジョブ（単一）に分離し、リリースアップロード競合を解消
+  - build ジョブから `GH_TOKEN`/`GITHUB_TOKEN` を除去し、electron-builder の自動 publish を防止
+  - `UpdateHandler` は `loadURL`/`loadFile` より前に初期化（レースコンディション防止）
+  - macOS 署名はスキップ（ユーザー指示）。`zip` ターゲットなら unsigned でも auto-update 動作
+
+- **実装した内容**:
+  - `electron-builder.json` — `extraResources` を `public/assets` に変更、`asarUnpack` から `resources/assets` 削除、`publish`（GitHub provider）追加
+  - `package.json` — `build:win`/`build:mac`/`build:all` から `rimraf && mkdir && cp` ステップ削除
+  - `.github/workflows/release.yml` — build/release ジョブ分離、`actions/upload-artifact@v4` + `actions/download-artifact@v4` でアーティファクト受け渡し、`softprops/action-gh-release@v2` で一括リリース、アップロード対象に `.zip`/`.yml`/`.blockmap` 追加
+  - `electron/main.ts` — `import { UpdateHandler } from './updater'` 追加、ダミー `check-for-updates` ハンドラ削除、自動更新無効化コメント削除、`createWindow()` 内で `initializeIpcHandlers()` 直後に `new UpdateHandler(window)` 追加
+  - `README.md` — エンドユーザー向けにリライト（ダウンロード、使い方、FAQ、開発者向け折りたたみ）
+  - `CHANGELOG.md`（新規）— v1.0.0〜v1.1.0 + Unreleased、Keep a Changelog 形式
+  - `.github/ISSUE_TEMPLATE/bug_report.yml`（新規）— OS/バージョン/再現手順/ログ添付
+  - `.github/ISSUE_TEMPLATE/feature_request.yml`（新規）— 機能説明/ユースケース
+
+- **Codexレビュー結果**: CRITICAL 2 / WARNING 1 / GOOD 4
+  - CRITICAL 1: UpdateHandler 初期化レース → 修正済み（loadURL 前に移動）
+  - CRITICAL 2: macOS 未署名で auto-update 不可 → スキップ（ユーザー指示、zip なら動作）
+  - WARNING 1: build ジョブで publish 発火リスク → 修正済み（GH_TOKEN 除去）
+
+- **ビルド結果**:
+  - TypeScript 型チェック: エラー 0件
+  - macOS ビルド: 成功（DMG 333MB, ZIP 326MB, blockmap x2, latest-mac.yml）
+  - Windows ビルド: 成功（EXE 218MB, blockmap, latest.yml）
+  - `cp` ステップなしでビルド正常完了を確認
+
+- **コミット**: 654fc72
+
+- **未解決の課題**:
+  - Viteビルドのchunkサイズ警告（536KB > 500KB）— 前回と同等
+  - macOS 署名なしでの auto-update 動作は実機テスト未実施
+  - CI ワークフローの動作確認は次回タグ push 時
+
+- **次のステップ**:
+  - バージョンバンプ（v1.2.0）してタグ push → CI ワークフローの動作確認
+  - macOS での auto-update 実機テスト（v1.1.0 → v1.2.0）
+  - README にスクリーンショットを追加
+
 ### [2026-02-16] v1.1.0 機能追加 — データ永続化・自動更新・UI改善（Agent Teams）
 
 - **決定事項**:
