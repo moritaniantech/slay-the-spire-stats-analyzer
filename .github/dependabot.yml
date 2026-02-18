@@ -1,0 +1,38 @@
+# Dependabot Version Updates
+#
+# セットアップ:
+#   このファイルを .github/dependabot.yml にコピーする。
+#   プロジェクトのパッケージエコシステムに合わせて調整すること。
+#
+# 機能:
+#   - 週次で依存パッケージの更新チェック
+#   - minor/patch は自動グループ化（PR数を削減）
+#   - open PR 上限 5 件
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "ci"

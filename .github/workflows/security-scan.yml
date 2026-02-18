@@ -1,0 +1,186 @@
+# Security Scan — Semgrep + Trivy + gitleaks
+#
+# トリガー:
+#   - PR 作成・更新時: セキュリティスキャン実行
+#   - main/master へのプッシュ時: フルスキャン
+#   - 毎週月曜 9:00 JST (日曜 24:00 UTC): 定期スキャン
+#
+# 必要な Secrets:
+#   なし（すべて無料ツール）
+#
+# セットアップ:
+#   1. このファイルを .github/workflows/security-scan.yml にコピー
+#   2. Settings > Code security > Dependency graph を有効化（Dependabot用）
+
+name: Security Scan
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, master]
+  schedule:
+    # 毎週月曜 00:00 UTC（JST 09:00）
+    - cron: "0 0 * * 1"
+
+concurrency:
+  group: security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  # ============================================================
+  # gitleaks: シークレット検知
+  # ============================================================
+  gitleaks:
+    name: Secret Detection (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================
+  # Semgrep: SAST（静的解析）
+  # ============================================================
+  semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan \
+            --config auto \
+            --sarif \
+            --output semgrep-results.sarif \
+            --severity WARNING \
+            --no-git-ignore \
+            .
+        env:
+          # PRの場合はdiff only、push/scheduleの場合はフルスキャン
+          SEMGREP_BASELINE_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+  # ============================================================
+  # Trivy: 脆弱性・設定ミス・シークレット
+  # ============================================================
+  trivy:
+    name: Vulnerability Scan (Trivy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy (filesystem)
+        uses: aquasecurity/trivy-action@0.32.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          scanners: "vuln,secret,misconfig"
+          severity: "HIGH,CRITICAL"
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+  # ============================================================
+  # スキャン結果サマリー
+  # ============================================================
+  summary:
+    name: Security Summary
+    needs: [gitleaks, semgrep, trivy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate results
+        run: |
+          echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # 各ジョブの結果を表示
+          echo "| Scanner | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| gitleaks (Secrets) | ${{ needs.gitleaks.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Semgrep (SAST) | ${{ needs.semgrep.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trivy (Vuln/Misconfig) | ${{ needs.trivy.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+
+          # いずれかが失敗した場合は警告
+          if [ "${{ needs.gitleaks.result }}" = "failure" ] || \
+             [ "${{ needs.semgrep.result }}" = "failure" ] || \
+             [ "${{ needs.trivy.result }}" = "failure" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "> セキュリティスキャンで問題が検出されました。詳細はジョブログを確認してください。" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # CI失敗時にセキュリティIssueを自動作成（Claude Codeセッション開始時に検知）
+      - name: Create security issue on failure
+        if: |
+          (needs.gitleaks.result == 'failure' ||
+           needs.semgrep.result == 'failure' ||
+           needs.trivy.result == 'failure') &&
+          github.event_name != 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const failed = [];
+            if ('${{ needs.gitleaks.result }}' === 'failure') failed.push('gitleaks (シークレット検知)');
+            if ('${{ needs.semgrep.result }}' === 'failure') failed.push('Semgrep (SAST)');
+            if ('${{ needs.trivy.result }}' === 'failure') failed.push('Trivy (脆弱性/設定ミス)');
+
+            // 同一タイトルのopenなIssueがあれば作成しない（重複防止）
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'security',
+              state: 'open',
+              per_page: 10
+            });
+            const title = `[Security] ${failed.length}件のスキャン失敗`;
+            if (existing.data.some(i => i.title.startsWith('[Security]'))) {
+              console.log('既存のセキュリティIssueあり — 新規作成スキップ');
+              return;
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: [
+                '## セキュリティスキャン失敗',
+                '',
+                '以下のスキャナーで問題が検出されました:',
+                ...failed.map(f => `- ${f}`),
+                '',
+                `**実行ログ**: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+                '',
+                '> このIssueはClaude Codeセッション開始時に自動検知されます。',
+                '> 対応完了後にcloseしてください。'
+              ].join('\n'),
+              labels: ['security']
+            });
