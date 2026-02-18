@@ -12,9 +12,6 @@ export const isDevelopment = (): boolean => {
   if (typeof window !== 'undefined' && window.electronAPI) {
     return window.electronAPI.isDevelopment ?? false;
   }
-  if (typeof window !== 'undefined' && window.electron) {
-    return typeof window.electron.isDevelopment === 'boolean' ? !window.electron.isDevelopment : false;
-  }
   // Viteの環境変数
   return import.meta.env.DEV === true;
 };
@@ -34,7 +31,7 @@ export const isProduction = (): boolean => {
 export const isElectron = (): boolean => {
   return (
     typeof window !== 'undefined' &&
-    (!!window.electron || !!window.electronAPI)
+    !!window.electronAPI
   );
 };
 
@@ -46,11 +43,7 @@ export const getPlatform = (): string | undefined => {
   if (typeof window !== 'undefined' && window.electronAPI) {
     return window.electronAPI.platform;
   }
-  if (typeof window !== 'undefined' && window.electron) {
-    // @ts-ignore - 後方互換性のため
-    return window.electron.platform;
-  }
-  
+
   if (typeof navigator !== 'undefined') {
     const userAgent = navigator.userAgent.toLowerCase();
     if (userAgent.includes('windows')) return 'win32';

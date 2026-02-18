@@ -27,16 +27,6 @@ interface Window {
   __ENV__: ElectronEnv;
   __resolveAssetPath__: AssetPathResolver;
 
-  // レガシーElectron API（一部のコンポーネントで使用）
-  electron?: {
-    isPackaged?: boolean;
-    isDevelopment?: boolean;
-    platform?: string;
-    time?: string;
-    getAssetPath?: (path: string) => Promise<string>;
-    getFileURLForAsset?: (assetPath: string) => Promise<string>;
-  };
-
   // アプリケーション設定
   __APP_SETTINGS__: {
     lowMemoryMode: boolean;
