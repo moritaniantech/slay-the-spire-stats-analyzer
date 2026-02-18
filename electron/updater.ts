@@ -70,6 +70,10 @@ export class UpdateHandler {
       return this.checkForUpdates();
     });
 
+    ipcMain.handle('download-update', () => {
+      return autoUpdater.downloadUpdate();
+    });
+
     ipcMain.handle('start-update', () => {
       autoUpdater.quitAndInstall();
     });

@@ -25,6 +25,7 @@ interface Window {
     onLoadProgress: (callback: (progress: any) => void) => () => void;
     deleteRun: (run: any) => Promise<void>;
     checkForUpdates: () => Promise<void>;
+    downloadUpdate: () => Promise<void>;
     startUpdate: () => Promise<void>;
     onUpdateAvailable: (callback: (info: any) => void) => () => void;
     onUpdateProgress: (callback: (info: any) => void) => () => void;

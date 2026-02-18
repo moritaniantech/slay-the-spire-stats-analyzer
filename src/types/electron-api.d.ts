@@ -101,7 +101,12 @@ interface Window {
     checkForUpdates: () => Promise<any>;
     
     /**
-     * アップデートを開始する
+     * アップデートをダウンロードする
+     */
+    downloadUpdate: () => Promise<void>;
+
+    /**
+     * アップデートをインストールして再起動する
      */
     startUpdate: () => Promise<void>;
 

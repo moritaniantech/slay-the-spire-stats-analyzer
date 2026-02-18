@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-// グローバル型定義は src/global.d.ts を参照
-
 interface UpdateInfo {
   version: string;
   releaseNotes?: string;
@@ -19,49 +17,48 @@ interface UpdateError extends Error {
   message: string;
 }
 
+type UpdateState = 'idle' | 'available' | 'downloading' | 'downloaded' | 'error';
+
 const UpdateNotification: React.FC = () => {
   const { t } = useTranslation();
-  const [updateAvailable, setUpdateAvailable] = useState<UpdateInfo | null>(null);
+  const [state, setState] = useState<UpdateState>('idle');
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [downloadProgress, setDownloadProgress] = useState<ProgressInfo | null>(null);
-  const [isDownloaded, setIsDownloaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // 開発環境ではアップデートチェックを行わない
-    if (process.env.NODE_ENV === 'development') {
-      return;
-    }
+    if (process.env.NODE_ENV === 'development') return;
 
-    // アップデートの確認
     window.electronAPI.checkForUpdates().catch((err: UpdateError) => {
       console.error('Error checking for updates:', err);
     });
 
-    // アップデートが利用可能な場合
     const removeUpdateAvailable = window.electronAPI.onUpdateAvailable((info: UpdateInfo) => {
-      setUpdateAvailable(info);
+      setUpdateInfo(info);
       setError(null);
+      setDismissed(false);
+      // ダウンロード中・完了状態では available に戻さない
+      setState((prev) => (prev === 'downloading' || prev === 'downloaded' ? prev : 'available'));
     });
 
-    // ダウンロードの進捗
     const removeUpdateProgress = window.electronAPI.onUpdateProgress((info: ProgressInfo) => {
       setDownloadProgress(info);
+      setState('downloading');
       setError(null);
     });
 
-    // ダウンロード完了
-    const removeUpdateDownloaded = window.electronAPI.onUpdateDownloaded((info: UpdateInfo) => {
-      setIsDownloaded(true);
+    const removeUpdateDownloaded = window.electronAPI.onUpdateDownloaded((_info: UpdateInfo) => {
+      setState('downloaded');
       setError(null);
     });
 
-    // エラー処理
     const removeUpdateError = window.electronAPI.onUpdateError((err: unknown) => {
       const errorMessage = err instanceof Error ? err.message : String(err);
       setError(errorMessage);
+      setState('error');
     });
 
-    // クリーンアップ
     return () => {
       removeUpdateAvailable();
       removeUpdateProgress();
@@ -70,58 +67,113 @@ const UpdateNotification: React.FC = () => {
     };
   }, []);
 
-  // 開発環境では何も表示しない
-  if (process.env.NODE_ENV === 'development') {
-    return null;
-  }
+  if (process.env.NODE_ENV === 'development') return null;
+  if (dismissed || state === 'idle') return null;
 
-  const handleUpdate = () => {
+  const handleDownload = () => {
+    setState('downloading');
+    setDownloadProgress({ bytesPerSecond: 0, percent: 0, transferred: 0, total: 0 });
+    window.electronAPI.downloadUpdate().catch((err: unknown) => {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(errorMessage);
+      setState('error');
+    });
+  };
+
+  const handleInstall = () => {
     window.electronAPI.startUpdate();
   };
 
-  if (error) {
+  // エラー状態
+  if (state === 'error') {
     return (
-      <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <p>{t('update.error')}: {error}</p>
-      </div>
-    );
-  }
-
-  if (isDownloaded) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-        <p>{t('update.ready')}</p>
-        <button
-          onClick={handleUpdate}
-          className="mt-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-        >
-          {t('update.restart')}
-        </button>
-      </div>
-    );
-  }
-
-  if (downloadProgress) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
-        <p>{t('update.downloading')}: {Math.round(downloadProgress.percent)}%</p>
-        <div className="w-full bg-gray-200 rounded h-2 mt-2">
-          <div
-            className="bg-blue-500 rounded h-2"
-            style={{ width: `${downloadProgress.percent}%` }}
-          />
+      <div className="toast toast-end toast-bottom z-50">
+        <div className="alert alert-error shadow-lg max-w-md">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="flex-1">
+            <p className="text-sm font-bold">{t('update.error', 'アップデートエラー')}</p>
+            <p className="text-xs opacity-80 line-clamp-2">{error}</p>
+          </div>
+          <div className="flex gap-1">
+            <button className="btn btn-ghost btn-xs" onClick={() => setDismissed(true)}>✕</button>
+            {updateInfo && (
+              <button className="btn btn-error btn-xs" onClick={handleDownload}>
+                {t('update.retry', '再試行')}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
-  if (updateAvailable) {
+  // ダウンロード完了 → インストール促進
+  if (state === 'downloaded') {
     return (
-      <div className="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-        <p>{t('update.available')}: v{updateAvailable.version}</p>
-        {updateAvailable.releaseNotes && (
-          <p className="mt-2 text-sm">{updateAvailable.releaseNotes}</p>
-        )}
+      <div className="toast toast-end toast-bottom z-50">
+        <div className="alert alert-success shadow-lg max-w-md">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="flex-1">
+            <p className="text-sm font-bold">{t('update.ready', 'アップデート準備完了')}</p>
+            <p className="text-xs opacity-80">
+              {t('update.restartMessage', '再起動してアップデートを適用します')}
+            </p>
+          </div>
+          <button className="btn btn-success btn-sm" onClick={handleInstall}>
+            {t('update.restart', '再起動')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ダウンロード中
+  if (state === 'downloading' && downloadProgress) {
+    const percent = Math.round(downloadProgress.percent);
+    const mbTransferred = (downloadProgress.transferred / 1024 / 1024).toFixed(0);
+    const mbTotal = (downloadProgress.total / 1024 / 1024).toFixed(0);
+
+    return (
+      <div className="toast toast-end toast-bottom z-50">
+        <div className="alert alert-info shadow-lg max-w-md">
+          <span className="loading loading-spinner loading-sm"></span>
+          <div className="flex-1">
+            <p className="text-sm font-bold">{t('update.downloading', 'ダウンロード中')}</p>
+            <p className="text-xs opacity-80">{mbTransferred} / {mbTotal} MB ({percent}%)</p>
+            <progress className="progress progress-info w-full mt-1" value={percent} max="100"></progress>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // アップデート利用可能 → ダウンロードボタン
+  if (state === 'available' && updateInfo) {
+    return (
+      <div className="toast toast-end toast-bottom z-50">
+        <div className="alert alert-warning shadow-lg max-w-md">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="flex-1">
+            <p className="text-sm font-bold">
+              {t('update.available', '新しいバージョンが利用可能です')}
+            </p>
+            <p className="text-xs opacity-80">v{updateInfo.version}</p>
+          </div>
+          <div className="flex gap-1">
+            <button className="btn btn-ghost btn-xs" onClick={() => setDismissed(true)}>
+              {t('update.later', '後で')}
+            </button>
+            <button className="btn btn-warning btn-sm" onClick={handleDownload}>
+              {t('update.download', 'ダウンロード')}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -129,4 +181,4 @@ const UpdateNotification: React.FC = () => {
   return null;
 };
 
-export default UpdateNotification; 
+export default UpdateNotification;

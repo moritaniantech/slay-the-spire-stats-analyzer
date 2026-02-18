@@ -50,6 +50,7 @@ interface ElectronAPI {
   deleteRun: (run: any) => Promise<void>;
   sqlite: SQLiteAPI;
   checkForUpdates: () => Promise<void>;
+  downloadUpdate: () => Promise<void>;
   startUpdate: () => Promise<void>;
   onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
   onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
@@ -106,6 +107,7 @@ const electronAPI = {
   deleteRun: (run: any) => ipcRenderer.invoke('delete-run', run),
   sqlite: sqliteAPI,
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
   startUpdate: () => ipcRenderer.invoke('start-update'),
   onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
     const handler = (_event: any, info: UpdateInfo) => callback(info);

@@ -56,6 +56,7 @@ interface ElectronAPI {
   deleteRun: (run: Run) => Promise<void>;
   sqlite: SQLiteAPI;
   checkForUpdates: () => Promise<void>;
+  downloadUpdate: () => Promise<void>;
   startUpdate: () => Promise<void>;
   onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
   onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;

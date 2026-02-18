@@ -56,6 +56,7 @@ interface Window {
     getRun: (id: string) => Promise<any>;
     deleteRun: (id: string | any) => Promise<void>;
     checkForUpdates: () => Promise<void>;
+    downloadUpdate: () => Promise<void>;
     startUpdate: () => Promise<void>;
     getAssetPath: (assetPath: string) => Promise<string>;
     assetExists: (assetPath: string) => Promise<boolean>;
