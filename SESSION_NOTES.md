@@ -1,5 +1,83 @@
 # SESSION NOTES
 
+### [2026-02-19] 脆弱性対応・CI整備 — 未使用依存19パッケージ削除・Dependabot/セキュリティスキャン導入
+
+- **決定事項**:
+  - 未使用パッケージ（typeorm, crypto-browserify 等19件）は完全削除
+  - 推移的依存の脆弱性は yarn resolutions で強制バージョン指定
+  - Dependabot は npm + GitHub Actions を週次チェック、patch/minor は自動マージ
+  - セキュリティスキャンは gitleaks + Semgrep + Trivy の3ジョブ構成
+
+- **実装した内容**:
+  - `package.json` — 未使用19パッケージ削除、react-router-dom/vite/electron/glob 更新、resolutions追加（js-yaml, lodash, tar-fs, tmp）
+  - `.github/dependabot.yml`（新規）— npm + GitHub Actions 週次更新チェック、minor/patch グループ化
+  - `.github/workflows/dependabot-auto-merge.yml`（新規）— patch/minor 自動マージ、major は手動レビュー
+  - `.github/workflows/security-scan.yml`（新規）— gitleaks/Semgrep/Trivy 週次スキャン、SARIF でGitHub Security連携
+
+- **脆弱性対応結果**:
+  - 解消: 20/26件（Critical 2件含む — pbkdf2, sha.js は未使用パッケージ削除で解消）
+  - 残存: 6件（tar@6 x4 + ajv@6 x1 + tailwindcss oxide tar — ビルドツール推移的依存、上流対応待ち）
+  - 削除パッケージ: typeorm, crypto-browserify, stream-browserify, buffer, util, vite-plugin-node-polyfills, reflect-metadata, @npmcli/arborist, @npmcli/fs, @npmcli/package-json, @electron/remote, electron-is-dev, @emotion/is-prop-valid, @emotion/react, @headlessui/react, html-react-parser, react-switch, @eslint/config-array, @eslint/object-schema
+  - 2ファイル変更: +123 / -1947行
+
+- **コミット**: 40b79d6（脆弱性対応）, cfb38b8（CI整備）
+
+- **未解決の課題**:
+  - 残存脆弱性6件（tar@6, ajv@6 — ビルドツール推移的依存）
+  - `window.electron` レガシー参照の整理
+  - README にスクリーンショットを追加
+  - auto-update の E2E テスト（次回リリース時）
+
+- **次のステップ**:
+  - `window.electron` レガシー参照の調査・整理（Medium priority）
+  - README にスクリーンショット追加（Low priority）
+  - 次回リリース時に auto-update の E2E テスト
+
+### [2026-02-19] コードレビュー指摘の修正 — セキュリティ・リソースクリーンアップ・型定義統一
+
+- **決定事項**:
+  - `app-getPath` は許可リスト方式（userData, appData, temp, desktop, documents, downloads のみ）
+  - `debug-resources` は `app.isPackaged` チェックで本番無効化（内部パス情報を返さない）
+  - `set-theme` は light/dark のみ受け付けるバリデーション追加
+  - `fs-readFile` のディレクトリ境界チェックを `startsWith` → `relative()` 方式に改善
+  - 型定義は `src/vite-env.d.ts` を唯一の正本とし、他ファイルの重複定義を削除
+  - CI permissions は workflow 全体 `contents: read`、release job のみ `contents: write`
+  - ログレベルは本番 `info`、開発 `debug` に分離
+
+- **実装した内容**:
+  - `electron/main.ts` — app-getPath 許可リスト、debug-resources 本番無効化、set-theme バリデーション、fs-readFile `relative()` 境界チェック、ログレベル調整、UpdateHandler.destroy() 呼び出し
+  - `electron/updater.ts` — `safeSend()` メソッド（isDestroyed チェック）、`removeAllListeners()` 重複防止、`setInterval` 戻り値保存+`destroy()` でクリーンアップ、`ipcMain.handle` try-catch 二重登録防止、エラーオブジェクトのサニタイズ、ログレベル調整
+  - `electron/preload.ts` — 本番 console.log 2行削除、コメントアウト型チェックコード削除
+  - `src/vite-env.d.ts` — IElectronAPI に `onNewRunDetected` 追加、正本としてコメント明記
+  - `src/global.d.ts` — electronAPI 重複定義を削除、Viteグローバル・レガシーAPI・__APP_SETTINGS__ のみ残す
+  - `src/types/electron-api.d.ts` — Window 拡張を削除、FilePickerOptions/FilePickerResult モジュール宣言のみ残す
+  - `.github/workflows/release.yml` — workflow permissions `contents: read`、release job に `permissions: contents: write`、verify ステップの exit 修正（サブシェル問題解消）
+  - `src/components/UpdateNotification.tsx` — エラー時の progress リセット追加
+  - 削除: `src/components/Settings.tsx`（未使用）、`src/types/electron.d.ts`、`src/types/globals.d.ts`
+
+- **Codexレビュー結果**: WARNING 1 / GOOD 8
+  - WARNING 1: fs-readFile の `startsWith` ディレクトリ境界チェック不足 → `relative()` 方式に修正済み
+
+- **ビルド結果**:
+  - TypeScript 型チェック: エラー 0件
+  - Vite ビルド: 成功
+  - 変更ファイル: 11ファイル、+153 / -522行
+
+- **コミット**: a438844
+
+- **未解決の課題**:
+  - Dependabot が31件の脆弱性を検出（4 critical, 13 high, 7 moderate, 7 low）
+  - asset-protocol の `ReferenceError: Cannot access 'o' before initialization`（既存問題）
+  - README にスクリーンショットを追加（未着手）
+  - auto-update のダウンロード→再起動 E2E テスト（次回リリース時に検証）
+  - `window.electron`（レガシーAPI）が environment.ts, ImageAsset.tsx で参照されているが preload.ts では公開されていない（デッドコードの可能性）
+
+- **次のステップ**:
+  - Dependabot の脆弱性対応（特に critical 4件）
+  - `window.electron` レガシー参照の調査・整理
+  - 次回リリース時に auto-update の E2E テスト
+  - README にスクリーンショットを追加
+
 ### [2026-02-18] auto-update 修正・実機テスト・バージョン表示
 
 - **決定事項**:
