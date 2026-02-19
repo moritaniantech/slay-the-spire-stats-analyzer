@@ -7,6 +7,15 @@ import { startWatching, stopWatching } from './watcher';
 import { UpdateHandler } from './updater';
 import fs from 'fs';
 
+// アセットパスのサニタイズ（パストラバーサル防止）
+function sanitizeAssetPath(input: string): string {
+  const p = input.replace(/\\/g, '/').replace(/^assets\//, '').replace(/^\/+/, '');
+  if (!p || p.includes('\0') || p.split('/').includes('..') || isAbsolute(p)) {
+    throw new Error(`Invalid asset path: ${input}`);
+  }
+  return p;
+}
+
 // ログレベルを設定（本番はinfo以上、開発はdebug）
 log.transports.file.level = app.isPackaged ? 'info' : 'debug';
 log.transports.console.level = app.isPackaged ? 'info' : 'debug';
@@ -96,8 +105,10 @@ function initializeIpcHandlers() {
   // アセットファイルの存在確認ハンドラー
   ipcMain.handle('asset-exists', (_, assetPath: string) => {
     try {
+      // パストラバーサル防止
+      const sanitized = sanitizeAssetPath(assetPath);
       // assetPathが'assets/'で始まる場合は削除（二重のassets/を防ぐ）
-      let normalizedAssetPath = assetPath;
+      let normalizedAssetPath = sanitized;
       if (normalizedAssetPath.startsWith('assets/')) {
         normalizedAssetPath = normalizedAssetPath.substring('assets/'.length);
         log.debug(`[asset-exists] パスから'assets/'プレフィックスを削除: ${assetPath} -> ${normalizedAssetPath}`);
@@ -195,8 +206,10 @@ function initializeIpcHandlers() {
         });
       }
       
+      // パストラバーサル防止
+      const sanitized = sanitizeAssetPath(assetPath);
       // assetPathが'assets/'で始まる場合は削除（二重のassets/を防ぐ）
-      let normalizedAssetPath = assetPath;
+      let normalizedAssetPath = sanitized;
       if (normalizedAssetPath.startsWith('assets/')) {
         normalizedAssetPath = normalizedAssetPath.substring('assets/'.length);
         log.debug(`[get-asset-path] パスから'assets/'プレフィックスを削除: ${assetPath} -> ${normalizedAssetPath}`);
@@ -431,6 +444,8 @@ function initializeIpcHandlers() {
   // 画像のBase64データを取得するハンドラー
   ipcMain.handle('get-image-base64', async (event, relativeImagePath: string) => {
     try {
+      // パストラバーサル防止
+      const sanitizedPath = sanitizeAssetPath(relativeImagePath);
       let imagePathToLoad: string | undefined;
 
       if (app.isPackaged) {
@@ -438,26 +453,16 @@ function initializeIpcHandlers() {
         // relativeImagePathは "ui/topPanel/deck.png" のような形式で来る可能性がある
         const pathsToTry: string[] = [];
         
-        // 1. assets/プレフィックスがある場合
-        if (relativeImagePath.startsWith('assets/')) {
-          pathsToTry.push(join(process.resourcesPath, relativeImagePath));
-          pathsToTry.push(join(process.resourcesPath, 'app.asar.unpacked', relativeImagePath));
-        } else {
-          // 2. assets/プレフィックスがない場合、assets/を追加
-          pathsToTry.push(join(process.resourcesPath, 'assets', relativeImagePath));
-          pathsToTry.push(join(process.resourcesPath, 'app.asar.unpacked', 'assets', relativeImagePath));
-        }
-        
-        // 3. Windows本番環境での追加パス（NSISインストーラーの場合）
+        // sanitizedPath は assets/ プレフィックスが除去済み
+        // assets/ ディレクトリ配下のパスとして構築
+        pathsToTry.push(join(process.resourcesPath, 'assets', sanitizedPath));
+        pathsToTry.push(join(process.resourcesPath, 'app.asar.unpacked', 'assets', sanitizedPath));
+
+        // Windows本番環境での追加パス（NSISインストーラーの場合）
         if (process.platform === 'win32') {
           const exeDir = app.getPath('exe');
-          if (relativeImagePath.startsWith('assets/')) {
-            pathsToTry.push(join(exeDir, '..', 'resources', relativeImagePath));
-            pathsToTry.push(join(exeDir, '..', 'resources', relativeImagePath.substring('assets/'.length)));
-          } else {
-            pathsToTry.push(join(exeDir, '..', 'resources', 'assets', relativeImagePath));
-            pathsToTry.push(join(exeDir, '..', 'resources', relativeImagePath));
-          }
+          pathsToTry.push(join(exeDir, '..', 'resources', 'assets', sanitizedPath));
+          pathsToTry.push(join(exeDir, '..', 'resources', sanitizedPath));
         }
         
         // 各パスを試す（Windowsでのパスセパレータ混在問題を解決するため、normalizeを使用）
@@ -472,16 +477,15 @@ function initializeIpcHandlers() {
         }
         
         if (!imagePathToLoad) {
-          log.warn(`[get-image-base64] Image not found in any of the tried paths for: ${relativeImagePath}`);
+          log.warn(`[get-image-base64] Image not found in any of the tried paths for: ${sanitizedPath}`);
           // フォールバックとして最初のパスを使用
           imagePathToLoad = normalize(pathsToTry[0]);
         }
       } else {
         // 開発環境: public/assets 配下を優先的に試す
         const devPaths = [
-          join(app.getAppPath(), 'public', 'assets', relativeImagePath),
-          join(app.getAppPath(), 'public', 'assets', 'assets', relativeImagePath), // 二重プレフィックスの場合
-          join(app.getAppPath(), 'src', 'assets', relativeImagePath)
+          join(app.getAppPath(), 'public', 'assets', sanitizedPath),
+          join(app.getAppPath(), 'src', 'assets', sanitizedPath)
         ];
         
         for (const candidatePath of devPaths) {
@@ -499,7 +503,7 @@ function initializeIpcHandlers() {
         }
       }
       
-      log.debug(`[get-image-base64] Attempting to read image from: ${imagePathToLoad} (requested: ${relativeImagePath})`);
+      log.debug(`[get-image-base64] Attempting to read image from: ${imagePathToLoad} (requested: ${sanitizedPath})`);
 
       if (!imagePathToLoad || !fs.existsSync(imagePathToLoad)) {
         log.error(`[get-image-base64] Final check: Image file does not exist at resolved path: ${imagePathToLoad}`);
@@ -1098,15 +1102,19 @@ app.on('ready', async () => {
 
           // パスの正規化ステップ
           if (requestedAssetPath.startsWith('./')) {
-            const oldPath = requestedAssetPath;
             requestedAssetPath = requestedAssetPath.substring(2);
-            log.warn(`[asset-protocol] Normalized leading './': "${oldPath}" -> "${requestedAssetPath}"`);
           }
 
           if (requestedAssetPath.startsWith('assets/assets/')) {
-            const oldPath = requestedAssetPath;
             requestedAssetPath = requestedAssetPath.substring('assets/'.length);
-            log.warn(`[asset-protocol] Normalized double 'assets/' prefix: "${oldPath}" -> "${requestedAssetPath}"`);
+          }
+
+          // パストラバーサル防止
+          const segments = requestedAssetPath.replace(/\\/g, '/').split('/');
+          if (segments.includes('..') || requestedAssetPath.includes('\0') || isAbsolute(requestedAssetPath)) {
+            log.error(`[asset-protocol] Blocked path traversal attempt: "${requestedAssetPath}"`);
+            callback({ statusCode: 403 });
+            return;
           }
           
           log.info(`[asset-protocol] Requested asset (normalized): "${requestedAssetPath}"`);
