@@ -358,15 +358,32 @@ const Relic: React.FC<{
   // フレーバーテキストの整形
   const formattedFlavorText = formatFlavorText(relic.flavor);
   
+  // HTMLの特殊文字をエスケープする関数（XSS防止）
+  const escapeHtml = (text: string): string => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
+  // 正規表現の特殊文字をエスケープする関数
+  const escapeRegExp = (string: string): string => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
   // 検索語句のハイライト
   const highlightSearchTerm = (text: string) => {
     if (!searchTerm) return text;
-    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    const escapedSearchTerm = escapeRegExp(searchTerm);
+    const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
     return text.replace(regex, '<span class="bg-yellow-400 text-black">$1</span>');
   };
 
   // レリック名の処理（検索語句）
-  const highlightedName = searchTerm ? highlightSearchTerm(relic.name) : relic.name;
+  const escapedRelicName = escapeHtml(relic.name);
+  const highlightedName = searchTerm ? highlightSearchTerm(escapedRelicName) : escapedRelicName;
 
   // 縁取り用のテキストシャドウスタイル - カードと同様
   const textOutlineStyle = '1px 1px 0 #59564f, -1px -1px 0 #59564f, 1px -1px 0 #59564f, -1px 1px 0 #59564f, 0px 2px 3px rgba(0,0,0,0.7)';
@@ -565,8 +582,8 @@ const Relic: React.FC<{
             >
               {searchTerm && formattedFlavorText.toLowerCase().includes(searchTerm.toLowerCase()) ? (
                 <span
-                  dangerouslySetInnerHTML={{ 
-                    __html: highlightSearchTerm(formattedFlavorText) 
+                  dangerouslySetInnerHTML={{
+                    __html: highlightSearchTerm(escapeHtml(formattedFlavorText))
                   }}
                 />
               ) : (

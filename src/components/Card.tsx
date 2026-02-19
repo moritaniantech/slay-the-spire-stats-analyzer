@@ -79,9 +79,19 @@ const Card: React.FC<CardProps> = ({
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   };
 
+  // HTMLの特殊文字をエスケープする関数（XSS防止）
+  const escapeHtml = (text: string): string => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
   // 説明文のキーワードをハイライト
   const getHighlightedDescription = (text: string) => {
-    let highlighted = text;
+    let highlighted = escapeHtml(text);
     
     // アップグレード前後の説明文を比較して追加されたキーワードを検出
     const keywordsAddedAfterUpgrade: string[] = [];
@@ -259,7 +269,8 @@ const Card: React.FC<CardProps> = ({
   if (upgraded) {
     displayName = `${name}+`;
   }
-  const highlightedName = searchTerm ? highlightSearchTerm(displayName) : displayName;
+  const escapedDisplayName = escapeHtml(displayName);
+  const highlightedName = searchTerm ? highlightSearchTerm(escapedDisplayName) : escapedDisplayName;
 
   // 縁取り用のテキストシャドウスタイル - より立体的で画像のような見た目に調整
   const textOutlineStyle = '1px 1px 0 #59564f, -1px -1px 0 #59564f, 1px -1px 0 #59564f, -1px 1px 0 #59564f, 0px 2px 3px rgba(0,0,0,0.7)';
