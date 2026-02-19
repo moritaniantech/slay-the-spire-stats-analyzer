@@ -1,5 +1,52 @@
 # SESSION NOTES
 
+### [2026-02-19] レガシー整理・Dependabot PR全件対応・devDeps major更新・XSS対策
+
+- **決定事項**:
+  - `window.electron` は `preload.ts` で一切公開されておらず、全参照がデッドコード → 削除
+  - `src/components/ImageAsset.tsx` は未使用（正本は `common/ImageAsset.tsx`）→ 削除
+  - Dependabot PRの推移的依存（qs, lodash, pbkdf2）は resolutions/パッケージ削除で対応済み → クローズ
+  - devDependencies の major 更新4件はすべて安全に適用可能と判断（Node 22 環境が要件充足）
+  - Dependabot 残存7件・Code Scanning残存26件は対応不要（推移的依存の上流待ち / Semgrep誤検出）
+  - `dangerouslySetInnerHTML` 4件は入力テキストのHTMLエスケープで対策
+
+- **実装した内容**:
+  - `src/utils/environment.ts` — `window.electron` フォールバック分岐3箇所を削除
+  - `src/global.d.ts` — `window.electron?` 型定義を削除
+  - `src/components/ImageAsset.tsx` — 未使用コンポーネントを削除
+  - `package.json` / `yarn.lock` — devDeps major 更新4件
+    - @vitejs/plugin-react: 4.4.1 → 5.1.4
+    - postcss-nesting: 13.0.1 → 14.0.0
+    - eslint-plugin-react-hooks: 5.2.0 → 7.0.1
+    - wait-on: 8.0.3 → 9.0.4
+  - `src/components/Card.tsx` — `escapeHtml` 追加、カード名・説明文のHTMLエスケープ
+  - `src/components/RelicList.tsx` — `escapeHtml`/`escapeRegExp` 追加、レリック名・フレーバーテキストのHTMLエスケープ
+
+- **Dependabot PR対応結果** (13本 → 0本):
+  - マージ: #3(diff), #5(axios), #12(24パッケージ minor/patch), #6(upload-artifact), #8(checkout), #10(github-script)
+  - クローズ: #1(qs), #2(lodash), #4(pbkdf2) — resolutions/削除で対応済み
+  - ローカル更新→自動クローズ: #13(wait-on), #14(react-hooks), #15(postcss-nesting), #16(plugin-react)
+
+- **GitHub Security アラート状況**:
+  - Dependabot: 7件残存（tar@6 x4, minimatch, glob CLI, ajv — ビルドツール推移的依存、上流待ち）
+  - Code Scanning: 30件（path-traversal 21件=誤検出大半、non-literal-regexp 5件=低リスク、dangerouslySetInnerHTML 4件=エスケープ対策済み）
+
+- **ビルド結果**:
+  - TypeScript 型チェック: エラー 0件
+  - Vite ビルド: 成功
+
+- **コミット**: 6760426（レガシー削除）, 93f698b（devDeps major更新）, a36a267（XSS対策）
+
+- **未解決の課題**:
+  - ESLint 202件の既存エラー（主に `no-explicit-any`）
+  - README にスクリーンショットを追加（未着手）
+  - auto-update の E2E テスト（次回リリース時）
+
+- **次のステップ**:
+  - ESLint エラーの段階的修正（優先度は低）
+  - README にスクリーンショット追加
+  - 次回リリース時に auto-update の E2E テスト
+
 ### [2026-02-19] 脆弱性対応・CI整備 — 未使用依存19パッケージ削除・Dependabot/セキュリティスキャン導入
 
 - **決定事項**:
