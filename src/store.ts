@@ -7,13 +7,13 @@ export interface Run {
   id?: string;
   timestamp: number;
   character: string;
-  character_chosen: string;
+  character_chosen?: string;
   ascension_level: number;
   victory: boolean;
   floor_reached: number;
   playtime: number;
   score: number;
-  run_data: any;
+  run_data: RunData;
   neow_bonus?: string;
   neow_cost?: string;
 }

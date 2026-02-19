@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, protocol, dialog } from 'electron';
 import { join, normalize, relative, isAbsolute, resolve } from 'path';
 import log from 'electron-log';
 import { validateAssetPaths } from './utils/assetUtils';
-import { findRunFiles, parseRunFile } from './utils/fileUtils';
+import { findRunFiles, parseRunFile, ParsedRun } from './utils/fileUtils';
 import { startWatching, stopWatching } from './watcher';
 import { UpdateHandler } from './updater';
 import fs from 'fs';
@@ -17,27 +17,9 @@ log.info('Electron version:', process.versions.electron);
 log.info('Node version:', process.versions.node);
 log.info('Chrome version:', process.versions.chrome);
 
-// CommonJSスタイルでelectron-storeを読み込む
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// CommonJSスタイルでelectron-storeを読み込む（ESM非対応のためrequireを使用）
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const Store = require('electron-store');
-
-// アプリケーション名を設定
-const APP_NAME = 'StS Stats Analyzer';
-
-// Store型の定義
-interface StoreSchema {
-  windowBounds: {
-    width: number;
-    height: number;
-    x?: number;
-    y?: number;
-  };
-  settings: {
-    theme: 'light' | 'dark';
-    language: 'en' | 'ja';
-  };
-  runFolderPath: string | null;
-}
 
 // Store のインスタンス
 let store;
@@ -654,7 +636,7 @@ function initializeIpcHandlers() {
         log.error(`[app-getPath] Access denied: "${name}" is not in the allowed list`);
         throw new Error(`Access denied: path name "${name}" is not allowed`);
       }
-      return app.getPath(name as any);
+      return app.getPath(name as Parameters<typeof app.getPath>[0]);
     } catch (error) {
       log.error(`[app-getPath] Error getting path for ${name}:`, error);
       throw error;
@@ -662,7 +644,7 @@ function initializeIpcHandlers() {
   });
 
   // dialog.showOpenDialog ハンドラ (preload.ts の showOpenDialog から呼び出される)
-  ipcMain.handle('dialog-showOpenDialog', async (event, options: any) => {
+  ipcMain.handle('dialog-showOpenDialog', async (event, options: Electron.OpenDialogOptions) => {
     // mainWindow を取得する必要がある場合がある
     const focusedWindow = BrowserWindow.getFocusedWindow();
     if (!focusedWindow) {
@@ -740,7 +722,7 @@ function initializeIpcHandlers() {
       };
 
       // 各ファイルを読み込んでパース
-      const runs: any[] = [];
+      const runs: ParsedRun[] = [];
       for (let i = 0; i < runFiles.length; i++) {
         const filePath = runFiles[i];
         try {
@@ -802,7 +784,7 @@ function initializeIpcHandlers() {
       }
 
       // 各ファイルをパース
-      const runs: any[] = [];
+      const runs: ParsedRun[] = [];
       for (const filePath of runFiles) {
         try {
           const content = await fs.promises.readFile(filePath, 'utf-8');
@@ -993,7 +975,7 @@ async function createWindow() {
               const urlPath = validatedURL.replace(/^file:\/\/\//, '').replace(/\//g, process.platform === 'win32' ? '\\' : '/');
               log.warn(`[createWindow] Attempted resource path: ${urlPath}`);
               log.warn(`[createWindow] Expected dist directory: ${distDir}`);
-              const expectedPath = join(distDir, urlPath.replace(distDir, '').replace(/^[\/\\]/, ''));
+              const expectedPath = join(distDir, urlPath.replace(distDir, '').replace(/^[/\\]/, ''));
               log.warn(`[createWindow] Expected resource path: ${expectedPath}`);
               log.warn(`[createWindow] Resource exists: ${fs.existsSync(expectedPath)}`);
             }

@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Run, useStore } from '../store';
-import { Tab } from './common/Tab';
 import ImageAsset from './common/ImageAsset';
 import { WinRateChart } from './charts/WinRateChart';
 import { normalizeCharacterName, getCharacterImagePath } from '../utils/characterUtils';
@@ -45,43 +44,44 @@ const formatNumber = (num: number): string => {
 export const StatsOverview: React.FC = () => {
   const { t } = useTranslation();
   const { runs } = useStore();
-  const [stats, setStats] = useState({
-    totalRuns: 0,
-    victories: 0,
-    winRate: 0,
-    totalPlaytime: 0,
-    averagePlaytime: 0,
-    averageScore: 0,
-    highestScore: 0,
-    averageFloor: 0,
-    highestFloor: 0,
-    characterStats: [] as {
-      character: string;
-      playCount: number;
-      victories: number;
-      winRate: number;
-      highestScore: number;
-      highestFloor: number;
-    }[]
-  });
 
-  // 統計データの計算
-  useEffect(() => {
-    if (!runs || runs.length === 0) return;
+  // 統計データの計算（useMemoで導出）
+  const stats = useMemo(() => {
+    const defaultStats = {
+      totalRuns: 0,
+      victories: 0,
+      winRate: 0,
+      totalPlaytime: 0,
+      averagePlaytime: 0,
+      averageScore: 0,
+      highestScore: 0,
+      averageFloor: 0,
+      highestFloor: 0,
+      characterStats: [] as {
+        character: string;
+        playCount: number;
+        victories: number;
+        winRate: number;
+        highestScore: number;
+        highestFloor: number;
+      }[]
+    };
+
+    if (!runs || runs.length === 0) return defaultStats;
 
     const totalRuns = runs.length;
-    
+
     // 「勝利」のみをカウントする（57階到達した場合のみ）
     const victories = runs.filter(run => {
       if (!run.victory) return false;
-      
+
       // 57階に到達したかどうかを確認
       const pathPerFloor = run.run_data?.path_per_floor || [];
       const reached57Floor = Array.isArray(pathPerFloor) && pathPerFloor.length >= 57;
-      
+
       return reached57Floor; // 57階に到達した勝利のみカウント
     }).length;
-    
+
     const winRate = totalRuns > 0 ? (victories / totalRuns) * 100 : 0;
     const totalPlaytime = runs.reduce((sum, run) => sum + run.playtime, 0);
     const averagePlaytime = totalRuns > 0 ? totalPlaytime / totalRuns : 0;
@@ -102,18 +102,18 @@ export const StatsOverview: React.FC = () => {
 
     const characterStats = Object.entries(characterGroups).map(([character, charRuns]) => {
       const playCount = charRuns.length;
-      
+
       // キャラクターごとの勝利数も同様に57階到達した場合のみカウント
       const charVictories = charRuns.filter(run => {
         if (!run.victory) return false;
-        
+
         // 57階に到達したかどうかを確認
         const pathPerFloor = run.run_data?.path_per_floor || [];
         const reached57Floor = Array.isArray(pathPerFloor) && pathPerFloor.length >= 57;
-        
+
         return reached57Floor; // 57階に到達した勝利のみカウント
       }).length;
-      
+
       const charWinRate = playCount > 0 ? (charVictories / playCount) * 100 : 0;
       const charHighestScore = charRuns.reduce((max, run) => Math.max(max, run.score), 0);
       const charHighestFloor = charRuns.reduce((max, run) => Math.max(max, run.floor_reached), 0);
@@ -128,7 +128,7 @@ export const StatsOverview: React.FC = () => {
       };
     }).sort((a, b) => b.playCount - a.playCount); // プレイ回数でソート
 
-    setStats({
+    return {
       totalRuns,
       victories,
       winRate,
@@ -139,7 +139,7 @@ export const StatsOverview: React.FC = () => {
       averageFloor,
       highestFloor,
       characterStats
-    });
+    };
   }, [runs]);
 
   // プレイ時間のフォーマット（秒から時間:分に変換）

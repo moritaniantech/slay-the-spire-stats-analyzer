@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, type TooltipItem } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
 // Chart.jsの登録
@@ -70,7 +70,7 @@ export const WinRateChart: React.FC<WinRateChartProps> = ({ characterStats }) =>
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => {
+          label: (context: TooltipItem<'bar'>) => {
             const characterIndex = context.dataIndex;
             const characterStat = characterStats[characterIndex];
             return [

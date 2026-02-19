@@ -59,11 +59,11 @@ function getCharacterIndex(runs: Run[]): CharacterIndex {
 // Run の run_data から正規化済み master_deck Set をキャッシュ
 let normalizedDeckCache = new WeakMap<object, Set<string>>();
 
-function getNormalizedDeckSet(runData: any): Set<string> {
+function getNormalizedDeckSet(runData: RunData): Set<string> {
   const hit = normalizedDeckCache.get(runData);
   if (hit) return hit;
   const set = new Set<string>(
-    (runData.master_deck || []).map((card: string) => normalizeCardId(card))
+    (runData.master_deck ?? []).map((card) => normalizeCardId(card))
   );
   normalizedDeckCache.set(runData, set);
   return set;
@@ -72,11 +72,11 @@ function getNormalizedDeckSet(runData: any): Set<string> {
 // Run の run_data から正規化済み relics Set をキャッシュ
 let normalizedRelicsCache = new WeakMap<object, Set<string>>();
 
-function getNormalizedRelicsSet(runData: any): Set<string> {
+function getNormalizedRelicsSet(runData: RunData): Set<string> {
   const hit = normalizedRelicsCache.get(runData);
   if (hit) return hit;
   const set = new Set<string>(
-    (runData.relics || []).map((relic: string) => normalizeRelicId(relic))
+    (runData.relics ?? []).map((relic) => normalizeRelicId(relic))
   );
   normalizedRelicsCache.set(runData, set);
   return set;
@@ -129,9 +129,9 @@ export function isLowMemoryMode(): boolean {
   // ストアから設定を取得（直接アクセスできないため、グローバル変数を使用）
   // この関数はアプリケーション起動時に一度だけ呼び出される想定
   try {
-    // @ts-ignore - windowオブジェクトに追加されたグローバル変数
-    return window.__APP_SETTINGS__?.lowMemoryMode === true;
-  } catch (e) {
+    const appSettings = (window as Window & { __APP_SETTINGS__?: { lowMemoryMode: boolean } }).__APP_SETTINGS__;
+    return appSettings?.lowMemoryMode === true;
+  } catch {
     return false;
   }
 }
@@ -170,14 +170,14 @@ export function isCardObtained(run: Run, cardId: string): boolean {
   const normalizedCardId = normalizeCardId(cardId);
 
   // キャッシュ済みSetを使用
-  if (runData.master_deck && Array.isArray(runData.master_deck)) {
+  if (runData.master_deck && runData.master_deck.length > 0) {
     if (getNormalizedDeckSet(runData).has(normalizedCardId)) {
       return true;
     }
   }
 
   // カード取得履歴からも確認
-  if (runData.card_choices && Array.isArray(runData.card_choices)) {
+  if (runData.card_choices) {
     for (const choice of runData.card_choices) {
       if (normalizeCardId(choice.picked) === normalizedCardId) {
         return true;
@@ -199,14 +199,14 @@ export function isRelicObtained(run: Run, relicId: string): boolean {
   const normalizedRelicId = normalizeRelicId(relicId);
 
   // キャッシュ済みSetを使用
-  if (runData.relics && Array.isArray(runData.relics)) {
+  if (runData.relics && runData.relics.length > 0) {
     if (getNormalizedRelicsSet(runData).has(normalizedRelicId)) {
       return true;
     }
   }
 
   // レリック取得履歴からも確認
-  if (runData.relics_obtained && Array.isArray(runData.relics_obtained)) {
+  if (runData.relics_obtained) {
     for (const relic of runData.relics_obtained) {
       if (normalizeRelicId(relic.key) === normalizedRelicId) {
         return true;

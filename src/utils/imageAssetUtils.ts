@@ -92,7 +92,7 @@ export const scanAllAssetReferences = () => {
   console.log('[AssetScan] 画像参照一覧:', imageReferences);
   
   const stylesheets = Array.from(document.styleSheets);
-  let cssImageReferences: CssImageReference[] = [];
+  const cssImageReferences: CssImageReference[] = [];
   
   try {
     stylesheets.forEach(sheet => {
@@ -147,7 +147,7 @@ export const rarityColors = {
   curse: '#4a0072',
 };
 
-export const debugImageLoading = async (): Promise<any> => {
+export const debugImageLoading = async (): Promise<Record<string, unknown>> => {
   try {
     // let resourceInfo = 'debugResources is not available on electronAPI.';
     // if (typeof window.electronAPI?.debugResources === 'function') { // debugResources が electronAPI に存在しないためコメントアウト

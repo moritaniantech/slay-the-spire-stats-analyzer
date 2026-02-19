@@ -10,7 +10,7 @@ interface Run {
   playtime: number;
   score: number;
   timestamp: number;
-  run_data: any;
+  run_data: Record<string, unknown>;
 }
 
 interface LoadProgress {
@@ -20,9 +20,9 @@ interface LoadProgress {
 
 // SQLite操作用の型定義
 interface SQLiteAPI {
-  execute: (sql: string, params?: any[]) => Promise<any>;
-  query: (sql: string, params?: any[]) => Promise<any[]>;
-  get: (sql: string, params?: any[]) => Promise<any>;
+  execute: (sql: string, params?: unknown[]) => Promise<unknown>;
+  query: (sql: string, params?: unknown[]) => Promise<unknown[]>;
+  get: (sql: string, params?: unknown[]) => Promise<unknown>;
 }
 
 interface UpdateInfo {
@@ -35,42 +35,6 @@ interface ProgressInfo {
   percent: number;
   transferred: number;
   total: number;
-}
-
-// APIの型定義
-interface ElectronAPI {
-  loadRunFiles: (runFolderPath: string) => Promise<Run[]>;
-  getAllRuns: () => Promise<Run[]>;
-  getTheme: () => Promise<string>;
-  setTheme: (theme: string) => Promise<string>;
-  selectFolder: () => Promise<string | null>;
-  getRunFolder: () => Promise<string | null>;
-  onLoadProgress: (callback: (progress: LoadProgress) => void) => () => void;
-  onNewRunDetected: (callback: (run: any) => void) => () => void;
-  deleteRun: (run: any) => Promise<void>;
-  sqlite: SQLiteAPI;
-  checkForUpdates: () => Promise<void>;
-  downloadUpdate: () => Promise<void>;
-  startUpdate: () => Promise<void>;
-  getAppVersion: () => Promise<string>;
-  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void;
-  onUpdateProgress: (callback: (info: ProgressInfo) => void) => () => void;
-  onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void;
-  onUpdateError: (callback: (error: unknown) => void) => () => void;
-  resolveAssetPath: (assetPath: string) => Promise<string>;
-  getResourcePath: () => Promise<string>;
-  isDevelopment: boolean;
-  resolveImagePath: (imagePath: string) => Promise<string>;
-  getAssetPath: (assetPath: string) => Promise<string>;
-  assetExists: (assetPath: string) => Promise<boolean>;
-  debugResources: () => Promise<any>;
-  getFileURLForAsset: (assetPath: string) => Promise<string>;
-  getImageBase64: (relativeImagePath: string) => Promise<string | null>;
-  platform: string;
-  get isPackaged(): boolean;
-  readFile: (filePath: string, encoding: string) => Promise<string>;
-  getUserDataPath: () => Promise<string>;
-  showOpenDialog: (options: any) => Promise<any>;
 }
 
 // SQLite APIの実装
@@ -92,47 +56,47 @@ const electronAPI = {
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   getRunFolder: () => ipcRenderer.invoke('get-run-folder'),
   onLoadProgress: (callback: (progress: LoadProgress) => void) => {
-    const progressHandler = (_event: any, data: LoadProgress) => callback(data);
+    const progressHandler = (_event: Electron.IpcRendererEvent, data: LoadProgress) => callback(data);
     ipcRenderer.on('load-progress', progressHandler);
     return () => {
       ipcRenderer.removeListener('load-progress', progressHandler);
     };
   },
-  onNewRunDetected: (callback: (run: any) => void) => {
-    const handler = (_event: any, run: any) => callback(run);
+  onNewRunDetected: (callback: (run: Run) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, run: Run) => callback(run);
     ipcRenderer.on('new-run-detected', handler);
     return () => {
       ipcRenderer.removeListener('new-run-detected', handler);
     };
   },
-  deleteRun: (run: any) => ipcRenderer.invoke('delete-run', run),
+  deleteRun: (run: Record<string, unknown>) => ipcRenderer.invoke('delete-run', run),
   sqlite: sqliteAPI,
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   downloadUpdate: () => ipcRenderer.invoke('download-update'),
   startUpdate: () => ipcRenderer.invoke('start-update'),
   onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
-    const handler = (_event: any, info: UpdateInfo) => callback(info);
+    const handler = (_event: Electron.IpcRendererEvent, info: UpdateInfo) => callback(info);
     ipcRenderer.on('update-available', handler);
     return () => {
       ipcRenderer.removeListener('update-available', handler);
     };
   },
   onUpdateProgress: (callback: (info: ProgressInfo) => void) => {
-    const handler = (_event: any, info: ProgressInfo) => callback(info);
+    const handler = (_event: Electron.IpcRendererEvent, info: ProgressInfo) => callback(info);
     ipcRenderer.on('download-progress', handler);
     return () => {
       ipcRenderer.removeListener('download-progress', handler);
     };
   },
   onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => {
-    const handler = (_event: any, info: UpdateInfo) => callback(info);
+    const handler = (_event: Electron.IpcRendererEvent, info: UpdateInfo) => callback(info);
     ipcRenderer.on('update-downloaded', handler);
     return () => {
       ipcRenderer.removeListener('update-downloaded', handler);
     };
   },
   onUpdateError: (callback: (error: unknown) => void) => {
-    const handler = (_event: any, error: unknown) => callback(error);
+    const handler = (_event: Electron.IpcRendererEvent, error: unknown) => callback(error);
     ipcRenderer.on('update-error', handler);
     return () => {
       ipcRenderer.removeListener('update-error', handler);
@@ -154,7 +118,7 @@ const electronAPI = {
   readFile: (filePath: string, encoding: string = 'utf8') => ipcRenderer.invoke('fs-readFile', filePath, encoding),
   getUserDataPath: () => ipcRenderer.invoke('app-getPath', 'userData'),
   getAppVersion: () => ipcRenderer.invoke('app-getVersion'),
-  showOpenDialog: (options: any) => ipcRenderer.invoke('dialog-showOpenDialog', options),
+  showOpenDialog: (options: Electron.OpenDialogOptions) => ipcRenderer.invoke('dialog-showOpenDialog', options),
   resolveImagePath: (imagePath: string) => ipcRenderer.invoke('resolve-image-path', imagePath),
   getAssetPath: async (assetPath: string): Promise<string> => {
     try {
@@ -174,7 +138,7 @@ const electronAPI = {
       return false;
     }
   },
-  debugResources: async (): Promise<any> => ipcRenderer.invoke('debug-resources'),
+  debugResources: async (): Promise<Record<string, unknown>> => ipcRenderer.invoke('debug-resources'),
   getFileURLForAsset: async (assetPath: string) => {
       try {
         const fileUrl = await ipcRenderer.invoke('get-file-url-for-asset', assetPath);
@@ -195,10 +159,10 @@ ipcRenderer.invoke('is-app-packaged').then((value) => {
 });
 
 // メインプロセスのログを受信するリスナーを登録
-ipcRenderer.on('main-process-log', (_event, logData: { level: string; message: string; details?: any; error?: string }) => {
+ipcRenderer.on('main-process-log', (_event: Electron.IpcRendererEvent, logData: { level: string; message: string; details?: unknown; error?: string }) => {
   const { level, message, details, error } = logData;
   const logMessage = details ? `${message}\n詳細: ${JSON.stringify(details, null, 2)}` : error ? `${message}\nエラー: ${error}` : message;
-  
+
   switch (level) {
     case 'error':
       console.error(`[Main Process] ${logMessage}`);
@@ -212,4 +176,4 @@ ipcRenderer.on('main-process-log', (_event, logData: { level: string; message: s
 });
 
 // APIをウィンドウオブジェクトに公開
-contextBridge.exposeInMainWorld('electronAPI', electronAPI); 
+contextBridge.exposeInMainWorld('electronAPI', electronAPI);

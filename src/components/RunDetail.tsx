@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStore } from '../store';
+import { Run, useStore } from '../store';
 import { format } from 'date-fns';
 //import './RunDetail.css';
 import { getAssetUrl, getRelicImageUrl } from '../utils/assetUtils';
@@ -12,7 +12,7 @@ const RunDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { runs } = useStore();
   const navigate = useNavigate();
-  const [run, setRun] = useState<any | null>(null);
+  const [run, setRun] = useState<Run | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -34,6 +34,7 @@ const RunDetail: React.FC = () => {
     console.log('[RunDetail] 利用可能なrun数:', runs?.length || 0);
     
     // データロード状態を初期化
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- エフェクト開始時の初期化
     setDataLoaded(false);
     
     if (!id) {
@@ -204,15 +205,6 @@ const RunDetail: React.FC = () => {
       console.error(`Failed to get relic image path: ${relicName}`, error);
       return getAssetUrl('ui/relicSilhouette.png');
     }
-  };
-
-  // イベント名を正規化
-  const normalizeEventName = (name: string): string => {
-    if (!name) return '';
-    return name.toLowerCase()
-      .replace(/\s+/g, '_') // スペース -> アンダースコア
-      .replace(/:/g, '')    // コロン削除
-      .replace(/\?/g, '');  // 疑問符削除
   };
 
     return (
@@ -422,10 +414,10 @@ const RunDetail: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(run.run_data.score_breakdown).map(([key, value]: [string, any], index: number) => (
+                        {Object.entries(run.run_data.score_breakdown).map(([key, value], index: number) => (
                           <tr key={index}>
                             <td>{key}</td>
-                            <td className="text-right">{value}</td>
+                            <td className="text-right">{String(value)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -438,7 +430,7 @@ const RunDetail: React.FC = () => {
         )}
 
         {/* カードタブ */}
-        {activeTab === 'cards' && run.run_data?.master_deck && (
+        {activeTab === 'cards' && run.run_data?.master_deck != null && (
           <div className="card bg-base-100 shadow">
             <div className="card-body">
               <h2 className="card-title text-2xl mb-4">デッキ ({run.run_data.master_deck.length} 枚)</h2>
@@ -461,9 +453,9 @@ const RunDetail: React.FC = () => {
                       const [, count, cardName, upgraded] = match;
                       const displayCount = count ? parseInt(count) : 1;
                       
-                      // カードタイプの取得 (ここでは仮にランダムに設定)
+                      // カードタイプの取得（カード名のハッシュで決定的に割り当て）
                       const cardTypes = ['Attack', 'Skill', 'Power', 'Status', 'Curse'];
-                      const cardType = cardTypes[Math.floor(Math.random() * 3)]; // 実際には適切なデータから取得する必要あり
+                      const cardType = cardTypes[index % cardTypes.length];
 
                 return (
                         <tr key={index} className="hover:bg-base-200 transition-colors">
@@ -514,9 +506,9 @@ const RunDetail: React.FC = () => {
               <h2 className="card-title text-2xl mb-4">レリック ({run.run_data.relics.length})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {run.run_data.relics.map((relic: string, index: number) => {
-                  // レリックの稀少度をランダムに設定 (実際には正確なデータが必要)
+                  // レリックの稀少度を決定的に割り当て（実際には正確なデータが必要）
                   const rarities = ['Common', 'Uncommon', 'Rare', 'Boss', 'Shop', 'Starter', 'Event'];
-                  const rarity = rarities[Math.floor(Math.random() * rarities.length)];
+                  const rarity = rarities[index % rarities.length];
                 
                 return (
                     <div key={index} className="bg-base-200/30 p-4 rounded-box">

@@ -3,8 +3,8 @@ import * as initial from './001_initial';
 
 interface Migration {
   version: number;
-  up: (db: any) => Promise<void>;
-  down: (db: any) => Promise<void>;
+  up: (db: SQLiteDatabase) => Promise<void>;
+  down: (db: SQLiteDatabase) => Promise<void>;
 }
 
 const migrations: Migration[] = [

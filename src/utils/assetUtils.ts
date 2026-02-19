@@ -240,7 +240,7 @@ export function normalizeRelicName(name: string): string {
   if (specialCases[name]) return specialCases[name];
 
   // "The " プレフィックスを除去（The Boot → boot, The Courier → courier）
-  let cleaned = name.replace(/^The\s+/i, '');
+  const cleaned = name.replace(/^The\s+/i, '');
 
   // 一般: camelCase変換（アポストロフィ・ピリオド除去、ハイフン・スペースで分割）
   return cleaned

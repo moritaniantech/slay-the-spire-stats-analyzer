@@ -6,11 +6,6 @@ import { Run } from '../store';
 const Dashboard: React.FC = () => {
   const [filteredRuns, setFilteredRuns] = useState<Run[]>([]);
 
-  useEffect(() => {
-    // Fetch runs from the backend
-    fetchRuns();
-  }, []);
-
   const fetchRuns = async () => {
     try {
       const response = await fetch('/api/runs');
@@ -20,6 +15,12 @@ const Dashboard: React.FC = () => {
       console.error('Error fetching runs:', error);
     }
   };
+
+  useEffect(() => {
+    // Fetch runs from the backend
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 非同期fetch内のsetState
+    fetchRuns();
+  }, []);
 
   return (
     <div className="overflow-x-auto">

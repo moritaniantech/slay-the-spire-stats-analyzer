@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
 import './RelicList.css';
 import { getAssetUrl, normalizeRelicName, RELIC_FALLBACK_URL, getRelicImageUrl } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
@@ -21,7 +20,6 @@ const relicFrameRare = getAssetUrl('ui/relicFrames/relicFrameRare.png') ?? undef
 const relicFrameBoss = getAssetUrl('ui/relicFrames/relicFrameBoss.png') ?? undefined;
 
 // 画像のパスを変数として定義
-const searchIcon = getAssetUrl('ui/cursors/magGlass2.png') ?? undefined;
 const relicPopup = getAssetUrl('ui/relicFrames/relicPopup.png') ?? undefined;
 
 interface RelicData {
@@ -140,12 +138,6 @@ const getRarityColor = (rarity: RelicRarity): string => {
 // レリックのレアリティ表示テキストを取得する関数
 const getRarityDisplayText = (rarity: RelicRarity): string => {
   return `${rarity.charAt(0).toUpperCase() + rarity.slice(1)} Relic`;
-};
-
-// レリックフレームのサイズ設定
-const defaultRelicFrameSizes = {
-  frameSizeDesktop: 1200,
-  relicSizeDesktop: 600
 };
 
 // 複数単語のキーワードチェック（現在の単語が複数単語キーワードの一部かどうか）
@@ -336,19 +328,14 @@ const Relic: React.FC<{
   onMouseMove: (event: React.MouseEvent) => void;
   searchTerm?: string;
 }> = ({ relic, onMouseEnter, onMouseLeave, onMouseMove, searchTerm = '' }) => {
-  const [imagePath, setImagePath] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    // レリック名から画像パスを取得
+  // レリック名から画像パスを取得（同期的に計算可能）
+  const imagePath = useMemo(() => {
     if (relic.englishName) {
-      const path = getRelicImageUrl(relic.englishName);
-      setImagePath(path ?? undefined);
+      return getRelicImageUrl(relic.englishName) ?? undefined;
     } else if (relic.imagePath) {
-      const path = getAssetUrl(`images/relics/${relic.imagePath}.png`);
-      setImagePath(path ?? undefined);
-    } else {
-      setImagePath(undefined);
+      return getAssetUrl(`images/relics/${relic.imagePath}.png`) ?? undefined;
     }
+    return undefined;
   }, [relic.imagePath, relic.englishName]);
 
   const relicFrame = getRelicFrame(relic.rarity);
@@ -389,15 +376,8 @@ const Relic: React.FC<{
   const textOutlineStyle = '1px 1px 0 #59564f, -1px -1px 0 #59564f, 1px -1px 0 #59564f, -1px 1px 0 #59564f, 0px 2px 3px rgba(0,0,0,0.7)';
 
   // relicPopup.pngの元のサイズは190px × 252px
-  // カードサイズ420px × 520pxに拡大表示する際のスケール比
-  // アスペクト比を維持するため、幅基準でスケール
-  const baseWidth = 190;
-  const baseHeight = 252;
-  const targetWidth = 420;
-  const targetHeight = 520;
-  
-  // 幅基準のスケール比を使用（アスペクト比を維持）
-  const scale = targetWidth / baseWidth; // ≈ 2.21
+  // カードサイズ420px × 520pxに拡大表示する際のスケール比（幅基準）
+  const scale = 420 / 190; // ≈ 2.21
   
   return (
     <div 
@@ -598,14 +578,9 @@ const Relic: React.FC<{
 };
 
 const RelicList: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClass, setSelectedClass] = useState<RelicClass>('all_classes');
-  const [selectedRarities, setSelectedRarities] = useState<RelicRarity[]>([]);
-  const [hoveredRelic, setHoveredRelic] = useState<{ id: string, name: string, element: HTMLElement | null } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [isLoaded, setIsLoaded] = useState(false);
   const { runs, settings } = useStore();
   // const allCharacterStats = useMemo(() => calculateRelicStats(runs), [runs]); // この行をコメントアウト
 
@@ -616,7 +591,7 @@ const RelicList: React.FC = () => {
   useEffect(() => {
     const fetchRelics = async () => {
       try {
-        let jsonData: { relics: RelicData[] } & Record<string, any>;
+        let jsonData: { relics: RelicData[] } & Record<string, unknown>;
         
         // Electron環境（開発環境・本番環境共通）: IPC経由でファイルを読み込む
         if (window.electronAPI) {
@@ -704,8 +679,6 @@ const RelicList: React.FC = () => {
   }, []);
   // --- ここまで追加 ---
 
-  const searchRef = useRef<HTMLInputElement>(null);
-  const rarityFilterRef = useRef<HTMLDivElement>(null);
   const [relics, setRelics] = useState<FormattedRelic[]>([]);
   const [isGlobalSearch, setIsGlobalSearch] = useState(false);
   const [rarityFilter, setRarityFilter] = useState<RelicRarity | ''>('');
@@ -714,8 +687,6 @@ const RelicList: React.FC = () => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipRelicId, setTooltipRelicId] = useState<string | null>(null);
   const [tooltipRelicName, setTooltipRelicName] = useState<string | null>(null);
-
-  const [relicImages, setRelicImages] = useState<{ [key: string]: string | undefined }>({});
 
   useEffect(() => {
     // レリックデータを整形
@@ -813,19 +784,14 @@ const RelicList: React.FC = () => {
   }, [allRelics]);
 
   useEffect(() => {
-    const loadImages = () => {
-      // 画像のプリロード
-      const images: { [key: string]: string | undefined } = {};
-      // Filter out undefined image paths before trying to get asset URLs
-      const validImagePaths = relics.map(r => r.imagePath).filter(Boolean) as string[];
-      for (const relicImagePath of validImagePaths) {
-        // Assuming relicImagePath is like "ironWave" and needs full path construction
-        images[relicImagePath] = getAssetUrl(`images/relics/${relicImagePath}.png`) ?? undefined;
-      }
-      setRelicImages(images);
-    };
     if (relics.length > 0) {
-        loadImages();
+      // レリック画像のプリロード
+      relics.forEach(r => {
+        if (r.imagePath) {
+          const img = new Image();
+          img.src = getAssetUrl(`images/relics/${r.imagePath}.png`) ?? '';
+        }
+      });
     }
   }, [relics]);
 
@@ -840,12 +806,6 @@ const RelicList: React.FC = () => {
   const handleTabSelect = (classId: RelicClass) => {
     setSelectedClass(classId);
     setIsGlobalSearch(classId === 'all_classes');
-  };
-
-  // 検索背景色の取得
-  const getSearchBgColor = () => {
-    if (isGlobalSearch) return 'bg-base-200/50';
-    return classTabConfig.find(config => config.id === selectedClass)?.searchBgColor || 'bg-base-200/50';
   };
 
   // フィルタリングされたレリックリスト

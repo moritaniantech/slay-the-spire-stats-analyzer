@@ -30,6 +30,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
   useEffect(() => {
     console.log(`[CommonImageAsset] Component mounted/updated. Path: "${path}", Fallback: "${fallbackPath}"`);
     let isMounted = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- パス変更時の初期化
     setIsLoading(true);
     setHasError(false);
     setImageUrl(undefined); // Reset on path change

@@ -97,7 +97,8 @@ function Layout({ children }: { children: React.ReactNode }) {
     };
 
     loadInitialData();
-  }, []); // 初回マウント時のみ実行
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 初回マウント時のみ実行
+  }, []);
 
   // 新しいランの検出リスナー
   useEffect(() => {
@@ -357,7 +358,7 @@ function PlayToRunsRedirect() {
       console.log(`[Redirect] ${location.pathname} から /runs/${id} へリダイレクトします`);
       navigate(`/runs/${id}`, { replace: true });
     } else {
-      console.error('[Redirect] リダイレクト先のIDが見つかりません', { path: location.pathname, params: useParams() });
+      console.error('[Redirect] リダイレクト先のIDが見つかりません', { path: location.pathname });
       navigate('/404', { replace: true });
     }
   }, [id, navigate, location.pathname]);

@@ -1,20 +1,21 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStore } from '../store';
+import { Run, useStore } from '../store';
 import { calculateNeowBonusStats } from '../services/neowBonusService';
 import { NeowBonusData } from '../types/neowBonus';
 import './NeowBonusList.css';
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 import { XMarkIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { Link } from 'react-router-dom';
-import { getAssetUrl } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
 
-const characterImages: { [key: string]: string | null } = {
-  IRONCLAD: getAssetUrl('images/characters/ironclad.png'),
-  THE_SILENT: getAssetUrl('images/characters/silent.png'),
-  DEFECT: getAssetUrl('images/characters/defect.png'),
-  WATCHER: getAssetUrl('images/characters/watcher.png'),
+// キャラクター名のマッピング（モジュールレベルで安定参照）
+const characterMap: Record<string, string> = {
+  'ironclad': 'IRONCLAD',
+  'silent': 'THE_SILENT',
+  'defect': 'DEFECT',
+  'watcher': 'WATCHER',
+  'all': 'ALL'
 };
 
 const classTabConfig = [
@@ -92,14 +93,13 @@ interface NeowBonusHistoryModalProps {
   onClose: () => void;
   bonusKey: string;
   character: string;
-  runs: any[];
+  runs: Run[];
 }
 
 const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
   isOpen,
   onClose,
   bonusKey,
-  character,
   runs
 }) => {
   const { t } = useTranslation();
@@ -131,7 +131,7 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
   };
 
   // リザルトバッジのクラス名を取得する関数
-  const getResultBadgeClass = (run: any): string => {
+  const getResultBadgeClass = (run: Run): string => {
     if (run.victory && run.floor_reached < 57) {
       return 'badge-warning';
     }
@@ -139,7 +139,7 @@ const NeowBonusHistoryModal: React.FC<NeowBonusHistoryModalProps> = ({
   };
 
   // リザルトテキストを取得する関数
-  const getResultText = (run: any): string => {
+  const getResultText = (run: Run): string => {
     if (run.victory && run.floor_reached < 57) {
       return '勝利？';
     }
@@ -418,6 +418,7 @@ const NeowBonusList: React.FC = () => {
       calculatedStats,
       hasData: Object.keys(calculatedStats).length > 0
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- useMemoの結果をstateに同期
     setBonusData(calculatedStats);
   }, [calculatedStats]);
 
@@ -426,14 +427,7 @@ const NeowBonusList: React.FC = () => {
     setSelectedCharacter(classId);
   }, []);
 
-  // キャラクター名のマッピング
-  const characterMap: Record<string, string> = {
-    'ironclad': 'IRONCLAD',
-    'silent': 'THE_SILENT',
-    'defect': 'DEFECT',
-    'watcher': 'WATCHER',
-    'all': 'ALL'
-  };
+  // characterMapはモジュールレベルで定義（安定参照）
 
   // 選択されたキャラクターの変換
   const normalizedCharacter = characterMap[selectedCharacter] || selectedCharacter.toUpperCase();
@@ -490,13 +484,13 @@ const NeowBonusList: React.FC = () => {
         return runBonus === bonusKey.replace('neowBonus.', '');
       });
     },
-    [runs, selectedCharacter, characterMap]
+    [runs, selectedCharacter]
   );
 
-  const handleRowClick = (bonusKey: string) => {
+  const handleRowClick = useCallback((bonusKey: string) => {
     setSelectedBonus(bonusKey);
     setIsModalOpen(true);
-  };
+  }, []);
 
   const handleModalClose = () => {
     setIsModalOpen(false);

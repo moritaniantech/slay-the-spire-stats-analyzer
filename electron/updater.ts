@@ -38,7 +38,7 @@ export class UpdateHandler {
   }
 
   /** ウィンドウが破棄されていない場合のみ webContents.send を実行 */
-  private safeSend(channel: string, ...args: any[]) {
+  private safeSend(channel: string, ...args: unknown[]) {
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
       this.mainWindow.webContents.send(channel, ...args);
     }

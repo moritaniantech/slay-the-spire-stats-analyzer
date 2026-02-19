@@ -97,52 +97,6 @@ export async function ensureDirectory(dirPath: string, allowedDirectories: strin
   }
 }
 
-/**
- * macOS環境でのResourcesパス検証を行う
- */
-function checkMacOSResourcePath() {
-  if (process.platform !== 'darwin') return null;
-  
-  try {
-    const resourcesPath = process.resourcesPath;
-    const appPath = app.getAppPath();
-    const exePath = app.getPath('exe');
-    
-    // 標準的なmacOSのバンドル構造をチェック
-    const isStandardBundle = exePath.includes('.app/Contents/MacOS/');
-    
-    // 期待されるアセットディレクトリのパス
-    const expectedAssetsPath = path.join(resourcesPath, 'assets');
-    const assetsExists = fs.existsSync(expectedAssetsPath);
-    
-    // ディレクトリが存在する場合は内容を確認
-    let assetContents: string[] = [];
-    if (assetsExists) {
-      try {
-        assetContents = fs.readdirSync(expectedAssetsPath);
-      } catch (e) {
-        log.error('Error reading assets directory:', e);
-      }
-    }
-    
-    // 詳細情報を記録
-    const pathInfo = {
-      resourcesPath,
-      appPath,
-      exePath,
-      isStandardBundle,
-      expectedAssetsPath,
-      assetsExists,
-      assetContents: assetContents.slice(0, 10) // 最初の10件のみ表示
-    };
-    
-    log.info('MacOS path validation:', pathInfo);
-    return pathInfo;
-  } catch (error) {
-    log.error('Error checking MacOS resources path:', error);
-    return null;
-  }
-}
 
 /**
  * アセットパスを解決するユーティリティ関数
@@ -250,7 +204,22 @@ export function findRunFiles(dir: string): string[] {
  * @param content ファイル内容（JSON文字列）
  * @returns Run オブジェクト、パース失敗時は null
  */
-export function parseRunFile(filePath: string, content: string): any | null {
+export interface ParsedRun {
+  id: string;
+  timestamp: number;
+  character: string;
+  character_chosen: string;
+  ascension_level: number;
+  victory: boolean;
+  floor_reached: number;
+  playtime: number;
+  score: number;
+  run_data: Record<string, unknown>;
+  neow_bonus?: string;
+  neow_cost?: string;
+}
+
+export function parseRunFile(filePath: string, content: string): ParsedRun | null {
   try {
     const runData = JSON.parse(content);
 

@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Run, useStore } from '../store';
 import { format } from 'date-fns';
-import { ChevronUpIcon, ChevronDownIcon, FunnelIcon, ArrowPathIcon } from '@heroicons/react/20/solid';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRightIcon } from '@heroicons/react/20/solid';
+import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
+import { useNavigate } from 'react-router-dom';
 //import './RunList.css';
-import { getAssetUrl } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
-import Tab from './common/Tab';
 import { normalizeCharacterName, getCharacterImagePath } from '../utils/characterUtils';
 
 type SortKey = 'timestamp' | 'character' | 'ascension_level' | 'victory' | 'floor_reached' | 'playtime' | 'score' | 'name';
@@ -27,55 +23,6 @@ const SortIcon: React.FC<SortIconProps> = ({ active, direction }) => {
     </span>
   );
 };
-
-interface Filters {
-  character?: string;
-  ascensionLevel?: number;
-  minScore?: number;
-  result?: 'victory' | 'defeat';
-}
-
-// タブの設定
-const classTabConfig = [
-  {
-    id: 'ironclad',
-    name: 'IRONCLAD',
-    searchBgColor: 'bg-[#ff6563]/20',
-    textColor: 'text-[#ff6563]',
-    costFrame: getAssetUrl('cards/design/ironclad/ironclad.png')
-  },
-  {
-    id: 'silent',
-    name: 'SILENT',
-    searchBgColor: 'bg-[#7fff00]/20',
-    textColor: 'text-[#7fff00]',
-    costFrame: getAssetUrl('cards/design/silent/silent.png')
-  },
-  {
-    id: 'defect',
-    name: 'DEFECT',
-    searchBgColor: 'bg-[#87ceeb]/20',
-    textColor: 'text-[#87ceeb]',
-    costFrame: getAssetUrl('cards/design/defect/defect.png')
-  },
-  {
-    id: 'watcher',
-    name: 'WATCHER',
-    searchBgColor: 'bg-[#a600ff]/20',
-    textColor: 'text-[#a600ff]',
-    costFrame: getAssetUrl('cards/design/watcher/watcher.png')
-  },
-  {
-    id: 'all',
-    name: 'ALL',
-    searchBgColor: 'bg-base-200/50',
-    textColor: 'text-base-content',
-    costFrame: getAssetUrl('cards/design/colorless/colorless.png')
-  }
-] as const;
-
-// キャラクタータイプの型定義
-type CharacterType = 'ironclad' | 'silent' | 'defect' | 'watcher' | 'all';
 
 // 数値を3桁ごとにカンマ区切りで表示する関数
 const formatNumber = (num: number): string => {
@@ -193,9 +140,9 @@ const RunList: React.FC = () => {
       // ソート処理
       if (['timestamp', 'ascension_level', 'floor_reached', 'playtime', 'score'].includes(sortKey)) {
         // 数値によるソート
-        return sortOrder === 'asc'
-          ? a[sortKey as keyof Run] - b[sortKey as keyof Run]
-          : b[sortKey as keyof Run] - a[sortKey as keyof Run];
+        const aVal = (a[sortKey as keyof Run] as number) ?? 0;
+        const bVal = (b[sortKey as keyof Run] as number) ?? 0;
+        return sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
       } else if (sortKey === 'character') {
         // 文字列によるソート
         return sortOrder === 'asc'
@@ -221,7 +168,7 @@ const RunList: React.FC = () => {
   // 表示するページ番号の範囲
   const maxPageButtons = 5;
   let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-  let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
   
   if (endPage - startPage + 1 < maxPageButtons && startPage > 1) {
     startPage = Math.max(1, endPage - maxPageButtons + 1);

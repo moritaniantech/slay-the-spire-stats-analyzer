@@ -5,7 +5,6 @@ import { useStore } from '../store';
 import { calculateCardStats } from '../services/StatsService';
 import { createEmptyAllCharacterStats } from '../models/StatsModel';
 import StatsTooltip from './StatsTooltip';
-import { getAssetUrl } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
 
 // タブ画像のインポートを削除
@@ -105,10 +104,8 @@ const CardList: React.FC = () => {
   const [selectedClass, setSelectedClass] = useState<CardClass>('ironclad');
   const [searchTerm, setSearchTerm] = useState('');
   const [allCardsData, setAllCardsData] = useState<{ cards: AllCardData[] }>({ cards: [] }); // allCards.json のデータを保持するstate
-  const [loadingError, setLoadingError] = useState<string | null>(null);
   const [cards, setCards] = useState<FormattedCard[]>([]);
   const [upgradedCards, setUpgradedCards] = useState<Set<string>>(new Set());
-  const [upgradedCardsVersion, setUpgradedCardsVersion] = useState(0);
   const [isGlobalSearch, setIsGlobalSearch] = useState(false);
   const [cardTypeFilter, setCardTypeFilter] = useState<CardType | ''>('');
   const [costFilter, setCostFilter] = useState<number | string | null>(null);
@@ -187,7 +184,7 @@ const CardList: React.FC = () => {
         }
       } catch (error) {
         console.error("Failed to fetch cards:", error);
-        setLoadingError('カードデータの読み込みに失敗しました。');
+        console.error('カードデータの読み込みに失敗しました。');
       }
     };
     fetchCards();
@@ -434,8 +431,7 @@ const CardList: React.FC = () => {
         return newSet;
       });
       
-      // 強制的に再レンダリングを行うためにバージョン番号を更新
-      setUpgradedCardsVersion(prev => prev + 1);
+      // （upgradedCardsの状態変更により再レンダリングされる）
     } catch (error) {
       console.error('Error in handleCardClick:', error);
     }
@@ -659,7 +655,6 @@ const CardList: React.FC = () => {
                     onChange={(e) => {
                       setDefaultUpgraded(e.target.checked);
                       setUpgradedCards(new Set());
-                      setUpgradedCardsVersion(prev => prev + 1);
                     }}
                   />
                 </label>

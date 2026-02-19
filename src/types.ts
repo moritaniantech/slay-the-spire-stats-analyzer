@@ -7,7 +7,7 @@ export interface Run {
   playtime: number;
   score: number;
   timestamp: number;
-  run_data: any;
+  run_data: RunData;
   neow_cost?: string;
   neow_bonus?: string;
 }

@@ -35,7 +35,7 @@ export const calculateNeowBonusStats = (runs: Run[]): NeowBonusData => {
   // キャラクター毎の処理
   runs.forEach((run, index) => {
     const runCharacter = run.character_chosen || run.character;
-    const neowBonus = (run.neow_bonus || (run.run_data && run.run_data.neow_bonus))?.replace('neowBonus.', '');
+    const neowBonus = (run.neow_bonus || run.run_data?.neow_bonus)?.replace('neowBonus.', '');
     
     if (!runCharacter || !neowBonus) {
       console.log('Debug - Skipping run:', { 
@@ -50,8 +50,8 @@ export const calculateNeowBonusStats = (runs: Run[]): NeowBonusData => {
     }
 
     // キャラクター名を正規化
-    const character = Object.entries(characterMap).find(([_, value]) => value === runCharacter)?.[1] || runCharacter;
-    console.log('Debug - Processing run:', { 
+    const character = Object.entries(characterMap).find(([, value]) => value === runCharacter)?.[1] || runCharacter;
+    console.log('Debug - Processing run:', {
       index,
       originalCharacter: runCharacter, 
       normalizedCharacter: character,
@@ -89,7 +89,7 @@ export const calculateNeowBonusStats = (runs: Run[]): NeowBonusData => {
     const characterRuns = runs.filter(run => {
       const runCharacter = run.character_chosen || run.character;
       // キャラクター名を正規化して比較
-      const normalizedCharacter = Object.entries(characterMap).find(([_, value]) => value === runCharacter)?.[1] || runCharacter;
+      const normalizedCharacter = Object.entries(characterMap).find(([, value]) => value === runCharacter)?.[1] || runCharacter;
       return normalizedCharacter === character;
     });
     console.log('Debug - Processing character stats:', {
@@ -110,11 +110,11 @@ export const calculateNeowBonusStats = (runs: Run[]): NeowBonusData => {
       
       // Last50の計算（neowBonus.の文字列を削除して比較）
       const last50Count = last50Runs.filter(run => {
-        const runBonus = (run.neow_bonus || (run.run_data && run.run_data.neow_bonus))?.replace('neowBonus.', '');
+        const runBonus = (run.neow_bonus || run.run_data?.neow_bonus)?.replace('neowBonus.', '');
         return runBonus === bonus;
       }).length;
       const last50Wins = last50Runs.filter(run => {
-        const runBonus = (run.neow_bonus || (run.run_data && run.run_data.neow_bonus))?.replace('neowBonus.', '');
+        const runBonus = (run.neow_bonus || run.run_data?.neow_bonus)?.replace('neowBonus.', '');
         return runBonus === bonus && run.victory === true && run.floor_reached >= 57;
       }).length;
 

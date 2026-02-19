@@ -58,8 +58,9 @@ const StatsTooltip: React.FC<StatsTooltipProps> = memo(({ stats, title, visible,
       adjustedY = 10; // 画面上端から10px下に表示
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 位置計算結果をstateに反映
     setPosition({ x: adjustedX, y: adjustedY });
-    
+
     // 位置計算が完了したらready状態にする
     setIsReady(true);
   }, [x, y, visible, settings.showStats]);
@@ -68,6 +69,7 @@ const StatsTooltip: React.FC<StatsTooltipProps> = memo(({ stats, title, visible,
   useEffect(() => {
     if (visible && settings.showStats) {
       // 表示されたときは初期状態にリセット
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 表示切替時のリセット
       setIsReady(false);
     }
   }, [visible, settings.showStats]);

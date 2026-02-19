@@ -1,21 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useStore } from '../store';
+import { Run, useStore } from '../store';
 import { format } from 'date-fns';
-import { ArrowUpIcon, ArrowDownIcon, ArrowRightIcon } from '@heroicons/react/20/solid';
 import { getAssetUrl, normalizeRelicName } from '../utils/assetUtils';
 import ImageAsset from './common/ImageAsset';
 import { normalizeCharacterName } from '../utils/characterUtils';
-import Tab from './common/Tab';
 import { useTranslation } from 'react-i18next';
-import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 import Card from './Card';
 import StatsTooltip from './StatsTooltip';
-import { AllCharacterStats, createEmptyAllCharacterStats } from '../models/StatsModel';
+import { createEmptyAllCharacterStats } from '../models/StatsModel';
 import { calculateCardStats } from '../services/StatsService';
-
-// プレイヤーキャラクターのタイプ
-type CharacterType = 'ironclad' | 'silent' | 'defect' | 'watcher' | 'all';
 
 // マップのアイコンのタイプ
 const MAP_ICONS = {
@@ -57,7 +51,7 @@ const PlayDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { runs, settings } = useStore();
   const navigate = useNavigate();
-  const [run, setRun] = useState<any | null>(null);
+  const [run, setRun] = useState<Run | null>(null);
   const [floorInfos, setFloorInfos] = useState<FloorInfo[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   
@@ -68,13 +62,13 @@ const PlayDetail: React.FC = () => {
   const [tooltipCardName, setTooltipCardName] = useState('');
 
   // JSONデータを保持するstate
-  const [cardsTranslationData, setCardsTranslationData] = useState<any | null>(null);
-  const [monstersTranslationData, setMonstersTranslationData] = useState<any | null>(null);
-  const [potionsTranslationData, setPotionsTranslationData] = useState<any | null>(null);
-  const [relicsTranslationData, setRelicsTranslationData] = useState<any | null>(null);
-  const [eventsTranslationData, setEventsTranslationData] = useState<any | null>(null);
-  const [neowBonusTranslationData, setNeowBonusTranslationData] = useState<any | null>(null);
-  const [allCardsJson, setAllCardsJson] = useState<any | null>(null); // allCards.json のデータ
+  const [cardsTranslationData, setCardsTranslationData] = useState<Record<string, unknown> | null>(null);
+  const [monstersTranslationData, setMonstersTranslationData] = useState<Record<string, unknown> | null>(null);
+  const [potionsTranslationData, setPotionsTranslationData] = useState<Record<string, unknown> | null>(null);
+  const [relicsTranslationData, setRelicsTranslationData] = useState<Record<string, unknown> | null>(null);
+  const [eventsTranslationData, setEventsTranslationData] = useState<Record<string, unknown> | null>(null);
+  const [neowBonusTranslationData, setNeowBonusTranslationData] = useState<Record<string, unknown> | null>(null);
+  const [allCardsJson, setAllCardsJson] = useState<Record<string, unknown> | null>(null); // allCards.json のデータ
   const [loadingError, setLoadingError] = useState<string | null>(null);
 
   // カードの統計情報を計算（メモ化）
@@ -193,15 +187,15 @@ const PlayDetail: React.FC = () => {
       });
     }
     if (allCardsJson.cards) {
-      allCardsJson.cards.forEach((card: any) => {
+      (allCardsJson.cards as Array<Record<string, unknown>>).forEach((card) => {
         if (card.name) {
-          const originalName = card.name;
+          const originalName = card.name as string;
           const noSpaceName = originalName.replace(/\s+/g, '').toLowerCase();
           nameMap.set(noSpaceName, originalName);
           const lowerCaseName = originalName.toLowerCase();
           nameMap.set(lowerCaseName, originalName);
           if (card.alias) {
-            const aliases = Array.isArray(card.alias) ? card.alias : [card.alias];
+            const aliases = Array.isArray(card.alias) ? (card.alias as string[]) : [card.alias as string];
             aliases.forEach((alias: string) => {
               const lowerAlias = alias.toLowerCase();
               nameMap.set(lowerAlias, originalName);
@@ -246,6 +240,7 @@ const PlayDetail: React.FC = () => {
       if (isMounted) navigate('/404');
     }
     return () => { isMounted = false; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- processRunDataは安定的な関数
   }, [
     id,
     runs,
@@ -263,7 +258,7 @@ const PlayDetail: React.FC = () => {
   const normalizeCardName = (rawCardName: string): string => {
     // アップグレード表記を保持するために分離
     const isUpgraded = rawCardName.includes('+');
-    let baseName = isUpgraded ? rawCardName.replace('+', '') : rawCardName;
+    const baseName = isUpgraded ? rawCardName.replace('+', '') : rawCardName;
     
     // 大文字小文字を区別せず検索
     const lowerName = baseName.toLowerCase();
@@ -285,46 +280,46 @@ const PlayDetail: React.FC = () => {
   };
 
   // ランデータを処理して階層情報を生成
-  const processRunData = (runData: any) => {
+  const processRunData = (runData: Run) => {
     if (!runData.run_data) return;
-    
-    const data = runData.run_data;
+
+    const data = runData.run_data as Record<string, unknown>;
     const infos: FloorInfo[] = [];
-    
+
     // 経路データ
-    const pathTaken = data.path_taken || [];
-    const pathPerFloor = data.path_per_floor || [];
-    
+    const pathTaken = (data.path_taken || []) as string[];
+    const pathPerFloor = (data.path_per_floor || []) as string[];
+
     // 体力データ
-    const currentHpPerFloor = data.current_hp_per_floor || [];
-    const maxHpPerFloor = data.max_hp_per_floor || [];
-    
+    const currentHpPerFloor = (data.current_hp_per_floor || []) as number[];
+    const maxHpPerFloor = (data.max_hp_per_floor || []) as number[];
+
     // ゴールドデータ
-    const goldPerFloor = data.gold_per_floor || [];
-    
+    const goldPerFloor = (data.gold_per_floor || []) as number[];
+
     // ダメージ履歴
-    const damageTaken = data.damage_taken || [];
-    
+    const damageTaken = (data.damage_taken || []) as Array<Record<string, unknown>>;
+
     // ポーション履歴
-    const potionsObtained = data.potions_obtained || [];
-    
+    const potionsObtained = (data.potions_obtained || []) as Array<Record<string, unknown>>;
+
     // カード選択履歴
-    const cardChoices = data.card_choices || [];
-    
+    const cardChoices = (data.card_choices || []) as Array<Record<string, unknown>>;
+
     // レリック取得履歴
-    const relicsObtained = data.relics_obtained || [];
-    
+    const relicsObtained = (data.relics_obtained || []) as Array<Record<string, unknown>>;
+
     // ボスレリック選択履歴
-    const bossRelics = data.boss_relics || [];
-    
+    const bossRelics = (data.boss_relics || []) as Array<Record<string, unknown>>;
+
     // イベント選択履歴
-    const eventChoices = data.event_choices || [];
-    
+    const eventChoices = (data.event_choices || []) as Array<Record<string, unknown>>;
+
     // キャンプファイヤー選択履歴
-    const campfireChoices = data.campfire_choices || [];
-    
+    const campfireChoices = (data.campfire_choices || []) as Array<Record<string, unknown>>;
+
     // floor_reachedを取得して確実に全階層を表示する
-    const floorReached = runData.floor_reached || pathPerFloor.length;
+    const floorReached = (runData.floor_reached as number) || pathPerFloor.length;
     
     // pathPerFloorのインデックスとpathTakenのインデックスのずれを計算するための変数
     let pathTakenOffset = 0;
@@ -354,19 +349,19 @@ const PlayDetail: React.FC = () => {
         // ボスレリック
         if (isBossChest17 && bossRelics.length > 0) {
           // 選択したレリック
-          info.relics = [{ key: bossRelics[0].picked, picked: true }];
-          
+          info.relics = [{ key: bossRelics[0].picked as string, picked: true }];
+
           // 選択しなかったレリック
-          if (bossRelics[0].not_picked && bossRelics[0].not_picked.length > 0) {
-            info.relics = [...info.relics, ...bossRelics[0].not_picked.map((relic: string) => ({ key: relic, picked: false }))];
+          if (bossRelics[0].not_picked && (bossRelics[0].not_picked as string[]).length > 0) {
+            info.relics = [...info.relics, ...(bossRelics[0].not_picked as string[]).map((relic: string) => ({ key: relic, picked: false }))];
           }
         } else if (isBossChest34 && bossRelics.length > 1) {
           // 選択したレリック
-          info.relics = [{ key: bossRelics[1].picked, picked: true }];
-          
+          info.relics = [{ key: bossRelics[1].picked as string, picked: true }];
+
           // 選択しなかったレリック
-          if (bossRelics[1].not_picked && bossRelics[1].not_picked.length > 0) {
-            info.relics = [...info.relics, ...bossRelics[1].not_picked.map((relic: string) => ({ key: relic, picked: false }))];
+          if (bossRelics[1].not_picked && (bossRelics[1].not_picked as string[]).length > 0) {
+            info.relics = [...info.relics, ...(bossRelics[1].not_picked as string[]).map((relic: string) => ({ key: relic, picked: false }))];
           }
         }
         
@@ -408,27 +403,27 @@ const PlayDetail: React.FC = () => {
       }
       
       // 敵情報（ゲームデータのfloorは1始まりなのでインデックスiと比較）
-      const enemy = damageTaken.find((d: any) => d.floor === currentFloor);
+      const enemy = (damageTaken as Array<Record<string, unknown>>).find((d) => d.floor === currentFloor);
       if (enemy) {
-        info.enemies = enemy.enemies;
+        info.enemies = enemy.enemies as string;
       }
-      
+
       // ポーション情報（ゲームデータのfloorは0始まりなのでインデックスiと比較）
-      const potions = potionsObtained.filter((p: any) => p.floor === currentFloor);
+      const potions = (potionsObtained as Array<Record<string, unknown>>).filter((p) => p.floor === currentFloor);
       if (potions.length > 0) {
-        info.potions = potions.map((p: any) => p.key);
+        info.potions = potions.map((p) => p.key as string);
       }
-      
+
       // カード情報（ゲームデータのfloorは0始まりなのでインデックスiと比較）
-      const cards = cardChoices.filter((c: any) => c.floor === currentFloor);
+      const cards = (cardChoices as Array<Record<string, unknown>>).filter((c) => c.floor === currentFloor);
       if (cards.length > 0) {
         const cardInfos: { card: string; action: 'added' | 'removed' | 'transformed' | 'upgraded' | 'not_picked' }[] = [];
         
-        cards.forEach((choice: any) => {
+        cards.forEach((choice) => {
           // 選択したカード
           if (choice.picked !== 'SKIP') {
             // +1をプラスに変換して正規化
-            const cardNameRaw = choice.picked.replace('+1', '+');
+            const cardNameRaw = (choice.picked as string).replace('+1', '+');
             const normalizedCardName = normalizeCardName(cardNameRaw);
             cardInfos.push({
               card: normalizedCardName,
@@ -438,7 +433,7 @@ const PlayDetail: React.FC = () => {
           
           // 選択しなかったカード
           if (choice.not_picked) {
-            choice.not_picked.forEach((card: string) => {
+            (choice.not_picked as string[]).forEach((card: string) => {
               // +1をプラスに変換して正規化
               const cardNameRaw = card.replace('+1', '+');
               const normalizedCardName = normalizeCardName(cardNameRaw);
@@ -454,21 +449,21 @@ const PlayDetail: React.FC = () => {
       }
       
       // レリック情報（ゲームデータのfloorは0始まりなのでインデックスiと比較）
-      const relics = relicsObtained.filter((r: any) => r.floor === currentFloor);
+      const relics = (relicsObtained as Array<Record<string, unknown>>).filter((r) => r.floor === currentFloor);
       if (relics.length > 0) {
-        info.relics = relics.map((r: any) => ({ key: r.key, picked: true }));
+        info.relics = relics.map((r) => ({ key: r.key as string, picked: true }));
       }
-      
+
       // イベント情報（ゲームデータのfloorは0始まりなのでインデックスiと比較）
-      const events = eventChoices.filter((e: any) => e.floor === currentFloor);
+      const events = (eventChoices as Array<Record<string, unknown>>).filter((e) => e.floor === currentFloor);
       if (events.length > 0) {
-        info.content = events.map((e: any) => `${e.event_name}: ${e.player_choice}`);
+        info.content = events.map((e) => `${e.event_name}: ${e.player_choice}`);
       }
-      
+
       // 休憩マスの情報を処理
-      const campfires = campfireChoices.filter((c: any) => c.floor === currentFloor);
+      const campfires = (campfireChoices as Array<Record<string, unknown>>).filter((c) => c.floor === currentFloor);
       if (campfires.length > 0) {
-        const campfireContent = campfires.map((campfire: any) => `${campfire.key}`);
+        const campfireContent = campfires.map((campfire) => `${campfire.key}`);
         info.content = info.content ? [...info.content, ...campfireContent] : campfireContent;
       }
       
@@ -477,11 +472,11 @@ const PlayDetail: React.FC = () => {
         info.icon = 'bosschest';
         
         // 選択したレリック
-        info.relics = [{ key: bossRelics[2].picked, picked: true }];
-        
+        info.relics = [{ key: bossRelics[2].picked as string, picked: true }];
+
         // 選択しなかったレリック
-        if (bossRelics[2].not_picked && bossRelics[2].not_picked.length > 0) {
-          info.relics = [...info.relics, ...bossRelics[2].not_picked.map((relic: string) => ({ key: relic, picked: false }))];
+        if (bossRelics[2].not_picked && (bossRelics[2].not_picked as string[]).length > 0) {
+          info.relics = [...info.relics, ...(bossRelics[2].not_picked as string[]).map((relic: string) => ({ key: relic, picked: false }))];
         }
       }
       
@@ -538,35 +533,16 @@ const PlayDetail: React.FC = () => {
     }
   };
 
-  // キャラクターの背景色を取得
-  const getCharacterBgColor = (character: string) => {
-    switch (normalizeCharacterName(character)) {
-      case 'ironclad': return 'bg-[#ff6563]/10';
-      case 'silent': return 'bg-[#7fff00]/10';
-      case 'defect': return 'bg-[#87ceeb]/10';
-      case 'watcher': return 'bg-[#a600ff]/10';
-      default: return 'bg-base-200';
-    }
-  };
-
   // 結果の色を取得
   const getResultColor = (victory: boolean) => {
     return victory ? 'text-success' : 'text-error';
-  };
-
-  // 体力変化のアイコンと色を取得
-  const getHpChangeStyle = (hpDiff?: number) => {
-    if (!hpDiff) return { icon: <ArrowRightIcon className="w-4 h-4 text-yellow-500" />, color: 'text-yellow-500' };
-    if (hpDiff > 0) return { icon: <ArrowUpIcon className="w-4 h-4 text-green-500" />, color: 'text-green-500' };
-    if (hpDiff < 0) return { icon: <ArrowDownIcon className="w-4 h-4 text-red-500" />, color: 'text-red-500' };
-    return { icon: <ArrowRightIcon className="w-4 h-4 text-yellow-500" />, color: 'text-yellow-500' };
   };
 
   // 名前を日本語に変換する関数
   const translateName = (name: string, type: 'card' | 'monster' | 'potion' | 'relic' | 'event' | 'neow'): string => {
     if (!name) return '';
     const lowerName = name.toLowerCase();
-    let translationSet: any = null;
+    let translationSet: Record<string, unknown> | null = null;
     switch (type) {
       case 'card':    translationSet = cardsTranslationData; break;
       case 'monster': translationSet = monstersTranslationData; break;
@@ -575,31 +551,18 @@ const PlayDetail: React.FC = () => {
       case 'event':   translationSet = eventsTranslationData; break;
       case 'neow':    translationSet = neowBonusTranslationData; break;
     }
-    if (translationSet && translationSet[lowerName] && translationSet[lowerName].NAME) {
-      return translationSet[lowerName].NAME;
+    if (translationSet && translationSet[lowerName] && (translationSet[lowerName] as Record<string, unknown>).NAME) {
+      return (translationSet[lowerName] as Record<string, unknown>).NAME as string;
     }
-    if (translationSet && translationSet[name] && translationSet[name].NAME) { // 元のキーも試す
-        return translationSet[name].NAME;
+    if (translationSet && translationSet[name] && (translationSet[name] as Record<string, unknown>).NAME) { // 元のキーも試す
+      return (translationSet[name] as Record<string, unknown>).NAME as string;
     }
     // 特定のキーが存在しない場合のフォールバック (例: "Golden Idol" -> "golden idol")
-    if (type === 'relic' && relicsTranslationData && relicsTranslationData[name.replace(/\s/g, '').toLowerCase()]) {
-        return relicsTranslationData[name.replace(/\s/g, '').toLowerCase()].NAME;
+    const relicsKeyNoSpace = name.replace(/\s/g, '').toLowerCase();
+    if (type === 'relic' && relicsTranslationData && relicsTranslationData[relicsKeyNoSpace]) {
+      return ((relicsTranslationData[relicsKeyNoSpace] as Record<string, unknown>).NAME as string) || name;
     }
     return name; // 見つからなければ元の名前を返す
-  };
-
-  // カード名を日本語に変換（アップグレード対応）
-  const translateCardName = (cardName: string): { name: string, upgraded: boolean } => {
-    if (!cardName) return { name: '', upgraded: false };
-    
-    // アップグレードの判定
-    const upgraded = cardName.endsWith('+');
-    const baseName = upgraded ? cardName.slice(0, -1) : cardName;
-    
-    // 日本語名を取得
-    const translatedName = translateName(baseName, 'card');
-    
-    return { name: translatedName, upgraded };
   };
 
   // 必要な定数と関数を定義
@@ -697,9 +660,6 @@ const PlayDetail: React.FC = () => {
   // レリックをレンダリングする関数
   const renderRelics = (relics?: Array<{ key: string; picked: boolean } | string>) => {
     if (!relics || relics.length === 0) return "-";
-    
-    // relics.jsonからエイリアスマッピングを取得
-    const relicAlias = (relicsTranslationData as any).alias || {};
     
     return (
       <div className="flex flex-wrap gap-1">
@@ -843,7 +803,7 @@ const PlayDetail: React.FC = () => {
     if (!neowBonusTranslationData || !neowBonusTranslationData[neowBonusKey]) {
       return neowBonusKey; // データがないか、キーがなければ元のキーを返す
     }
-    return neowBonusTranslationData[neowBonusKey].NAME || neowBonusKey;
+    return ((neowBonusTranslationData[neowBonusKey] as Record<string, unknown>).NAME as string) || neowBonusKey;
   };
 
   if (loadingError) {
@@ -989,7 +949,7 @@ const PlayDetail: React.FC = () => {
                 const baseName = isUpgraded ? normalizedCard.slice(0, -1) : normalizedCard;
                 
                 // カード情報の取得
-                const cardInfo = allCardsJson.cards.find((c: any) => 
+                const cardInfo = allCardsJson && (allCardsJson.cards as Array<{ name: string; alias?: string | string[]; class?: string; type?: string; rarity?: string; cost?: number; upgradedCost?: number; effect?: string; upgradedEffect?: string }>)?.find((c) =>
                   c.name.toLowerCase() === baseName.toLowerCase() ||
                   (c.alias && (
                     (Array.isArray(c.alias) && c.alias.some((a: string) => a.toLowerCase() === baseName.toLowerCase())) ||
@@ -1001,7 +961,7 @@ const PlayDetail: React.FC = () => {
 
                 // カードクラスの型を修正
                 const cardClass = (() => {
-                  switch (cardInfo.class.toLowerCase()) {
+                  switch ((cardInfo.class ?? '').toLowerCase()) {
                     case 'ironclad':
                     case 'red':
                       return 'ironclad';
@@ -1026,7 +986,7 @@ const PlayDetail: React.FC = () => {
                 // カードタイプの型を修正
                 const cardType = (() => {
                   if (cardClass === 'curse') return 'curse';
-                  switch (cardInfo.type.toLowerCase()) {
+                  switch ((cardInfo.type ?? '').toLowerCase()) {
                     case 'attack':
                       return 'attack';
                     case 'skill':
@@ -1042,7 +1002,7 @@ const PlayDetail: React.FC = () => {
 
                 // レアリティの型を修正
                 const cardRarity = (() => {
-                  switch (cardInfo.rarity.toLowerCase()) {
+                  switch ((cardInfo.rarity ?? '').toLowerCase()) {
                     case 'starter':
                       return 'starter';
                     case 'common':
@@ -1061,7 +1021,7 @@ const PlayDetail: React.FC = () => {
                 })() as 'starter' | 'common' | 'uncommon' | 'rare' | 'special' | 'curse';
 
                 // アップグレード後のコストを設定
-                const currentCost = isUpgraded && cardInfo.upgradedCost !== undefined ? cardInfo.upgradedCost : cardInfo.cost;
+                const currentCost = isUpgraded && cardInfo.upgradedCost !== undefined ? cardInfo.upgradedCost : (cardInfo.cost ?? 0);
 
                 return (
                   <div 
@@ -1080,11 +1040,11 @@ const PlayDetail: React.FC = () => {
                       class={cardClass}
                       type={cardType}
                       cost={currentCost}
-                      description={isUpgraded && cardInfo.upgradedEffect ? cardInfo.upgradedEffect : cardInfo.effect}
+                      description={isUpgraded && cardInfo.upgradedEffect ? cardInfo.upgradedEffect : (cardInfo.effect ?? '')}
                       rarity={cardRarity}
                       upgraded={isUpgraded}
-                      originalDescription={cardInfo.effect}
-                      originalCost={cardInfo.cost}
+                      originalDescription={cardInfo.effect ?? ''}
+                      originalCost={cardInfo.cost ?? 0}
                     />
                   </div>
                 );

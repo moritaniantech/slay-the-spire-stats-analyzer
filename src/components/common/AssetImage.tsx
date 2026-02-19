@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getAssetUrl, normalizeAssetPath } from '../../utils/assetUtils';
+import { getAssetUrl } from '../../utils/assetUtils';
 
 interface AssetImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   path: string;
