@@ -2,8 +2,7 @@
 
 Slay the Spire のプレイデータを解析し、統計情報を可視化するデスクトップアプリケーションです。
 
-<!-- スクリーンショットをここに配置してください -->
-<!-- ![StS Stats Analyzer](docs/screenshots/overview.png) -->
+![StS Stats Analyzer](docs/screenshots/overview.png)
 
 ## ダウンロード
 
