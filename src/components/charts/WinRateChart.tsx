@@ -40,6 +40,8 @@ interface WinRateChartProps {
 }
 
 export const WinRateChart: React.FC<WinRateChartProps> = ({ characterStats }) => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
   // グラフデータの準備
   const chartData = {
     labels: characterStats.map(stat => stat.character.charAt(0).toUpperCase() + stat.character.slice(1).toLowerCase()),
@@ -62,7 +64,7 @@ export const WinRateChart: React.FC<WinRateChartProps> = ({ characterStats }) =>
       legend: {
         position: 'top' as const,
         labels: {
-          color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#ffffff' : '#333333'
+          color: isDark ? '#e8e0d0' : '#1a1510'
         }
       },
       title: {
@@ -87,25 +89,25 @@ export const WinRateChart: React.FC<WinRateChartProps> = ({ characterStats }) =>
         beginAtZero: true,
         max: 100,
         ticks: {
-          color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#cccccc' : '#666666'
+          color: isDark ? '#b8a890' : '#3d3428'
         },
         grid: {
-          color: document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          color: isDark ? 'rgba(212, 160, 23, 0.08)' : 'rgba(0, 0, 0, 0.08)'
         }
       },
       x: {
         ticks: {
-          color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#cccccc' : '#666666'
+          color: isDark ? '#b8a890' : '#3d3428'
         },
         grid: {
-          color: document.documentElement.getAttribute('data-theme') === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          color: isDark ? 'rgba(212, 160, 23, 0.08)' : 'rgba(0, 0, 0, 0.08)'
         }
       }
     }
   };
 
   return (
-    <div className="card bg-base-100 shadow">
+    <div className="card-navy">
       <div className="card-body">
         <div className="h-64">
           <Bar data={chartData} options={chartOptions} />
@@ -113,4 +115,4 @@ export const WinRateChart: React.FC<WinRateChartProps> = ({ characterStats }) =>
       </div>
     </div>
   );
-}; 
+};

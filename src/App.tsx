@@ -2,7 +2,6 @@ import React, { useState, useEffect, Suspense } from "react";
 import { Header } from "./components/Header";
 import { StatsOverview } from "./components/StatsOverview";
 import RunList from "./components/RunList";
-import { FolderSelector } from "./components/FolderSelector";
 import {
   HashRouter,
   BrowserRouter,
@@ -11,23 +10,18 @@ import {
   Navigate,
   useNavigate,
   useLocation,
-  Link,
   useParams
 } from "react-router-dom";
 const RunDetail = React.lazy(() => import("./components/RunDetail"));
 const PlayDetail = React.lazy(() => import("./components/PlayDetail"));
 import { Run, useStore } from "./store";
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/20/solid";
 const CardList = React.lazy(() => import("./components/CardList"));
 const RelicList = React.lazy(() => import("./components/RelicList"));
 import { precalculateCardStats, precalculateRelicStats, clearStatsCache, setCacheMaxSize } from "./services/StatsService";
-// allCards と allRelics は CardList と RelicList コンポーネント内で IPC 経由で読み込むため、
-// 静的インポートは不要（public/assets に存在するため、Vite のビルド時にバンドルされない）
-// import allCards from "./assets/cards/allCards.json";
-// import allRelics from "./assets/relics/relics.json";
 const NeowBonusList = React.lazy(() => import('./components/NeowBonusList'));
 import UpdateNotification from './components/UpdateNotification';
 import { isElectron } from './utils/environment';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // グローバル設定変数を定義
 declare global {
@@ -43,8 +37,6 @@ declare global {
 function Layout({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<string>("dark");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
   const { runs, settings, setRuns } = useStore();
 
   // グローバル設定変数を初期化
@@ -242,82 +234,11 @@ function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-navy-dark w-full overflow-x-hidden">
+    <div className="min-h-screen bg-sts-texture w-full overflow-x-hidden">
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Header onThemeToggle={handleThemeToggle} theme={theme} />
-        <div className="bg-navy-base border-b border-navy">
-          <div className="container mx-auto px-4 py-2 relative max-w-[1920px]">
-            <div className="absolute left-4 flex items-center gap-2">
-              <button
-                onClick={() => navigate(-1)}
-                className="btn btn-ghost btn-circle text-primary-custom hover:bg-navy-light transition-colors"
-                disabled={location.pathname === "/home"}
-              >
-                <ArrowLeftIcon className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate(1)}
-                className="btn btn-ghost btn-circle text-primary-custom hover:bg-navy-light transition-colors"
-                disabled={
-                  !window.history.state ||
-                  window.history.state.idx === window.history.length - 1
-                }
-              >
-                <ArrowRightIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <Link
-                to="/home"
-                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
-                  location.pathname === "/home" ? "bg-navy-accent" : ""
-                }`}
-              >
-                ホーム
-              </Link>
-              <Link
-                to="/cards"
-                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
-                  location.pathname === "/cards" ? "bg-navy-accent" : ""
-                }`}
-              >
-                カード一覧
-              </Link>
-              <Link
-                to="/relics"
-                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
-                  location.pathname === "/relics" ? "bg-navy-accent" : ""
-                }`}
-              >
-                レリック一覧
-              </Link>
-              <Link
-                to="/neow-bonus"
-                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
-                  location.pathname === "/neow-bonus" ? "bg-navy-accent" : ""
-                }`}
-              >
-                ネオーの祝福
-              </Link>
-              <Link
-                to="/settings"
-                className={`btn btn-ghost btn-sm text-primary-custom hover:bg-navy-light transition-colors ${
-                  location.pathname === "/settings" ? "bg-navy-accent" : ""
-                }`}
-              >
-                設定
-              </Link>
-            </div>
-          </div>
-        </div>
-        {/* フォルダセレクターバーを追加 */}
-        <div className="bg-navy-dark/95 border-b border-navy/50">
-          <div className="container mx-auto px-4 max-w-[1920px]">
-            <FolderSelector onFolderSelect={handleFolderSelect} />
-          </div>
-        </div>
+        <Header onThemeToggle={handleThemeToggle} theme={theme} onFolderSelect={handleFolderSelect} />
       </div>
-      <div className="pt-40 pb-8">
+      <div className="pt-24 pb-8">
         {children}
       </div>
       <UpdateNotification />
@@ -331,13 +252,13 @@ function HomePage() {
       <div className="grid grid-cols-1 gap-6">
         <div className="card-navy">
           <div className="card-body p-4">
-            <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ統計</h2>
+            <h2 className="card-title text-lg mb-4 text-gold-light font-jp">プレイ統計</h2>
             <StatsOverview />
           </div>
         </div>
         <div className="card-navy">
           <div className="card-body p-4">
-            <h2 className="card-title text-lg mb-4 text-primary-custom font-jp">プレイ履歴</h2>
+            <h2 className="card-title text-lg mb-4 text-gold-light font-jp">プレイ履歴</h2>
             <RunList />
           </div>
         </div>
@@ -370,6 +291,68 @@ function PlayToRunsRedirect() {
       <p className="text-lg">プレイデータへリダイレクト中...</p>
       <p className="text-sm text-base-content/70 mt-2">ID: {id || 'なし'}</p>
     </div>
+  );
+}
+
+// ページ遷移アニメーション付きルーティング
+function AnimatedRoutes() {
+  const location = useLocation();
+  const shouldReduceMotion = useReducedMotion();
+
+  const pageVariants = shouldReduceMotion
+    ? { initial: {}, animate: {}, exit: {} }
+    : {
+        initial: { opacity: 0, y: 8 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -8 },
+      };
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.25, ease: 'easeInOut' }}
+      >
+        <Routes location={location}>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/runs/:id" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <RunDetail />
+            </Suspense>
+          } />
+          <Route path="/play-detail/:id" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <PlayDetail />
+            </Suspense>
+          } />
+          <Route path="/cards" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <CardList />
+            </Suspense>
+          } />
+          <Route path="/relics" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <RelicList />
+            </Suspense>
+          } />
+          <Route path="/neow-bonus" element={
+            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
+              <NeowBonusList />
+            </Suspense>
+          } />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/play/:id" element={<PlayToRunsRedirect />} />
+          <Route path="/run/:id" element={<PlayToRunsRedirect />} />
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
@@ -518,40 +501,7 @@ function App() {
       )}
 
       <Layout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/runs/:id" element={
-            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
-              <RunDetail />
-            </Suspense>
-          } />
-          <Route path="/play-detail/:id" element={
-            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
-              <PlayDetail />
-            </Suspense>
-          } />
-          <Route path="/cards" element={
-            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
-              <CardList />
-            </Suspense>
-          } />
-          <Route path="/relics" element={
-            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
-              <RelicList />
-            </Suspense>
-          } />
-          <Route path="/neow-bonus" element={
-            <Suspense fallback={<div className="flex justify-center p-8"><span className="loading loading-spinner loading-lg"></span></div>}>
-              <NeowBonusList />
-            </Suspense>
-          } />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/play/:id" element={<PlayToRunsRedirect />} />
-          <Route path="/run/:id" element={<PlayToRunsRedirect />} />
-          <Route path="/404" element={<NotFoundPage />} />
-          <Route path="*" element={<Navigate to="/404" replace />} />
-        </Routes>
+        <AnimatedRoutes />
       </Layout>
     </Router>
   );
@@ -578,7 +528,7 @@ function SettingsPage() {
     <div className="mx-auto px-4 space-y-6 max-w-[1920px]">
       <div className="card-navy">
         <div className="card-body">
-          <h2 className="card-title text-xl mb-4 text-primary-custom font-jp">アプリケーション設定</h2>
+          <h2 className="card-title text-xl mb-4 text-gold-light font-jp">アプリケーション設定</h2>
           
           <div className="form-control">
             <label className="label cursor-pointer">
@@ -635,7 +585,7 @@ function NotFoundPage() {
   
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
-      <h1 className="text-3xl font-bold mb-4 text-primary-custom font-jp">ページが見つかりません</h1>
+      <h1 className="text-3xl font-bold mb-4 text-gold-light font-jp">ページが見つかりません</h1>
       <p className="mb-6 text-secondary-custom font-jp">
         お探しのページは存在しないか、移動された可能性があります。
       </p>

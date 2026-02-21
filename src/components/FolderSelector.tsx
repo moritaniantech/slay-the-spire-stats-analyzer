@@ -43,7 +43,6 @@ export const FolderSelector: React.FC<Props> = ({ onFolderSelect }) => {
         const path = await window.electronAPI.getRunFolder() as string;
         if (path) {
           setCurrentPath(path);
-          // 起動時はパス表示のみ（getAllRunsで既にデータ読み込み済み）
         }
         setIsInitialized(true);
       } catch (error) {
@@ -72,26 +71,26 @@ export const FolderSelector: React.FC<Props> = ({ onFolderSelect }) => {
   };
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 bg-base-200/50 rounded-lg">
-      <FolderIcon className="h-5 w-5 text-primary flex-shrink-0" />
+    <div className="flex items-center gap-3 py-1">
+      <FolderIcon className="h-4 w-4 text-gold-primary flex-shrink-0" />
 
       {currentPath ? (
         <>
           <div className="flex-1 min-w-0">
-            <p className="text-sm truncate text-base-content">
+            <p className="text-xs truncate text-secondary-custom">
               {currentPath}
             </p>
             {progress && (
-              <div className="flex items-center gap-2 mt-1">
-                <div className="flex-1 bg-base-300 rounded-full h-1">
+              <div className="flex items-center gap-2 mt-0.5">
+                <div className="flex-1 bg-navy-accent rounded-full h-1">
                   <div
-                    className="bg-primary h-1 rounded-full transition-all duration-300"
+                    className="bg-gold-primary h-1 rounded-full transition-all duration-300"
                     style={{
                       width: `${(progress.progress / progress.total) * 100}%`
                     }}
                   />
                 </div>
-                <span className="text-xs opacity-70 flex-shrink-0">
+                <span className="text-xs text-muted-custom flex-shrink-0">
                   {Math.round((progress.progress / progress.total) * 100)}%
                 </span>
               </div>
@@ -100,20 +99,20 @@ export const FolderSelector: React.FC<Props> = ({ onFolderSelect }) => {
           <button
             onClick={handleClick}
             disabled={!!progress}
-            className="btn btn-sm btn-ghost flex-shrink-0"
+            className="btn btn-xs btn-ghost text-text-secondary hover:text-gold-light flex-shrink-0"
           >
             変更
           </button>
         </>
       ) : (
         <>
-          <span className="text-sm text-base-content/70 flex-1">
+          <span className="text-xs text-muted-custom flex-1">
             フォルダを選択してください
           </span>
           <button
             onClick={handleClick}
             disabled={!!progress}
-            className="btn btn-sm btn-primary flex-shrink-0"
+            className="btn btn-xs btn-navy-primary flex-shrink-0"
           >
             選択
           </button>
@@ -129,4 +128,4 @@ export const FolderSelector: React.FC<Props> = ({ onFolderSelect }) => {
   );
 };
 
-export default FolderSelector; 
+export default FolderSelector;

@@ -46,12 +46,12 @@ const determineVictoryStatus = (run: Run): { status: string; colorClass: string 
     const reached57Floor = Array.isArray(pathPerFloor) && pathPerFloor.length >= 57;
     
     if (reached57Floor) {
-      return { status: '勝利', colorClass: 'bg-success text-success-content' };
+      return { status: '勝利', colorClass: 'bg-success text-success-content shadow-[0_0_6px_rgba(74,222,128,0.4)]' };
     } else {
       return { status: '勝利？', colorClass: 'bg-warning text-warning-content' };
     }
   } else {
-    return { status: '敗北', colorClass: 'bg-error text-error-content' };
+    return { status: '敗北', colorClass: 'bg-error text-error-content shadow-[0_0_6px_rgba(248,113,113,0.3)]' };
   }
 };
 
@@ -301,23 +301,22 @@ const RunList: React.FC = () => {
 
           {/* 空状態メッセージ */}
           {runs.length === 0 ? (
-            <div className="alert alert-info bg-info/10 border-info/30 text-info mb-4">
-              <div className="flex flex-col">
-                <p className="font-medium">プレイデータがありません</p>
-                <p className="text-sm">フォルダを選択してください。</p>
-              </div>
+            <div className="card-navy p-8 text-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-12 h-12 mx-auto mb-3 stroke-current text-gold-dim">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              <p className="font-medium text-gold-light mb-1">プレイデータがありません</p>
+              <p className="text-sm text-secondary-custom">フォルダを選択してプレイデータを読み込んでください。</p>
             </div>
           ) : filteredRuns.length === 0 ? (
-            <div className="alert alert-warning bg-warning/10 border-warning/30 text-warning mb-4">
-              <div className="flex flex-col gap-2">
-                <p className="font-medium">条件に一致するデータがありません</p>
-                <button
-                  className="btn btn-sm btn-outline"
-                  onClick={resetFilters}
-                >
-                  フィルターをリセット
-                </button>
-              </div>
+            <div className="card-navy p-6 text-center mb-4">
+              <p className="font-medium text-gold-light mb-2">条件に一致するデータがありません</p>
+              <button
+                className="btn btn-sm btn-navy-secondary"
+                onClick={resetFilters}
+              >
+                フィルターをリセット
+              </button>
             </div>
           ) : (
             <>
@@ -334,19 +333,19 @@ const RunList: React.FC = () => {
             <table className="table table-navy w-full">
               <thead>
                 <tr className="text-base border-b border-navy">
-                  <th onClick={() => handleSort('timestamp')} className="cursor-pointer bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('timestamp')} className="cursor-pointer font-jp">
                     <div className="flex items-center justify-center">
                       <span>日時</span>
                       <SortIcon active={sortKey === 'timestamp'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th onClick={() => handleSort('character')} className="cursor-pointer bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('character')} className="cursor-pointer font-jp">
                     <div className="flex items-center justify-center">
                       <span>キャラクター</span>
                       <SortIcon active={sortKey === 'character'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th onClick={() => handleSort('ascension_level')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('ascension_level')} className="cursor-pointer text-center font-jp">
                     <div className="flex items-center justify-center">
                       <ImageAsset
                         path="ui/topPanel/ascension.png"
@@ -357,7 +356,7 @@ const RunList: React.FC = () => {
                       <SortIcon active={sortKey === 'ascension_level'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th onClick={() => handleSort('victory')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('victory')} className="cursor-pointer text-center font-jp">
                     <div className="flex items-center justify-center">
                       <div className="relative w-8 h-8 flex items-center justify-center">
                         <div className="absolute w-4 h-4">
@@ -382,7 +381,7 @@ const RunList: React.FC = () => {
                       <SortIcon active={sortKey === 'victory'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th onClick={() => handleSort('floor_reached')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('floor_reached')} className="cursor-pointer text-center font-jp">
                     <div className="flex items-center justify-center">
                       <ImageAsset
                         path="ui/topPanel/floor.png"
@@ -393,12 +392,12 @@ const RunList: React.FC = () => {
                       <SortIcon active={sortKey === 'floor_reached'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th className="text-center bg-navy-light text-primary-custom font-jp">
+                  <th className="text-center font-jp">
                     <div className="flex items-center justify-center">
                       <span>ネオーの祝福</span>
                     </div>
                   </th>
-                  <th onClick={() => handleSort('playtime')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('playtime')} className="cursor-pointer text-center font-jp">
                     <div className="flex items-center justify-center">
                       <ImageAsset
                         path="ui/timerIcon.png"
@@ -409,7 +408,7 @@ const RunList: React.FC = () => {
                       <SortIcon active={sortKey === 'playtime'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th onClick={() => handleSort('score')} className="cursor-pointer text-center bg-navy-light text-primary-custom font-jp">
+                  <th onClick={() => handleSort('score')} className="cursor-pointer text-center font-jp">
                     <div className="flex items-center justify-center">
                       <ImageAsset
                         path="ui/leaderboards/score.png"
@@ -420,7 +419,7 @@ const RunList: React.FC = () => {
                       <SortIcon active={sortKey === 'score'} direction={sortOrder} />
                     </div>
                   </th>
-                  <th className="text-center bg-navy-light text-primary-custom font-jp">
+                  <th className="text-center font-jp">
                     <div className="flex items-center justify-center">
                       <ImageAsset
                         path="ui/topPanel/peek_button.png"

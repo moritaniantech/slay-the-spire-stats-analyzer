@@ -6,48 +6,68 @@
 /* ダークモード（デフォルト） */
 :root,
 [data-theme="dark"] {
-  /* ネイビー基調カラーパレット */
-  --navy-base: #1a2332;
-  --navy-dark: #0f1419;
-  --navy-light: #2a3441;
-  --navy-accent: #3a4a5f;
+  /* ダークファンタジー基調カラーパレット */
+  --navy-base: #161921;
+  --navy-dark: #0d0f14;
+  --navy-light: #1e2230;
+  --navy-accent: #2a2e3d;
   --navy-blue: #2d3e50;
-  --navy-border: #1e2a3a;
-  --navy-hover: #3d4e60;
-  
-  /* テキストカラー */
-  --text-primary: #e8eef5;
-  --text-secondary: #b8c5d1;
-  --text-muted: #8a9ba8;
-  --text-light: #f5f7fa;
-  
+  --navy-border: #2c3040;
+  --navy-hover: #2e3348;
+
+  /* テキストカラー（羊皮紙調） */
+  --text-primary: #e8e0d0;
+  --text-secondary: #b8a890;
+  --text-muted: #8a7d6d;
+  --text-light: #f5f0e8;
+
   /* 背景色 */
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a2332;
-  --bg-tertiary: #2a3441;
+  --bg-primary: #0d0f14;
+  --bg-secondary: #161921;
+  --bg-tertiary: #1e2230;
+
+  /* ゴールドアクセント */
+  --gold-primary: #d4a017;
+  --gold-light: #f0c944;
+  --gold-dim: #8b7320;
+  --gold-glow: rgba(212, 160, 23, 0.3);
+  --gold-glow-strong: rgba(212, 160, 23, 0.5);
+
+  /* テキスト用ゴールド（テーマ別コントラスト最適化） */
+  --gold-text-emphasis: #f0c944;
 }
 
 /* ライトモード */
 [data-theme="light"] {
-  /* ネイビー基調カラーパレット（ライトモード用に調整） */
-  --navy-base: #e8eef5;
-  --navy-dark: #f5f7fa;
+  /* 暖色系ライトモード */
+  --navy-base: #f0ebe0;
+  --navy-dark: #faf7f0;
   --navy-light: #ffffff;
-  --navy-accent: #d1d9e6;
-  --navy-blue: #c8d1de;
-  --navy-border: #b8c5d1;
-  --navy-hover: #c8d1de;
-  
+  --navy-accent: #e0d8c8;
+  --navy-blue: #d4ccba;
+  --navy-border: #c8bfa8;
+  --navy-hover: #e8e0d0;
+
   /* テキストカラー（ライトモード用） */
-  --text-primary: #1a2332;
-  --text-secondary: #2d3e50;
-  --text-muted: #5a6b7d;
-  --text-light: #0f1419;
-  
+  --text-primary: #1a1510;
+  --text-secondary: #3d3428;
+  --text-muted: #6b5d4d;
+  --text-light: #0d0a05;
+
   /* 背景色（ライトモード用） */
-  --bg-primary: #f5f7fa;
+  --bg-primary: #faf7f0;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #e8eef5;
+  --bg-tertiary: #f0ebe0;
+
+  /* ゴールドアクセント（ライトモード） */
+  --gold-primary: #b8860b;
+  --gold-light: #d4a017;
+  --gold-dim: #8b6914;
+  --gold-glow: rgba(184, 134, 11, 0.2);
+  --gold-glow-strong: rgba(184, 134, 11, 0.35);
+
+  /* テキスト用ゴールド（ライト背景でWCAG AA準拠） */
+  --gold-text-emphasis: #7a5a0a;
 }
 
 /* 共通カラー（テーマに関係なく同じ） */
@@ -57,7 +77,7 @@
   --character-silent: #7fff00;
   --character-defect: #87ceeb;
   --character-watcher: #a600ff;
-  
+
   /* ステータスカラー */
   --status-success: #4ade80;
   --status-warning: #fbbf24;
@@ -126,23 +146,24 @@
   html, body, *, *::before, *::after {
     cursor: url('/assets/ui/cursors/gold2.png'), auto !important;
   }
-  
+
   /* グローバルなフォント設定：Kreonとセリフ系日本語フォントを統一 */
   body {
     font-family: 'Kreon', 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'Hiragino Mincho Pro', 'HiraMinProN-W3', 'Noto Serif CJK JP', 'Noto Serif JP', 'MS PMincho', 'MS Mincho', serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
     overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
   }
-  
-  /* テーマ切り替え時のスムーズなトランジション */
+
+  /* テーマ切り替え時のスムーズなトランジション（対象プロパティ限定） */
   * {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition-property: background-color, color, border-color, box-shadow;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
   }
-  
+
   /* 英数字のみを含む要素に対してKreonを優先的に適用 */
   :is(h1, h2, h3, h4, h5, h6, p, span, div, button, input, select, textarea):not(:has(*)):not(:lang(ja)) {
     font-family: 'Kreon', serif;
@@ -152,6 +173,15 @@
   :lang(ja),
   [lang="ja"] {
     font-family: 'Kreon', 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'Hiragino Mincho Pro', 'HiraMinProN-W3', 'Noto Serif CJK JP', 'Noto Serif JP', 'MS PMincho', 'MS Mincho', serif;
+  }
+}
+
+/* reduced-motion: アニメーション無効化 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -195,9 +225,28 @@
 }
 
 .text-shadow-lg {
-  text-shadow: 
+  text-shadow:
     2px 2px 4px rgba(0, 0, 0, 0.5),
     0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* カスタムスクロールバー（ゴールドテーマ） */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dim);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
 }
 
 /* デザインシステム用のユーティリティクラス */
@@ -206,117 +255,238 @@
   .bg-navy-base {
     background-color: var(--navy-base);
   }
-  
+
   .bg-navy-dark {
     background-color: var(--bg-primary);
   }
-  
+
   .bg-navy-light {
     background-color: var(--navy-light);
   }
-  
+
   .bg-navy-accent {
     background-color: var(--navy-accent);
   }
-  
+
   /* ネイビーボーダー */
   .border-navy {
     border-color: var(--navy-border);
   }
-  
+
   /* テキストカラー */
   .text-primary-custom {
     color: var(--text-primary);
   }
-  
+
   .text-secondary-custom {
     color: var(--text-secondary);
   }
-  
+
   .text-muted-custom {
     color: var(--text-muted);
   }
-  
-  /* カードスタイル */
+
+  /* ゴールドテキスト（テーマ別コントラスト最適化済み） */
+  .text-gold-light {
+    color: var(--gold-text-emphasis);
+  }
+
+  .text-gold-primary {
+    color: var(--gold-primary);
+  }
+
+  .text-gold-dim {
+    color: var(--gold-dim);
+  }
+
+  /* ゴールドボーダー */
+  .border-gold-dim {
+    border-color: var(--gold-dim);
+  }
+
+  .border-gold-primary {
+    border-color: var(--gold-primary);
+  }
+
+  .border-gold-dim-30 {
+    border-color: color-mix(in srgb, var(--gold-dim) 30%, transparent);
+  }
+
+  .border-gold-dim-15 {
+    border-color: color-mix(in srgb, var(--gold-dim) 15%, transparent);
+  }
+
+  /* カードスタイル（ゴールドボーダー付き） */
   .card-navy {
     background-color: var(--navy-base);
-    border: 1px solid var(--navy-border);
+    border: 1px solid var(--gold-dim);
     border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
     transition: all 0.2s ease-in-out;
   }
-  
+
   .card-navy:hover {
-    background-color: var(--navy-light);
+    border-color: var(--gold-primary);
+    box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.3), 0 0 8px var(--gold-glow);
   }
-  
-  /* ボタンスタイル */
+
+  /* ボタンスタイル（グラデーション+ゴールドボーダー） */
   .btn-navy-primary {
-    background-color: var(--navy-accent);
+    background: linear-gradient(180deg, var(--navy-accent), var(--navy-base));
     color: var(--text-primary);
-    border: none;
+    border: 1px solid var(--gold-dim);
     transition: all 0.2s ease-in-out;
   }
-  
+
   .btn-navy-primary:hover {
-    background-color: var(--navy-hover);
+    background: linear-gradient(180deg, var(--navy-hover), var(--navy-light));
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow);
   }
-  
+
   .btn-navy-secondary {
-    background-color: var(--navy-light);
+    background: linear-gradient(180deg, var(--navy-light), var(--navy-base));
     color: var(--text-primary);
     border: 1px solid var(--navy-border);
     transition: all 0.2s ease-in-out;
   }
-  
+
   .btn-navy-secondary:hover {
-    background-color: var(--navy-accent);
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 6px var(--gold-glow);
   }
-  
-  /* テーブルスタイル */
+
+  /* テーブルスタイル（ゴールドヘッダー+グロー付きホバー） */
   .table-navy thead {
-    background-color: var(--navy-light);
+    background: linear-gradient(180deg, var(--navy-accent), var(--navy-light));
   }
-  
+
+  .table-navy thead th {
+    color: var(--gold-light);
+    border-bottom: 1px solid var(--gold-dim);
+  }
+
   .table-navy tbody tr {
     background-color: var(--navy-base);
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   }
-  
+
   .table-navy tbody tr:hover {
     background-color: var(--navy-light);
+    box-shadow: inset 0 0 12px var(--gold-glow);
   }
-  
-  /* 入力フィールドスタイル */
+
+  /* 入力フィールドスタイル（ゴールドフォーカス） */
   .input-navy {
     background-color: var(--navy-light);
     border: 1px solid var(--navy-border);
     color: var(--text-primary);
   }
-  
+
   .input-navy:focus {
-    border-color: var(--navy-accent);
+    border-color: var(--gold-primary);
     outline: none;
+    box-shadow: 0 0 0 2px var(--gold-glow);
   }
-  
+
   .input-navy::placeholder {
     color: var(--text-muted);
   }
-  
-  /* プルダウン（select）スタイル */
+
+  /* プルダウン（select）スタイル（ゴールドフォーカス） */
   .select-navy {
     background-color: var(--navy-light);
     border: 1px solid var(--navy-border);
     color: var(--text-primary);
   }
-  
+
   .select-navy:focus {
-    border-color: var(--navy-accent);
+    border-color: var(--gold-primary);
     outline: none;
+    box-shadow: 0 0 0 2px var(--gold-glow);
   }
-  
+
   .select-navy option {
     background-color: var(--navy-light);
     color: var(--text-primary);
+  }
+
+  /* StS 統計カード */
+  .stat-sts {
+    background: linear-gradient(135deg, var(--navy-base) 0%, var(--navy-light) 100%);
+    border: 1px solid var(--gold-dim);
+    border-top: 2px solid var(--gold-primary);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .stat-sts:hover {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 12px var(--gold-glow), 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ゲームメニュー風ボタン */
+  .btn-sts {
+    background: linear-gradient(180deg, var(--navy-accent) 0%, var(--navy-base) 100%);
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+  }
+
+  .btn-sts:hover {
+    color: var(--gold-light);
+    border-color: var(--gold-dim);
+    background: linear-gradient(180deg, var(--navy-hover) 0%, var(--navy-light) 100%);
+  }
+
+  .btn-sts-active {
+    background: linear-gradient(180deg, var(--navy-hover) 0%, var(--navy-accent) 100%);
+    color: var(--gold-light);
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow);
+  }
+
+  /* ゴールドアンダーライン（ナビのアクティブインジケーター） */
+  .nav-active-indicator {
+    position: relative;
+  }
+
+  .nav-active-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    border-radius: 1px;
+  }
+
+  /* アイコンのドロップシャドウ（ゴールドグロー） */
+  .icon-glow {
+    filter: drop-shadow(0 0 4px var(--gold-glow));
+  }
+
+  /* 微細なラジアルグラデーション背景テクスチャ */
+  .bg-sts-texture {
+    background-color: var(--bg-primary);
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(212, 160, 23, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(212, 160, 23, 0.02) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(100, 80, 40, 0.03) 0%, transparent 50%);
+  }
+
+  /* ビネット効果（body用） */
+  .vignette {
+    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
   }
 }

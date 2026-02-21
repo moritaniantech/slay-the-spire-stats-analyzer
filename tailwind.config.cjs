@@ -17,6 +17,12 @@ module.exports = {
           border: 'var(--navy-border)',
           hover: 'var(--navy-hover)',
         },
+        // ゴールドアクセント（CSS変数参照）
+        gold: {
+          primary: 'var(--gold-primary)',
+          light: 'var(--gold-light)',
+          dim: 'var(--gold-dim)',
+        },
         // テキストカラー（CSS変数を使用）
         text: {
           primary: 'var(--text-primary)',
@@ -46,6 +52,12 @@ module.exports = {
           boss: '#ff666c',
         },
       },
+      boxShadow: {
+        'gold-sm': '0 0 4px var(--gold-glow)',
+        'gold-md': '0 0 8px var(--gold-glow), 0 0 4px var(--gold-glow)',
+        'gold-lg': '0 0 16px var(--gold-glow-strong), 0 0 8px var(--gold-glow)',
+        'gold-inset': 'inset 0 0 12px var(--gold-glow)',
+      },
     },
   },
   plugins: [
@@ -55,26 +67,26 @@ module.exports = {
     themes: [
       {
         dark: {
-          "primary": "#3a4a5f",
-          "secondary": "#2a3441",
-          "accent": "#3d4e60",
-          "neutral": "#1a2332",
-          "base-100": "#0f1419",
-          "base-200": "#1a2332",
-          "base-300": "#1e2a3a",
+          "primary": "#d4a017",
+          "secondary": "#1e2230",
+          "accent": "#2a2e3d",
+          "neutral": "#161921",
+          "base-100": "#0d0f14",
+          "base-200": "#161921",
+          "base-300": "#2c3040",
           "info": "#60a5fa",
           "success": "#4ade80",
           "warning": "#fbbf24",
           "error": "#f87171",
         },
         light: {
-          "primary": "#3a4a5f",
-          "secondary": "#2a3441",
-          "accent": "#3d4e60",
-          "neutral": "#1a2332",
-          "base-100": "#f5f7fa",
+          "primary": "#b8860b",
+          "secondary": "#e0d8c8",
+          "accent": "#d4ccba",
+          "neutral": "#f0ebe0",
+          "base-100": "#faf7f0",
           "base-200": "#ffffff",
-          "base-300": "#e8eef5",
+          "base-300": "#e0d8c8",
           "info": "#60a5fa",
           "success": "#4ade80",
           "warning": "#fbbf24",
@@ -83,4 +95,4 @@ module.exports = {
       },
     ],
   },
-}; 
+};
