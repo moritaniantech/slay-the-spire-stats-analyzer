@@ -105,6 +105,7 @@ export function validateAssetPaths() {
             
             // 重要なサブディレクトリを確認
             ['images', 'cards', 'ui', 'localization'].forEach(subDir => {
+              // nosemgrep: path-join-resolve-traversal — subDir は固定 allowlist（外部入力でない）
               const subPath = join(path, subDir);
               const subExists = fs.existsSync(subPath);
               log.info(`パス検証 - ${name}/${subDir}:`, `(存在: ${subExists ? '✓' : '✗'})`);

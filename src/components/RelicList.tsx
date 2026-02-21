@@ -428,6 +428,7 @@ const Relic: React.FC<{
             letterSpacing: '0.5px',
             lineHeight: '1.2'
           }}
+          // nosemgrep: react-dangerouslysetinnerhtml — escapeHtml() 後に固定 <span> タグのみ挿入
           dangerouslySetInnerHTML={{ __html: highlightedName }}
         />
       </div>
@@ -563,6 +564,7 @@ const Relic: React.FC<{
               {searchTerm && formattedFlavorText.toLowerCase().includes(searchTerm.toLowerCase()) ? (
                 <span
                   dangerouslySetInnerHTML={{
+                    // nosemgrep: react-dangerouslysetinnerhtml — escapeHtml() 適用後に検索語のみ <mark> 挿入
                     __html: highlightSearchTerm(escapeHtml(formattedFlavorText))
                   }}
                 />

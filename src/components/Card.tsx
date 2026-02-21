@@ -109,6 +109,7 @@ const Card: React.FC<CardProps> = ({
       // アップグレード後に追加されたキーワードを検出
       keywordsList.forEach(keyword => {
         const escapedKeyword = escapeRegExp(keyword);
+        // nosemgrep: detect-non-literal-regexp — escapedKeyword は escapeRegExp() 済み
         const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
         if (!originalDescription.match(regex) && text.match(regex)) {
           keywordsAddedAfterUpgrade.push(keyword);
@@ -128,8 +129,9 @@ const Card: React.FC<CardProps> = ({
     
     keywordsList.forEach(keyword => {
       const escapedKeyword = escapeRegExp(keyword);
+      // nosemgrep: detect-non-literal-regexp — escapedKeyword は escapeRegExp() 済み
       const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
-      
+
       // アップグレード後に追加されたキーワードには #76F900 を使用、それ以外は #F0C944
       const color = keywordsAddedAfterUpgrade.includes(keyword) ? '#76F900' : '#F0C944';
       
@@ -196,11 +198,13 @@ const Card: React.FC<CardProps> = ({
         if (specialWords.includes(word)) {
           // 大文字のALLなど、特殊な単語は正確にマッチさせる
           const escapedWord = escapeRegExp(word);
+          // nosemgrep: detect-non-literal-regexp — escapedWord は escapeRegExp() 済み
           const regex = new RegExp(`(${escapedWord})`, 'g');
           highlighted = highlighted.replace(regex, `<span style="color: ${COLORS.UPGRADED_VALUE}; font-family: 'Kreon', serif;">$1</span>`);
         } else {
           // 通常の単語は単語境界をチェック（正規表現の特殊文字をエスケープ）
           const escapedWord = escapeRegExp(word);
+          // nosemgrep: detect-non-literal-regexp — escapedWord は escapeRegExp() 済み
           const regex = new RegExp(`\\b${escapedWord}\\b`, 'gi');
           highlighted = highlighted.replace(regex, `<span style="color: ${COLORS.UPGRADED_VALUE}; font-family: 'Kreon', serif;">${word}</span>`);
         }
@@ -242,6 +246,7 @@ const Card: React.FC<CardProps> = ({
       
       // 変化した数字だけをハイライト
       changedNumbers.forEach(numStr => {
+        // nosemgrep: detect-non-literal-regexp — numStr は \d+ 抽出値のみ
         const regex = new RegExp(`\\b${numStr}\\b`, 'g');
         highlighted = highlighted.replace(regex, `<span style="color: ${COLORS.UPGRADED_VALUE}; font-family: 'Kreon', serif;">${numStr}</span>`);
       });
@@ -375,6 +380,7 @@ const Card: React.FC<CardProps> = ({
             fontWeight: 'bold',
             letterSpacing: '0.5px'
           }}
+          // nosemgrep: react-dangerouslysetinnerhtml — escapeHtml() 後に固定 <span> タグのみ挿入
           dangerouslySetInnerHTML={{ __html: highlightedName }}
         />
       </div>
@@ -429,6 +435,7 @@ const Card: React.FC<CardProps> = ({
           style={{ 
             fontFamily: 'Kreon, serif'
           }}
+          // nosemgrep: react-dangerouslysetinnerhtml — escapeHtml() 後に固定 <span> タグのみ挿入
           dangerouslySetInnerHTML={{ __html: finalDescription }}
         />
       </div>

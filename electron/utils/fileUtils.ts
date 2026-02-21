@@ -104,8 +104,16 @@ export async function ensureDirectory(dirPath: string, allowedDirectories: strin
  * @returns 解決された絶対パス
  */
 export function resolveAssetPath(assetPath: string): string {
+  // アセットパスのサニタイズ（パストラバーサル防止）
+  const sanitized = assetPath.replace(/\\/g, '/').replace(/^assets\//, '').replace(/^\/+/, '');
+  if (!sanitized || sanitized.includes('\0') || sanitized.split('/').includes('..') || path.isAbsolute(sanitized)) {
+    throw new Error(`Invalid asset path: ${assetPath}`);
+  }
+  // サニタイズ済みパスを使用
+  assetPath = sanitized;
+
   const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-  
+
   log.info('Resolving asset path:', {
     assetPath,
     isDev,
@@ -118,12 +126,14 @@ export function resolveAssetPath(assetPath: string): string {
 
   // 開発環境の場合
   if (isDev) {
+    // nosemgrep: path-join-resolve-traversal — assetPath は上部でサニタイズ済み
     const devPath = path.join(app.getAppPath(), 'src/assets', assetPath);
     log.info('Development path:', devPath, 'exists:', fs.existsSync(devPath));
     return devPath;
   }
 
   // 本番環境の場合
+  // nosemgrep: path-join-resolve-traversal — assetPath は上部でサニタイズ済み
   const resourcePath = path.join(process.resourcesPath, 'assets', assetPath);
   const distPath = path.join(app.getAppPath(), 'dist', 'assets', assetPath);
   
@@ -182,6 +192,7 @@ export function findRunFiles(dir: string): string[] {
     try {
       const entries = fs.readdirSync(currentDir, { withFileTypes: true });
       for (const entry of entries) {
+        // nosemgrep: path-join-resolve-traversal — entry.name は readdirSync の Dirent 名
         const fullPath = path.join(currentDir, entry.name);
         if (entry.isDirectory()) {
           search(fullPath);

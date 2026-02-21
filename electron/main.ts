@@ -610,16 +610,25 @@ function initializeIpcHandlers() {
           : join(app.getAppPath(), 'public', 'assets')
       ];
       // パスを正規化し、ディレクトリ境界を正確にチェック（/allowed vs /allowed_evil を区別）
+      // nosemgrep: path-join-resolve-traversal — 直後に allowedDirs 境界チェック + symlink 拒否で保護
       const resolvedFilePath = resolve(normalize(filePath));
-      const isAllowed = allowedDirs.some(dir => {
+      // まず許可ディレクトリかチェック（未許可パスの存在有無リークを防止）
+      const isAllowed = await Promise.all(allowedDirs.map(async (dir) => {
+        // nosemgrep: path-join-resolve-traversal — allowedDirs は固定値（userData, assets）
         const resolvedDir = resolve(normalize(dir));
         const rel = relative(resolvedDir, resolvedFilePath);
         // 相対パスが空（同じパス）、または .. で始まらず絶対パスでない（配下のファイル）
         return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
-      });
+      })).then(results => results.some(Boolean));
       if (!isAllowed) {
         log.error(`[fs-readFile] Access denied: ${filePath}`);
         throw new Error(`Access denied: ${filePath}`);
+      }
+      // 許可済みパスに対してのみシンボリックリンクチェック（脱出防止）
+      const stat = await fs.promises.lstat(resolvedFilePath);
+      if (stat.isSymbolicLink()) {
+        log.error(`[fs-readFile] Symlink rejected: ${filePath}`);
+        throw new Error(`Access denied: symlinks are not allowed`);
       }
       return await fs.promises.readFile(resolvedFilePath, encoding as BufferEncoding);
     } catch (error) {

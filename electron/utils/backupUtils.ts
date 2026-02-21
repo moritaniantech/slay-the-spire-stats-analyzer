@@ -32,6 +32,7 @@ export function startBackupInterval() {
 
       if (backups.length > MAX_BACKUPS) {
         backups.slice(MAX_BACKUPS).forEach(file => {
+          // nosemgrep: path-join-resolve-traversal — file は readdirSync(backupDir) 由来
           const oldBackupPath = join(backupDir, file);
           fs.unlinkSync(oldBackupPath);
           log.info(`Old backup removed: ${oldBackupPath}`);
