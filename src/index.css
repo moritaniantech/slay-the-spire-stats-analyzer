@@ -142,9 +142,16 @@
     width: 100%;
   }
 
-  /* カスタムカーソル — htmlに設定し子要素はinheritで継承（パフォーマンス最適化） */
+  /* カスタムカーソル — html + インタラクティブ要素（パフォーマンス最適化） */
   html {
     cursor: url('/assets/ui/cursors/gold2.png'), auto;
+  }
+
+  /* ボタン・リンク等のpointer要素にもカスタムカーソルを維持 */
+  a, button, [role="button"], label[for], select, summary,
+  input[type="button"], input[type="submit"], input[type="reset"],
+  [style*="cursor"] {
+    cursor: url('/assets/ui/cursors/gold2.png'), pointer;
   }
 
   /* グローバルなフォント設定：Kreonとセリフ系日本語フォントを統一 */
