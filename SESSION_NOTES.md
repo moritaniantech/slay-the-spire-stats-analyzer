@@ -1,5 +1,128 @@
 # SESSION NOTES
 
+### [2026-02-22] ゲームUI風デザインリニューアル — ダークファンタジー+ゴールドアクセント
+
+- **決定事項**:
+  - カラーパレット: ダークファンタジー背景（#0d0f14）+ 羊皮紙テキスト（#e8e0d0）+ ゴールドアクセント（#d4a017）
+  - ライトテーマ: WCAG AA準拠の暗めゴールド（--gold-text-emphasis: #7a5a0a）
+  - DaisyUI primary を navy → gold に変更（全コンポーネント自動ゴールド化）
+  - ナビゲーションは Header.tsx に統合（App.tsx Layout から移設）
+  - border-gold-dim の透過は color-mix() で実現（Tailwindの /opacity は CSS変数非対応）
+
+- **実装した内容**:
+  - `src/index.css` — CSS変数全面更新、ゴールドアクセント追加、stat-sts/btn-sts/nav-active-indicator/icon-glow/bg-sts-texture 新規クラス、カスタムスクロールバー、reduced-motion対応
+  - `tailwind.config.cjs` — gold カラー追加、boxShadow拡張、DaisyUI dark/light テーマ更新
+  - `src/components/Header.tsx` — 2段構成ヘッダー（ロゴ+ナビタブ+テーマトグル / 戻る進む+FolderSelector）
+  - `src/App.tsx` — Layout簡素化（3段→2段）、AnimatedRoutes（AnimatePresence+useReducedMotion）、見出しゴールド化
+  - `src/components/StatsOverview.tsx` — stat-sts適用、スタガードアニメーション、ゴールドテキスト
+  - `src/components/charts/WinRateChart.tsx` — card-navy適用、ゴールドグリッド線
+  - `src/components/RunList.tsx` — th冗長スタイル削除、勝敗バッジグロー、空状態カードデザイン
+  - `src/components/FolderSelector.tsx` — コンパクト化、ゴールドアイコン・プログレスバー
+
+- **Codexレビュー結果**（2回実施）:
+  - 1回目: CRITICAL 1（ライトテーマゴールドコントラスト不足）+ WARNING 2（border opacity参照切れ、未使用import）+ INFO 1 + GOOD 3 → 全対応済み
+  - 2回目: 不具合なし
+
+- **ビルド結果**:
+  - TypeScript: エラー 0件
+  - ESLint: エラー 0件
+  - Vite ビルド: 成功
+
+- **コミット**: b5d11e7
+
+- **未解決の課題**:
+  - auto-update の E2E テスト（次回リリース時）
+  - README スクリーンショットが旧デザインのまま（次回更新時に差し替え）
+
+- **次のステップ**:
+  - 必要に応じて微調整
+  - バージョンバンプ + リリース
+  - docs/screenshots/overview.png を新デザインに差し替え
+
+### [2026-02-22] README スクリーンショット追加・Semgrep全件解消・Dependabot全件解消
+
+- **決定事項**:
+  - スクリーンショットはホーム画面1枚のみ（シンプル構成）
+  - 画像保存先は `docs/screenshots/`
+  - Semgrep 検出の対処方針: コード修正（WARNING 5件）+ nosemgrep 抑制（GOOD 14件、理由付き）
+  - `@tailwindcss/postcss7-compat` は未使用 → 削除（postcss 脆弱性の根本原因）
+
+- **実装した内容**:
+  - `docs/screenshots/overview.png` — ホーム画面のスクリーンショットを配置
+  - `README.md` — プレースホルダーコメントを実際の画像表示に変更
+  - `electron/main.ts` — fs-readFile にシンボリックリンク拒否追加、判定順序修正（Codex P2 指摘対応: 未許可パスの存在有無リーク防止）
+  - `electron/utils/fileUtils.ts` — resolveAssetPath にパスサニタイズ追加、nosemgrep 追加
+  - `electron/utils/assetUtils.ts` — nosemgrep 追加（固定 allowlist）
+  - `electron/utils/backupUtils.ts` — nosemgrep 追加（readdirSync 由来）
+  - `src/components/Card.tsx` — nosemgrep 追加（escapeRegExp 済み 5件、escapeHtml 済み 2件）
+  - `src/components/RelicList.tsx` — nosemgrep 追加（escapeHtml 済み 2件）
+  - `package.json` / `yarn.lock` — `@tailwindcss/postcss7-compat` 削除（-427行、66MB 節約）
+
+- **セキュリティスキャン最終結果**:
+  - gitleaks: 0件
+  - Trivy: 0件（HIGH/CRITICAL なし）
+  - Semgrep: 19件 → 0件
+  - Dependabot: 0件（postcss #2 fixed）
+  - Code Scanning: 0件
+  - ESLint: 0 errors, 0 warnings
+  - TypeScript: 0 errors
+
+- **Codex レビュー（3回実施）**:
+  - Semgrep 修正: P2 指摘1件（lstat を allowedDirs 判定前に実行 → 順序修正）
+  - postcss7-compat 削除: 問題なし
+  - README 変更: 問題なし
+
+- **未解決の課題**:
+  - auto-update の E2E テスト（次回リリース時）
+
+- **次のステップ**:
+  - 必要に応じてバージョンバンプ + リリース
+  - 次回リリース時に auto-update の E2E テスト
+
+- **コミット**: 9f3f489（README）, 78eaf59（Semgrep 全件解消）, 38dc9ac（postcss7-compat 削除）
+
+### [2026-02-20] GitHub Security アラート全件対応 — Agent Teams + Codex レビュー
+
+- **決定事項**:
+  - tar@6 の resolutions 強制は安全（7.5.8+ で4件の HIGH 脆弱性を解消）
+  - minimatch@3→10 / glob@10.4→10.5 のグローバル resolutions は unsafe（Codex CRITICAL 指摘: @electron/asar の API 非互換、node-gyp の callback API 破壊）→ 撤回
+  - minimatch@3 は ReDoS だが信頼済みパターンでのみ使用（ビルド時限定）→ dismiss
+  - ajv@6 は GitHub が auto_dismissed（ビルド時限定・信頼済み入力限定）
+  - Code Scanning の path-traversal 19件は大半が偽陽性だが、防御的プログラミングとして sanitizeAssetPath() を追加
+  - dangerouslySetInnerHTML / non-literal-regexp は既存の escapeHtml / escapeRegExp で対策済みとして dismiss
+
+- **実装した内容**:
+  - `package.json` — resolutions に `"tar": "^7.5.8"` 追加（minimatch/glob は撤回）
+  - `electron/main.ts` — `sanitizeAssetPath()` 関数を追加（`..` セグメント・NUL 文字・絶対パスを拒否）
+    - `asset-exists`, `get-asset-path`, `get-image-base64` ハンドラに適用
+    - `asset://` プロトコルハンドラにパストラバーサルチェックを追加
+    - `get-image-base64` の冗長なパス構築ロジックを簡素化
+
+- **Agent Teams**: security-fix（2 teammate: dep-resolver/Sonnet, code-scanner/Sonnet）
+  - dep-resolver: Dependabot 脆弱性修正（resolutions 追加 + ビルド検証）
+  - code-scanner: Code Scanning 28件の全件トリアージ・dismiss
+
+- **Codex レビュー（3回実施）**:
+  - 初回: CRITICAL 1（minimatch unsafe）+ WARNING 2（glob unsafe、path-traversal dismiss 再検討）→ 全対応
+  - resolutions 修正後: 問題なし
+  - サニタイズ追加後: 問題なし
+
+- **最終結果**:
+  - Dependabot: 7件 → 0件（tar 4件 Fixed、glob/minimatch Dismissed、ajv Auto-dismissed）
+  - Code Scanning: 28件 → 0件（全件 dismiss: false positive 理由付き）
+  - ビルド: TypeScript 0エラー、Vite ビルド成功
+
+- **コミット**: 78f6990（resolutions 追加）, 5ee3f8d（unsafe resolutions 撤回）, c026b16（パスサニタイズ追加）
+
+- **未解決の課題**:
+  - README にスクリーンショットを追加（未着手）
+  - auto-update の E2E テスト（次回リリース時）
+
+- **次のステップ**:
+  - README にスクリーンショット追加
+  - 次回リリース時に auto-update の E2E テスト
+  - 必要に応じてバージョンバンプ + リリース
+
 ### [2026-02-19] レガシー整理・Dependabot PR全件対応・devDeps major更新・XSS対策
 
 - **決定事項**:
