@@ -610,7 +610,7 @@ function initializeIpcHandlers() {
           : join(app.getAppPath(), 'public', 'assets')
       ];
       // パスを正規化し、ディレクトリ境界を正確にチェック（/allowed vs /allowed_evil を区別）
-      // nosemgrep: path-join-resolve-traversal — 直後に allowedDirs 境界チェック + symlink 拒否で保護
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal — 直後に allowedDirs 境界チェック + symlink 拒否で保護
       const resolvedFilePath = resolve(normalize(filePath));
       // まず許可ディレクトリかチェック（未許可パスの存在有無リークを防止）
       const isAllowed = await Promise.all(allowedDirs.map(async (dir) => {
