@@ -4,6 +4,41 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-22
+
+### Added
+- ゲームUI風デザインリニューアル — ダークファンタジー背景 + ゴールドアクセント
+- README にアプリケーションスクリーンショットを追加
+- Dependabot 設定・自動マージワークフロー・セキュリティスキャン CI を導入
+- 設定画面にアプリバージョンを表示
+
+### Changed
+- DaisyUI primary カラーを navy → gold に変更
+- ヘッダーを2段構成に改修（ロゴ+ナビタブ+テーマトグル / 戻る進む+FolderSelector）
+- グローバル CSS のトランジション・カーソルルールを最適化
+- README をエンドユーザー向けに更新（スクリーンショット付き）
+
+### Fixed
+- Semgrep セキュリティ検出 19件を全件解消（コード修正 5件 + nosemgrep 抑制 14件）
+- Dependabot 脆弱性アラート全件解消（未使用依存 19パッケージ削除、tar resolutions 追加）
+- Code Scanning アラート全件解消
+- アセットパスのサニタイズ追加（パストラバーサル防止）
+- dangerouslySetInnerHTML の XSS 対策（入力テキストを HTML エスケープ）
+- ESLint 202件のエラーを全修正
+- インタラクティブ要素のカスタムカーソル維持
+
+### Removed
+- 未使用の `@tailwindcss/postcss7-compat` を削除（postcss 脆弱性の根本原因）
+- `window.electron` レガシー参照を完全削除
+- 未使用コンポーネント `Settings.tsx`、重複型定義ファイルを削除
+
+### Security
+- `fs-readFile` ハンドラにシンボリックリンク拒否・判定順序修正を追加
+- `app-getPath` を許可リスト方式に変更
+- `debug-resources` を本番環境で無効化
+- `set-theme` に light/dark バリデーション追加
+- CI permissions を最小権限に修正
+
 ## [1.2.0] - 2026-02-17
 
 ### Added
@@ -68,7 +103,8 @@
 - 日本語 / 英語対応
 - Windows / macOS 対応
 
-[Unreleased]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/moritaniantech/slay-the-spire-stats-analyzer/compare/v1.0.2...v1.0.3
