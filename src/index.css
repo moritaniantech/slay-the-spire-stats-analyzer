@@ -142,9 +142,9 @@
     width: 100%;
   }
 
-  /* カスタムカーソルをすべての要素に適用 */
-  html, body, *, *::before, *::after {
-    cursor: url('/assets/ui/cursors/gold2.png'), auto !important;
+  /* カスタムカーソル — htmlに設定し子要素はinheritで継承（パフォーマンス最適化） */
+  html {
+    cursor: url('/assets/ui/cursors/gold2.png'), auto;
   }
 
   /* グローバルなフォント設定：Kreonとセリフ系日本語フォントを統一 */
@@ -157,11 +157,16 @@
     max-width: 100vw;
   }
 
-  /* テーマ切り替え時のスムーズなトランジション（対象プロパティ限定） */
-  * {
-    transition-property: background-color, color, border-color, box-shadow;
-    transition-duration: 0.3s;
-    transition-timing-function: ease;
+  /* テーマ切り替え時のトランジション — 主要コンテナのみ（パフォーマンス最適化） */
+  body,
+  .card-navy,
+  .stat-sts,
+  .btn-sts,
+  .btn-navy-primary,
+  .btn-navy-secondary,
+  .input-navy,
+  .select-navy {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
 
   /* 英数字のみを含む要素に対してKreonを優先的に適用 */
